@@ -1,0 +1,34 @@
+﻿<Function Name="test">
+  <Setting Key="GetCustomer" SpName="CustomerByID" DbName="FanexDataTests">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+  <Setting Key="GetCustomerWithFakeServerName" SpName="CustomerByID" DbName="FanexDataTestsWithFakeServerName">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+  <Setting Key="TenMostExpensiveProducts" SpName="TenMostExpensiveProducts" DbName="FanexDataTests">
+    <Mapping DataField="TenMostExpensiveProducts" ObjectProperty="ProductName" />
+  </Setting>
+  <Setting Key="Get100kItems" SpName="Get100kItems" DbName="FanexDataTests">
+    <Mapping DataField="Name" ObjectProperty="CompanyName" />
+  </Setting>
+  <Setting Key="GetTopCustomers" SpName="GetTopCustomers" DbName="FanexDataTests" TimeOut="2" />
+  <Setting Key="SpNotExist" SpName="SpNotExist" DbName="FanexDataTests" />
+  <Setting Key="allowPassingNull" SpName="GetCustomerByContactTitle" DbName="FanexDataTests">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+
+  <Function Name="EmployeeTerritory">
+    <Setting Key="GetEmployeeTerritory" SpName="GetEmployeeTerritory" DbName="FanexDataTests" />
+    <Setting Key="InsertEmployeeTerritory" SpName="InsertEmployeeTerritory" DbName="FanexDataTests" />
+    <Setting Key="DeleteEmployeeTerritory" SpName="DeleteEmployeeTerritory" DbName="FanexDataTests" />
+  </Function>
+
+  <Setting Key="SupplierAndShipperByCustomerID" SpName="SupplierAndShipperByCustomerID" DbName="FanexDataTests">
+    <Mapping DataField="SupplierID" ObjectProperty="Id" Class="Supplier" />
+    <Mapping DataField="ShipperID" ObjectProperty="Id" Class="Shipper" />
+  </Setting>
+  <Setting Key="GetCustomerFromTableInput" SpName="GetCustomerFromTableInput" DbName="FanexDataTests">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+  <Setting Key="FetchMultipleTables" SpName="FetchMultipleTables" DbName="FanexDataTests" />
+</Function>

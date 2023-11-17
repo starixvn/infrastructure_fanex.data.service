@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34003.232
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{8ACEFD48-0238-45E0-B422-F0797FB66DCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{317F8A63-6154-4357-B0BD-8F5F246D5CB8}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.ProxyClient", "Sources\Fanex.Data.ProxyClient\Fanex.Data.ProxyClient.csproj", "{91DB4B38-9E0E-44E0-940D-34F603470E6B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{11F4A065-EEA0-4CC9-98EE-FAB6FAE46F90}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.Repository.Tests", "Tests\Fanex.Data.Repository.Tests\Fanex.Data.Repository.Tests.csproj", "{F0D589B7-D1AF-42B5-A168-A8F6E543ED57}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.ProxyClient.Tests", "Tests\Fanex.Data.ProxyClient.Tests\Fanex.Data.ProxyClient.Tests.csproj", "{56FA271C-B7EE-4DF6-AADB-36B831AC589F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.SampleData", "Tests\Fanex.Data.SampleData\Fanex.Data.SampleData.csproj", "{86FFC02D-730D-4974-BDB3-6C525A2E96B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91DB4B38-9E0E-44E0-940D-34F603470E6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91DB4B38-9E0E-44E0-940D-34F603470E6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91DB4B38-9E0E-44E0-940D-34F603470E6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91DB4B38-9E0E-44E0-940D-34F603470E6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0D589B7-D1AF-42B5-A168-A8F6E543ED57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0D589B7-D1AF-42B5-A168-A8F6E543ED57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0D589B7-D1AF-42B5-A168-A8F6E543ED57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0D589B7-D1AF-42B5-A168-A8F6E543ED57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56FA271C-B7EE-4DF6-AADB-36B831AC589F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56FA271C-B7EE-4DF6-AADB-36B831AC589F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56FA271C-B7EE-4DF6-AADB-36B831AC589F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56FA271C-B7EE-4DF6-AADB-36B831AC589F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86FFC02D-730D-4974-BDB3-6C525A2E96B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86FFC02D-730D-4974-BDB3-6C525A2E96B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86FFC02D-730D-4974-BDB3-6C525A2E96B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86FFC02D-730D-4974-BDB3-6C525A2E96B8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{91DB4B38-9E0E-44E0-940D-34F603470E6B} = {8ACEFD48-0238-45E0-B422-F0797FB66DCB}
+		{F0D589B7-D1AF-42B5-A168-A8F6E543ED57} = {11F4A065-EEA0-4CC9-98EE-FAB6FAE46F90}
+		{56FA271C-B7EE-4DF6-AADB-36B831AC589F} = {11F4A065-EEA0-4CC9-98EE-FAB6FAE46F90}
+		{86FFC02D-730D-4974-BDB3-6C525A2E96B8} = {11F4A065-EEA0-4CC9-98EE-FAB6FAE46F90}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ACB08B10-0594-42C8-A77B-3CF87D42D808}
+	EndGlobalSection
+EndGlobal
