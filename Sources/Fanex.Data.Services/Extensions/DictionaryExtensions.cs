@@ -54,4 +54,47 @@ public static class DictionaryExtensions
         value = string.Empty;
         return false;
     }
+
+    public static object GetFirstProperty(dynamic source)
+    {
+        if (source is not IDictionary<string, object>)
+        {
+            return null;
+        }
+
+        IDictionary<string, object> model = source;
+        if (model.Keys.Count == 0)
+        {
+            return null;
+        }
+
+        var key = model.Keys.First();
+        var result = model[key];
+
+        return result;
+    }
+
+    public static IEnumerable<object> GetFirstColumn(IEnumerable<dynamic> sources)
+    {
+        if (sources == null || !sources.Any())
+        {
+            return Enumerable.Empty<object>();
+        }
+
+        var firstModel = sources.First();
+        if (firstModel is not IDictionary<string, object>)
+        {
+            return Enumerable.Empty<object>();
+        }
+
+        IDictionary<string, object> firstDictionary = firstModel;
+        if (!firstDictionary.Keys.Any())
+        {
+            return Enumerable.Empty<object>();
+        }
+
+        var key = firstDictionary.Keys.First();
+
+        return sources.OfType<IDictionary<string, object>>().Select(sourceDictionary => sourceDictionary[key]).ToList();
+    }
 }

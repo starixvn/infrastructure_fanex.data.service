@@ -7,7 +7,10 @@ namespace Fanex.Data
     [Serializable]
     public class DbProxyException : Exception
     {
-        private static readonly Regex PasswordRegex = new Regex(@"(password|pwd)\s*=\s*(.*?)(;|$)", RegexOptions.IgnoreCase);
+        private static readonly Regex PasswordRegex1 = new Regex(@"password\s*=\s*(.*?);", RegexOptions.IgnoreCase);
+        private static readonly Regex PasswordRegex2 = new Regex(@"password\s*=\s*(.*?)""", RegexOptions.IgnoreCase);
+        private static readonly Regex PasswordRegex3 = new Regex(@"pwd\s*=\s*(.*?);", RegexOptions.IgnoreCase);
+        private static readonly Regex PasswordRegex4 = new Regex(@"pwd\s*=\s*(.*?)""", RegexOptions.IgnoreCase);
 
         public DbProxyException(string message)
             : base(message)
@@ -26,7 +29,12 @@ namespace Fanex.Data
 
         protected static string ObscurePassword(string message)
         {
-            return PasswordRegex.Replace(message, "Password=xxxx-xxxx-xxxx-xxxx;");
+            message = PasswordRegex1.Replace(message, "password=xxxx-xxxx-xxxx-xxxx;");
+            message = PasswordRegex2.Replace(message, "password=xxxx-xxxx-xxxx-xxxx\"");
+            message = PasswordRegex3.Replace(message, "pwd=xxxx-xxxx-xxxx-xxxx;");
+            message = PasswordRegex4.Replace(message, "pwd=xxxx-xxxx-xxxx-xxxx\"");
+
+            return message;
         }
     }
 }

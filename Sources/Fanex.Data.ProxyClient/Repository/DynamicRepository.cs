@@ -23,7 +23,7 @@
         static DynamicRepository()
         {
 #if NET5_0_OR_GREATER
-            var handler = new HttpClientHandler()
+            var handler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Brotli
             };
@@ -68,7 +68,9 @@
 
         public async Task<IEnumerable<T>> FetchAsync<T>(ICriteria criteria, string serverName = "")
         {
-            const string endpoint = "/api/dynamic-repository/fetch";
+            var endpoint = IsSimpleType(typeof(T))
+                ? "api/dynamic-repository/fetch-simple-type"
+                : "api/dynamic-repository/fetch";
 
             if (!criteria.IsValid())
             {
@@ -81,7 +83,7 @@
 
         public async Task<DataSet> FetchDataSetAsync(ICriteria criteria, string serverName = "")
         {
-            const string endpoint = "/api/dynamic-repository/fetch-dataset";
+            const string endpoint = "api/dynamic-repository/fetch-dataset";
 
             if (!criteria.IsValid())
             {
@@ -93,7 +95,9 @@
 
         public async Task<T> GetAsync<T>(ICriteria criteria, string serverName = "")
         {
-            const string endpoint = "/api/dynamic-repository/get";
+            var endpoint = IsSimpleType(typeof(T))
+                ? "api/dynamic-repository/get-simple-type"
+                : "api/dynamic-repository/get";
 
             if (!criteria.IsValid())
             {
@@ -106,7 +110,7 @@
 
         public async Task<int> ExecuteAsync(INonQueryCommand command, string serverName = "")
         {
-            const string endpoint = "/api/dynamic-repository/execute";
+            const string endpoint = "api/dynamic-repository/execute";
             if (!command.IsValid())
             {
                 return default;
@@ -171,7 +175,15 @@
                 throw DbProxyHttpRequestException.Create(endpoint, requestJson, e);
             }
         }
-        
+
+        private static bool IsSimpleType(Type type)
+        {
+            return type.IsPrimitive || type.IsEnum || type == typeof(decimal)
+                   || type == typeof(string)
+                   || type == typeof(DateTime)
+                   || type == typeof(TimeSpan) || type == typeof(DateTimeOffset);
+        }
+
         #endregion
     }
 }

@@ -31,4 +31,12 @@
     <Mapping DataField="CustomerID" ObjectProperty="Id" />
   </Setting>
   <Setting Key="FetchMultipleTables" SpName="FetchMultipleTables" DbName="FanexDataTests" />
+  <Setting Key="TestScalarInt" SpName="TestScalarInt" DbName="FanexDataTests" />
+  <Setting Key="TestScalarString" SpName="TestScalarString" DbName="FanexDataTests" />
+  <Setting Key="TestScalarBoolean" SpName="TestScalarBoolean" DbName="FanexDataTests" />
+  <Setting Key="TestScalarByte" SpName="TestScalarByte" DbName="FanexDataTests" />
+  <Setting Key="TestScalarDouble" SpName="TestScalarDouble" DbName="FanexDataTests" />
+  <Setting Key="TestScalarDecimal" SpName="TestScalarDecimal" DbName="FanexDataTests" />
+  <Setting Key="TestScalarDateTime" SpName="TestScalarDateTime" DbName="FanexDataTests" />
+
 </Function>

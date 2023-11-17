@@ -11,6 +11,24 @@ using System.Data;
 [ApiController]
 public class DynamicRepositoryController : ControllerBase
 {
+    [HttpPost("fetch-simple-type")]
+    public async Task<IActionResult> FetchSimpleType(ProxyParameter proxyParameter)
+    {
+        using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
+
+        var queriedModels = await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet);
+        var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
+        columnMaps.MapCollection(string.Empty, queriedModels);
+
+        var proxyResult = new ProxyResult<IEnumerable<object>>
+        {
+            Result = DictionaryExtensions.GetFirstColumn(queriedModels),
+            ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
+        };
+
+        return Ok(proxyResult);
+    }
+
     [HttpPost("fetch")]
     public async Task<IActionResult> Fetch(ProxyParameter proxyParameter)
     {
@@ -92,6 +110,24 @@ public class DynamicRepositoryController : ControllerBase
         }
 
         return result;
+    }
+
+    [HttpPost("get-simple-type")]
+    public async Task<IActionResult> GetSimpleType(ProxyParameter proxyParameter)
+    {
+        using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
+        var queriedModel = await objectDb.QueryEntityAsync<dynamic>(proxyParameter.ParameterSet);
+
+        var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
+        DictionaryExtensions.MapSingle(columnMaps, string.Empty, queriedModel);
+
+        var proxyResult = new ProxyResult<object>
+        {
+            Result = DictionaryExtensions.GetFirstProperty(queriedModel),
+            ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
+        };
+
+        return Ok(proxyResult);
     }
 
     [HttpPost("get")]

@@ -22,7 +22,7 @@ namespace Fanex.Data.ProxyClient.Tests
             var configuration = builder.Build();
             DbSettingProviderManager
                 .StartNewSession()
-                .Register(configuration, false)
+                .Register(configuration)
                 .Run();
 #endif
         }
