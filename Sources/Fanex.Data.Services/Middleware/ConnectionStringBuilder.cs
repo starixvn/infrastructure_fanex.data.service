@@ -1,6 +1,6 @@
 ﻿namespace Fanex.Data.Services.Middleware;
 
-internal class ConnectionStringBuilder
+internal class ConnectionStringBuilder(string connectionString)
 {
     private const int SplitIndex = 2;
     private const string DefaultServerKeyword = "data source";
@@ -9,13 +9,7 @@ internal class ConnectionStringBuilder
     private static readonly string[] ServerAliases = { DefaultServerKeyword, "server", "host", "datasource", "address", "addr", "network address" };
     private static readonly string[] UserIdAliases = { DefaultUserIdKeyword, "uid", "username", "user name", "user", "userid" };
 
-    private readonly IDictionary<string, string> connectionStringKeyValuePairs;
-
-    public ConnectionStringBuilder(string connectionString)
-    {
-        connectionStringKeyValuePairs = BuildConnectionStringKeyValues(connectionString
-                                                                       ?? throw new ArgumentNullException(nameof(connectionString)));
-    }
+    private readonly IDictionary<string, string> connectionStringKeyValuePairs = BuildConnectionStringKeyValues(connectionString);
 
     private static IDictionary<string, string> BuildConnectionStringKeyValues(string connectionString)
         => connectionString.Split(';')

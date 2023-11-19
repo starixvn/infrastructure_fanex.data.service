@@ -2,15 +2,8 @@
 
 using Data;
 
-public class ErrorHandler
+public class ErrorHandler(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public ErrorHandler(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public async Task InvokeAsync(HttpContext context)
     {
         try
