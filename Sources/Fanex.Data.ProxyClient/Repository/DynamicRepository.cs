@@ -129,6 +129,27 @@
             return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
         }
 
+
+        private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverName)
+        {
+            var typeNames = types.Select(t => t.Name).ToList();
+            var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverName, typeNames);
+            ValidateTypeForFetchMultiple(endpoint, types, proxyParameter);
+
+            return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
+        }
+
+        private static void ValidateTypeForFetchMultiple(string endpoint, List<Type> types, ProxyParameter proxyParameter)
+        {
+            var simpleType = types.Find(IsSimpleType);
+
+            if (simpleType != null)
+            {
+                var requestJson = JsonConvert.SerializeObject(proxyParameter, JsonSerializerSettings);
+                throw DbProxyFetchMultipleDoesNotSupportSimpleTypeException.Create(simpleType, endpoint, requestJson);
+            }
+        }
+
         private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, ProxyParameter proxyParameter)
         {
             var requestJson = JsonConvert.SerializeObject(proxyParameter, JsonSerializerSettings);

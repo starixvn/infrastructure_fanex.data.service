@@ -16,8 +16,9 @@ namespace Fanex.Data
             string requestJson,
             Exception e)
         {
-            var messageHeader = $"HttpRequestException occurs: {e.Message}";
+            var messageHeader = $"HttpRequestException occurs";
             var message = $"{messageHeader}" + Environment.NewLine
+                          + $"Exception Message: {e.Message}" + Environment.NewLine
                           + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine
                           + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
                           + "responseJson: Empty";

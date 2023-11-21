@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Data.Repository
 {
+    using System;
     using Newtonsoft.Json.Linq;
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -21,10 +22,10 @@
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=2";
 
-            var typeNames = new List<string>
+            var typeNames = new List<Type>
             {
-                typeof(T1).Name,
-                typeof(T2).Name
+                typeof(T1),
+                typeof(T2)
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
@@ -37,11 +38,11 @@
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=3";
 
-            var typeNames = new List<string>
+            var typeNames = new List<Type>
             {
-                typeof(T1).Name,
-                typeof(T2).Name,
-                typeof(T3).Name
+                typeof(T1),
+                typeof(T2),
+                typeof(T3)
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
@@ -55,12 +56,12 @@
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=4";
 
-            var typeNames = new List<string>
+            var typeNames = new List<Type>
             {
-                typeof(T1).Name,
-                typeof(T2).Name,
-                typeof(T3).Name,
-                typeof(T4).Name
+                typeof(T1),
+                typeof(T2),
+                typeof(T3),
+                typeof(T4)
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
@@ -74,13 +75,13 @@
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=5";
 
-            var typeNames = new List<string>
+            var typeNames = new List<Type>
             {
-                typeof(T1).Name,
-                typeof(T2).Name,
-                typeof(T3).Name,
-                typeof(T4).Name,
-                typeof(T5).Name
+                typeof(T1),
+                typeof(T2),
+                typeof(T3),
+                typeof(T4),
+                typeof(T5)
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
@@ -95,14 +96,14 @@
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=6";
 
-            var typeNames = new List<string>
+            var typeNames = new List<Type>
             {
-                typeof(T1).Name,
-                typeof(T2).Name,
-                typeof(T3).Name,
-                typeof(T4).Name,
-                typeof(T5).Name,
-                typeof(T6).Name
+                typeof(T1),
+                typeof(T2),
+                typeof(T3),
+                typeof(T4),
+                typeof(T5),
+                typeof(T6)
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 

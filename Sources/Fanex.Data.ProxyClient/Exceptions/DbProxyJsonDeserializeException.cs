@@ -20,6 +20,7 @@ namespace Fanex.Data
             const string messageHeader = "Json exception occurs when deserializing the json result";
 
             var message = $"{messageHeader}" + Environment.NewLine
+                          + $"Exception Message: {e.Message}" + Environment.NewLine
                           + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine
                           + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
                           + $"responseJson: {responseJson}";
