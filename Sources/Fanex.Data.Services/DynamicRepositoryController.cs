@@ -17,8 +17,6 @@ public class DynamicRepositoryController : ControllerBase
         using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
 
         var queriedModels = await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet);
-        var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
-        columnMaps.MapCollection(string.Empty, queriedModels);
 
         var proxyResult = new ProxyResult<IEnumerable<object>>
         {
@@ -36,7 +34,8 @@ public class DynamicRepositoryController : ControllerBase
 
         var models = await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet);
         var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
-        columnMaps.MapCollection(string.Empty, models);
+        var typeNames = proxyParameter.TypeNames ?? new List<string>();
+        columnMaps.MapCollection(typeNames.Any() ? typeNames[0] : string.Empty, models);
 
         var proxyResult = new ProxyResult<IEnumerable<dynamic>>
         {

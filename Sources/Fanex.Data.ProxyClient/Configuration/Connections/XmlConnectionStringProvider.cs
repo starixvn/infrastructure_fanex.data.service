@@ -1,13 +1,11 @@
 ﻿namespace Fanex.Data
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
 
 #if NETFRAMEWORK
-
+    using System;
     using System.Configuration;
-
+    using System.Linq;
 #endif
 
     public class XmlConnectionStringProvider : ConnectionStringProviderBase

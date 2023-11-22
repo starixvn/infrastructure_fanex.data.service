@@ -2,7 +2,7 @@
 {
     using Repository;
 
-    internal class GetTopCustomerCriteria : CriteriaBase
+    public class GetTopCustomerCriteria : CriteriaBase
     {
         public int Top { get; set; }
 

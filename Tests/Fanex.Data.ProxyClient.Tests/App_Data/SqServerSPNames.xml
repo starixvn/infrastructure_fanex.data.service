@@ -9,9 +9,20 @@
     <Mapping DataField="TenMostExpensiveProducts" ObjectProperty="ProductName" />
   </Setting>
   <Setting Key="Get100kItems" SpName="Get100kItems" DbName="FanexDataTests">
-    <Mapping DataField="Name" ObjectProperty="CompanyName" />
+    <Mapping DataField="Name" ObjectProperty="CompanyName" class="Customer" />
   </Setting>
   <Setting Key="GetTopCustomers" SpName="GetTopCustomers" DbName="FanexDataTests" TimeOut="2" />
+  <Setting Key="GetTopCustomersWithMapping" SpName="GetTopCustomers" DbName="FanexDataTests" TimeOut="2" >
+    <Mapping DataField="CustomerID" ObjectProperty="Id" Class="CustomerWithMappingProperty"/>
+    <Mapping DataField="ContactTitle" ObjectProperty="Title" Class="CustomerWithMappingProperty"/>
+    <Mapping DataField="PostalCode" ObjectProperty="Code" Class="CustomerWithMappingProperty" />
+    <Mapping DataField="CustomerID" ObjectProperty="Code" Class="CustomerWithFakeMappingProperty" />
+  </Setting>
+
+  <Setting Key="GetTopCustomersWithMappingClassEmpty" SpName="GetTopCustomers" DbName="FanexDataTests" TimeOut="2" >
+    <Mapping DataField="CustomerID" ObjectProperty="Id" Class=""/>
+  </Setting>
+
   <Setting Key="SpNotExist" SpName="SpNotExist" DbName="FanexDataTests" />
   <Setting Key="allowPassingNull" SpName="GetCustomerByContactTitle" DbName="FanexDataTests">
     <Mapping DataField="CustomerID" ObjectProperty="Id" />
@@ -24,8 +35,8 @@
   </Function>
 
   <Setting Key="SupplierAndShipperByCustomerID" SpName="SupplierAndShipperByCustomerID" DbName="FanexDataTests">
-    <Mapping DataField="SupplierID" ObjectProperty="Id" Class="Supplier" />
     <Mapping DataField="ShipperID" ObjectProperty="Id" Class="Shipper" />
+    <Mapping DataField="SupplierID" ObjectProperty="Id" Class="Supplier" />
   </Setting>
   <Setting Key="GetCustomerFromTableInput" SpName="GetCustomerFromTableInput" DbName="FanexDataTests">
     <Mapping DataField="CustomerID" ObjectProperty="Id" />
