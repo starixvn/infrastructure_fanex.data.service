@@ -78,7 +78,7 @@
             }
 
             var typeNames = new List<string> { typeof(T).Name };
-            return await ExecuteApiService<IEnumerable<T>>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
+            return await ExecuteApiService<List<T>>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
         }
 
         public async Task<DataSet> FetchDataSetAsync(ICriteria criteria, string serverName = "")

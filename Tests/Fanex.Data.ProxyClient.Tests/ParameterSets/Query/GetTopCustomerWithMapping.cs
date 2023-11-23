@@ -1,9 +1,11 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
-public class GetTopCustomerWithMapping : GetTopCustomerCriteria
+﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query
 {
-    [SpParam(Ignored = true)]
-    public bool ClassEmpty { get; set; } = false;
+    public class GetTopCustomerWithMapping : GetTopCustomerCriteria
+    {
+        [SpParam(Ignored = true)]
+        public bool ClassEmpty { get; set; } = false;
 
-    public override string GetSettingKey()
-        => ClassEmpty ? "GetTopCustomersWithMappingClassEmpty" : "GetTopCustomersWithMapping";
+        public override string GetSettingKey()
+            => ClassEmpty ? "GetTopCustomersWithMappingClassEmpty" : "GetTopCustomersWithMapping";
+    }
 }

@@ -122,7 +122,7 @@ namespace Fanex.Data.ProxyClient.Tests
             var criteria = new GetTopCustomerWithMapping
             {
                 Top = 10,
-                NotAllHaveClass = true,
+                ClassEmpty = true,
             };
 
             // Act.
