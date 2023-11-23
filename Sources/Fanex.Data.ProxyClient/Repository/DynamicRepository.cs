@@ -20,6 +20,8 @@
 
         private static readonly JsonSerializer JsonSerializer;
 
+        public string DebugInformation { get; set; }
+
         static DynamicRepository()
         {
 #if NET5_0_OR_GREATER
@@ -123,20 +125,49 @@
 
         #region utility
 
-        private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<string> typeNames, string serverName)
+        private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<string> typeNames, string serverName)
         {
             var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverName, typeNames);
             return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
         }
 
 
-        private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverName)
+        private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverName)
         {
             var typeNames = types.Select(t => t.Name).ToList();
             var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverName, typeNames);
             ValidateTypeForFetchMultiple(endpoint, types, proxyParameter);
 
             return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
+        }
+
+        private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, ProxyParameter proxyParameter)
+        {
+            var requestJson = JsonConvert.SerializeObject(proxyParameter, JsonSerializerSettings);
+            var response = await PostAsync(endpoint, requestJson).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw DbProxyNotSuccessHttpException.Create(endpoint, requestJson, json);
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            try
+            {
+                var result = ExtractResultFromJson<T>(criteria, responseJson);
+                DebugInformation = $"Endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine
+                    + $"RequestJson: {requestJson}" + Environment.NewLine
+                    + $"ResponseJson: {responseJson}";
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw DbProxyJsonDeserializeException.Create(
+                    endpoint,
+                    requestJson,
+                    responseJson,
+                    e);
+            }
         }
 
         private static void ValidateTypeForFetchMultiple(string endpoint, List<Type> types, ProxyParameter proxyParameter)
@@ -150,31 +181,6 @@
             }
         }
 
-        private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, ProxyParameter proxyParameter)
-        {
-            var requestJson = JsonConvert.SerializeObject(proxyParameter, JsonSerializerSettings);
-            var response = await PostAsync(endpoint, requestJson).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                throw DbProxyNotSuccessHttpException.Create(endpoint, requestJson, json);
-            }
-
-            var responseJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            try
-            {
-                return ExtractResultFromJson<T>(criteria, responseJson);
-            }
-            catch (Exception e)
-            {
-                throw DbProxyJsonDeserializeException.Create(
-                    endpoint,
-                    requestJson,
-                    responseJson,
-                    e);
-            }
-        }
-
         private static T ExtractResultFromJson<T>(ICriteria criteria, string responseJson)
         {
             var proxyResult = JsonConvert.DeserializeObject<ProxyResult<T>>(responseJson, JsonSerializerSettings);
@@ -184,7 +190,7 @@
             return proxyResult.Result;
         }
 
-        private static async Task<HttpResponseMessage> PostAsync(string endpoint, string requestJson)
+        private async Task<HttpResponseMessage> PostAsync(string endpoint, string requestJson)
         {
             var requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
             try
