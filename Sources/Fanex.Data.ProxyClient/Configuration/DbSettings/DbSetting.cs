@@ -1,6 +1,5 @@
 ﻿namespace Fanex.Data
 {
-    using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Diagnostics.CodeAnalysis;
@@ -22,28 +21,11 @@
             Key = key;
             Provider = provider;
             DbName = dbName;
-            ConnectionString = GetTrustServerConnectionString(connectionString);
+            ConnectionString = connectionString;
             SpName = spName;
             CommandTimeout = commandTimeout;
             ColumnMaps = columnMaps;
             FirmParameters = firmParameters;
-        }
-
-        private static string GetTrustServerConnectionString(string connectionString)
-        {
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                connectionString = string.Empty;
-            }
-
-            connectionString = connectionString.Trim();
-            if (connectionString.IndexOf("TrustServerCertificate", StringComparison.CurrentCultureIgnoreCase) < 0)
-            {
-                connectionString += ";TrustServerCertificate=True";
-                connectionString = connectionString.Replace(";;", ";");
-            }
-
-            return connectionString;
         }
 
         public string Key { get; }
