@@ -30,7 +30,7 @@ namespace Fanex.Data
             {
                 var dictionary = token.ToObject<SimpleClass>();
                 var value = dictionary.UnknownProperty.Values.First();
-                return new List<T>() { value.Value<T>() };
+                return new List<T> { value.Value<T>() };
             }
 
             var dictionaries = token.ToObject<SimpleClass[]>().Select(v => v.UnknownProperty);

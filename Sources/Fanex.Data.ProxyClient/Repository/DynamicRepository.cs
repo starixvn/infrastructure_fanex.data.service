@@ -70,7 +70,7 @@
 
         public async Task<IEnumerable<T>> FetchAsync<T>(ICriteria criteria, string serverName = "")
         {
-            var endpoint = "api/dynamic-repository/fetch";
+            const string endpoint = "api/dynamic-repository/fetch";
 
             if (!criteria.IsValid())
             {
@@ -96,7 +96,7 @@
 
         public async Task<T> GetAsync<T>(ICriteria criteria, string serverName = "")
         {
-            var endpoint = "api/dynamic-repository/get";
+            const string endpoint = "api/dynamic-repository/get";
 
             if (!criteria.IsValid())
             {
@@ -170,11 +170,11 @@
         {
             var proxyResult = JsonConvert.DeserializeObject<ProxyResult<T>>(responseJson, JsonSerializerSettings);
             var criteriaResult = JsonConvert.DeserializeObject(proxyResult.ParameterSet, criteria.GetType(), JsonSerializerSettings);
-            criteria.CopyPropertiesFrom(criteriaResult);
+            criteria.CopyValueFrom(criteriaResult);
             return proxyResult.Result;
         }
 
-        private async Task<HttpResponseMessage> PostAsync(string endpoint, string requestJson)
+        private static async Task<HttpResponseMessage> PostAsync(string endpoint, string requestJson)
         {
             var requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
             try

@@ -22,6 +22,15 @@ namespace Fanex.Data
 
         public virtual string GetConnectionString(string connectionAlias, bool isEncrypted = true)
         {
+            if (string.IsNullOrWhiteSpace(connectionAlias))
+            {
+                throw new ArgumentException(
+                    $"{nameof(connectionAlias)} must not be null or empty or only contain whitespaces.",
+                    nameof(connectionAlias));
+            }
+
+            return connectionCache.GetOrAdd(connectionAlias, PickConnectionStringFromConnectionMaps);
+
             string PickConnectionStringFromConnectionMaps(string alias)
             {
                 var connectionString = GetConnectionConfiguration(alias).ConnectionString;
@@ -33,15 +42,6 @@ namespace Fanex.Data
 
                 return connectionString;
             }
-
-            if (string.IsNullOrWhiteSpace(connectionAlias))
-            {
-                throw new ArgumentException(
-                    $"{nameof(connectionAlias)} must not be null or empty or only contain whitespaces.",
-                    nameof(connectionAlias));
-            }
-
-            return connectionCache.GetOrAdd(connectionAlias, PickConnectionStringFromConnectionMaps);
         }
 
         public virtual string GetProviderName(string connectionAlias)
