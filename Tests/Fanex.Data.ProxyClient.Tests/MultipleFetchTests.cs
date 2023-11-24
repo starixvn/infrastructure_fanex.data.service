@@ -1,5 +1,6 @@
 ﻿using Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
 using Fanex.Data.SampleData.Models;
+using System.Linq;
 using Xunit.Asserts.Compare;
 
 namespace Fanex.Data.ProxyClient.Tests
@@ -147,6 +148,43 @@ namespace Fanex.Data.ProxyClient.Tests
             Assert.Equal(ExpectedNumberOfOrders, parameterSet.NumberOfOrders);
             DeepAssert.Equal(ExpectedData.ExpectedSuppliers, suppliers);
             DeepAssert.Equal(ExpectedData.ExpectedShippers, shippers);
+        }
+
+        [Fact]
+        public async Task FetchMultipleAsync_WithSimpleType_ReturnCorrectly()
+        {
+            // Arrange.
+            var parameterSet = new GetMultipleTypesCriteria() { Top = 10 };
+            var expectedDateTime = new DateTime(2023, 12, 1, 0, 0, 0, DateTimeKind.Local);
+
+            // Act.
+            var (_bool, _dateTime, _decimal, _double, _int, _string) = await proxy.FetchMultipleAsync<bool, DateTime, decimal, double, int, string>(parameterSet);
+
+
+            Assert.True(_bool.First());
+            Assert.Equal(expectedDateTime, _dateTime.First());
+            Assert.Equal(10.5m, _decimal.First());
+            Assert.Equal(10.5, _double.First());
+            Assert.Equal(100, _int.First());
+            Assert.Equal("Hello", _string.First());
+        }
+
+        [Fact]
+        public async Task FetchMultipleAsync_EmptyCollectionSingleType_ReturnCorrectly()
+        {
+            // Arrange.
+            var parameterSet = new GetMultipleTypesCriteria() { Top = 0 };
+
+            // Act.
+            var (_bool, _dateTime, _decimal, _double, _int, _string) = await proxy.FetchMultipleAsync<bool, DateTime, decimal, double, int, string>(parameterSet);
+
+
+            Assert.Empty(_bool);
+            Assert.Empty(_dateTime);
+            Assert.Empty(_decimal);
+            Assert.Empty(_double);
+            Assert.Empty(_int);
+            Assert.Empty(_string);
         }
     }
 }

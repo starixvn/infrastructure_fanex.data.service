@@ -2,11 +2,11 @@
 
 namespace Fanex.Data.ProxyClient.Tests
 {
+    using ParameterSets.Query;
     using Repository;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using ParameterSets.Query;
     using Xunit;
 
     [Collection("Fanex Data Client collection")]
@@ -50,6 +50,7 @@ namespace Fanex.Data.ProxyClient.Tests
 
             // Assert.
             Assert.True(actualResult.First());
+            Assert.False(actualResult.ElementAt(1));
         }
         [Fact]
         public async Task FetchAsync_Byte_ReturnValueCorrectly()

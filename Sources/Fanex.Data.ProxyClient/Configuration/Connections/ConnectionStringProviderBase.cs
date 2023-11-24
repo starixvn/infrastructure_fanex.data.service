@@ -6,8 +6,8 @@ namespace Fanex.Data
     using System.Collections.Concurrent;
     using System.Collections.Generic;
 
-    [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global"),
+     SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
     public class ConnectionStringProviderBase
     {
         private readonly ConcurrentDictionary<string, string> connectionCache = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);

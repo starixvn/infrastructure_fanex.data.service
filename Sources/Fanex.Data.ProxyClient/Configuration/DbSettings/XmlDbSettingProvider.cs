@@ -12,8 +12,8 @@ namespace Fanex.Data
     using System.Xml.Linq;
     using System.Xml.Schema;
 
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]
+    [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global"),
+    SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class XmlDbSettingProvider : DbSettingProviderBase
     {
         private readonly ConcurrentDictionary<string, DbSetting> settingDataSource
@@ -136,7 +136,8 @@ namespace Fanex.Data
                             settingDataSource.AddOrUpdate(
                                 dbSetting.Key,
                                 dbSetting,
-                                (k, v) => dbSetting);
+                                // ReSharper disable once UnusedParameter.Local
+                                (k, _) => dbSetting);
                         }
                     }
                 }

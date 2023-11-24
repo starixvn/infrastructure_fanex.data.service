@@ -45,7 +45,7 @@ namespace Fanex.Data.ProxyClient.Tests
             await proxy.ExecuteAsync(command);
 
             // Assert.
-            var expectedData = GetEmployeeTerritory();
+            var expectedData = await GetEmployeeTerritory();
 
             Assert.NotNull(expectedData);
         }

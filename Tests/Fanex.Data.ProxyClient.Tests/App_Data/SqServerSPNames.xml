@@ -49,5 +49,5 @@
   <Setting Key="TestScalarDouble" SpName="TestScalarDouble" DbName="FanexDataTests" />
   <Setting Key="TestScalarDecimal" SpName="TestScalarDecimal" DbName="FanexDataTests" />
   <Setting Key="TestScalarDateTime" SpName="TestScalarDateTime" DbName="FanexDataTests" />
-
+  <Setting Key="GetMultipleTypes" SpName="GetMultipleTypes" DbName="FanexDataTests" />
 </Function>

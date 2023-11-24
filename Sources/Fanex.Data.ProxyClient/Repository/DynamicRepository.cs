@@ -2,6 +2,7 @@
 {
     using Extensions;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
     using System.Data;
@@ -11,7 +12,6 @@
     using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
-
     public partial class DynamicRepository
     {
         private static readonly HttpClient Client;
@@ -70,9 +70,7 @@
 
         public async Task<IEnumerable<T>> FetchAsync<T>(ICriteria criteria, string serverName = "")
         {
-            var endpoint = IsSimpleType(typeof(T))
-                ? "api/dynamic-repository/fetch-simple-type"
-                : "api/dynamic-repository/fetch";
+            var endpoint = "api/dynamic-repository/fetch";
 
             if (!criteria.IsValid())
             {
@@ -80,7 +78,8 @@
             }
 
             var typeNames = new List<string> { typeof(T).Name };
-            return await ExecuteApiService<List<T>>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
+            var result = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
+            return MapperExtension.MapCollection<T>(result, typeof(T), JsonSerializer);
         }
 
         public async Task<DataSet> FetchDataSetAsync(ICriteria criteria, string serverName = "")
@@ -97,9 +96,7 @@
 
         public async Task<T> GetAsync<T>(ICriteria criteria, string serverName = "")
         {
-            var endpoint = IsSimpleType(typeof(T))
-                ? "api/dynamic-repository/get-simple-type"
-                : "api/dynamic-repository/get";
+            var endpoint = "api/dynamic-repository/get";
 
             if (!criteria.IsValid())
             {
@@ -107,7 +104,8 @@
             }
 
             var typeNames = new List<string> { typeof(T).Name };
-            return await ExecuteApiService<T>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
+            var result = await ExecuteApiService<JObject>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
+            return MapperExtension.MapSingleData<T>(result, typeof(T), JsonSerializer);
         }
 
         public async Task<int> ExecuteAsync(INonQueryCommand command, string serverName = "")
@@ -131,12 +129,10 @@
             return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
         }
 
-
         private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverName)
         {
             var typeNames = types.Select(t => t.Name).ToList();
             var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverName, typeNames);
-            ValidateTypeForFetchMultiple(endpoint, types, proxyParameter);
 
             return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
         }
@@ -170,23 +166,11 @@
             }
         }
 
-        private static void ValidateTypeForFetchMultiple(string endpoint, List<Type> types, ProxyParameter proxyParameter)
-        {
-            var simpleType = types.Find(IsSimpleType);
-
-            if (simpleType != null)
-            {
-                var requestJson = JsonConvert.SerializeObject(proxyParameter, JsonSerializerSettings);
-                throw DbProxyFetchMultipleDoesNotSupportSimpleTypeException.Create(simpleType, endpoint, requestJson);
-            }
-        }
-
         private static T ExtractResultFromJson<T>(ICriteria criteria, string responseJson)
         {
             var proxyResult = JsonConvert.DeserializeObject<ProxyResult<T>>(responseJson, JsonSerializerSettings);
             var criteriaResult = JsonConvert.DeserializeObject(proxyResult.ParameterSet, criteria.GetType(), JsonSerializerSettings);
             criteria.CopyPropertiesFrom(criteriaResult);
-
             return proxyResult.Result;
         }
 
@@ -201,14 +185,6 @@
             {
                 throw DbProxyHttpRequestException.Create(endpoint, requestJson, e);
             }
-        }
-
-        private static bool IsSimpleType(Type type)
-        {
-            return type.IsPrimitive || type.IsEnum || type == typeof(decimal)
-                   || type == typeof(string)
-                   || type == typeof(DateTime)
-                   || type == typeof(TimeSpan) || type == typeof(DateTimeOffset);
         }
 
         #endregion

@@ -3,11 +3,11 @@ using Fanex.Data.SampleData.Models;
 
 namespace Fanex.Data.ProxyClient.Tests
 {
+    using ParameterSets.Query.ErrorCriteria;
     using Repository;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using ParameterSets.Query.ErrorCriteria;
     using Xunit;
 
     [Collection("Fanex Data Client collection")]

@@ -4,7 +4,6 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-
     public partial class DynamicRepository : IDynamicRepository
     {
         public (IEnumerable<T1>, IEnumerable<T2>) FetchMultiple<T1, T2>(ICriteria criteria, string serverName = "") => FetchMultipleAsync<T1, T2>(criteria, serverName).Result;
@@ -30,8 +29,8 @@
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
             return (
-                resultInJArray[0].ToObject<List<T1>>(JsonSerializer),
-                resultInJArray[1].ToObject<List<T2>>(JsonSerializer));
+                MapperExtension.MapCollection<T1>(resultInJArray[0], typeof(T1), JsonSerializer),
+                MapperExtension.MapCollection<T2>(resultInJArray[1], typeof(T2), JsonSerializer));
         }
 
         public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>)> FetchMultipleAsync<T1, T2, T3>(ICriteria criteria, string serverName = "")
@@ -47,9 +46,9 @@
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
             return (
-                resultInJArray[0].ToObject<List<T1>>(JsonSerializer),
-                resultInJArray[1].ToObject<List<T2>>(JsonSerializer),
-                resultInJArray[2].ToObject<List<T3>>(JsonSerializer));
+                MapperExtension.MapCollection<T1>(resultInJArray[0], typeof(T1), JsonSerializer),
+                MapperExtension.MapCollection<T2>(resultInJArray[1], typeof(T2), JsonSerializer),
+                MapperExtension.MapCollection<T3>(resultInJArray[2], typeof(T3), JsonSerializer));
         }
 
         public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(ICriteria criteria, string serverName = "")
@@ -65,10 +64,10 @@
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
-            return (resultInJArray[0].ToObject<List<T1>>(JsonSerializer)
-                , resultInJArray[1].ToObject<List<T2>>(JsonSerializer)
-                , resultInJArray[2].ToObject<List<T3>>(JsonSerializer)
-                , resultInJArray[3].ToObject<List<T4>>(JsonSerializer));
+            return (MapperExtension.MapCollection<T1>(resultInJArray[0], typeof(T1), JsonSerializer)
+                , MapperExtension.MapCollection<T2>(resultInJArray[1], typeof(T2), JsonSerializer)
+                , MapperExtension.MapCollection<T3>(resultInJArray[2], typeof(T3), JsonSerializer)
+                , MapperExtension.MapCollection<T4>(resultInJArray[3], typeof(T4), JsonSerializer));
         }
 
         public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>)> FetchMultipleAsync<T1, T2, T3, T4, T5>(ICriteria criteria, string serverName = "")
@@ -85,11 +84,11 @@
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
-            return (resultInJArray[0].ToObject<List<T1>>(JsonSerializer)
-                , resultInJArray[1].ToObject<List<T2>>(JsonSerializer)
-                , resultInJArray[2].ToObject<List<T3>>(JsonSerializer)
-                , resultInJArray[3].ToObject<List<T4>>(JsonSerializer)
-                , resultInJArray[4].ToObject<List<T5>>(JsonSerializer));
+            return (MapperExtension.MapCollection<T1>(resultInJArray[0], typeof(T1), JsonSerializer)
+                , MapperExtension.MapCollection<T2>(resultInJArray[1], typeof(T2), JsonSerializer)
+                , MapperExtension.MapCollection<T3>(resultInJArray[2], typeof(T3), JsonSerializer)
+                , MapperExtension.MapCollection<T4>(resultInJArray[3], typeof(T4), JsonSerializer)
+                , MapperExtension.MapCollection<T5>(resultInJArray[4], typeof(T5), JsonSerializer));
         }
 
         public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>)> FetchMultipleAsync<T1, T2, T3, T4, T5, T6>(ICriteria criteria, string serverName = "")
@@ -107,12 +106,12 @@
             };
             var resultInJArray = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
 
-            return (resultInJArray[0].ToObject<List<T1>>(JsonSerializer)
-                , resultInJArray[1].ToObject<List<T2>>(JsonSerializer)
-                , resultInJArray[2].ToObject<List<T3>>(JsonSerializer)
-                , resultInJArray[3].ToObject<List<T4>>(JsonSerializer)
-                , resultInJArray[4].ToObject<List<T5>>(JsonSerializer)
-                , resultInJArray[5].ToObject<List<T6>>(JsonSerializer));
+            return (MapperExtension.MapCollection<T1>(resultInJArray[0], typeof(T1), JsonSerializer)
+                , MapperExtension.MapCollection<T2>(resultInJArray[1], typeof(T2), JsonSerializer)
+                , MapperExtension.MapCollection<T3>(resultInJArray[2], typeof(T3), JsonSerializer)
+                , MapperExtension.MapCollection<T4>(resultInJArray[3], typeof(T4), JsonSerializer)
+                , MapperExtension.MapCollection<T5>(resultInJArray[4], typeof(T5), JsonSerializer)
+                , MapperExtension.MapCollection<T6>(resultInJArray[5], typeof(T6), JsonSerializer));
         }
     }
 }

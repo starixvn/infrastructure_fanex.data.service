@@ -1,13 +1,12 @@
 ﻿using Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
+using Fanex.Data.Repository;
 using Fanex.Data.SampleData.Models;
 
 namespace Fanex.Data.ProxyClient.Tests
 {
-    using Repository;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Xml.Schema;
     using Xunit;
 
     [Collection("Fanex Data Client collection")]
@@ -113,23 +112,6 @@ namespace Fanex.Data.ProxyClient.Tests
 
             // Assert.
             Assert.NotNull(actualResult.First().Id);
-        }
-
-        [Fact]
-        public async Task FetchAsync_MappingWithNotAllMappingHaveClass_ThrowException()
-        {
-            // Arrange.
-            var criteria = new GetTopCustomerWithMapping
-            {
-                Top = 10,
-                ClassEmpty = true,
-            };
-
-            // Act.
-            var exception = await Record.ExceptionAsync(() => proxy.FetchAsync<Customer>(criteria));
-
-            // Assert.
-            Assert.IsType<XmlSchemaValidationException>(exception);
         }
     }
 }

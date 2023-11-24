@@ -8,9 +8,9 @@
 
     public static class Cryptography
     {
-#pragma warning disable S2278 // Neither DES (Data Encryption Standard) nor DES (3DES) should be used
+#pragma warning disable SYSLIB0021
         private static readonly DESCryptoServiceProvider CryptoServiceProvider = new DESCryptoServiceProvider();
-#pragma warning restore S2278 // Neither DES (Data Encryption Standard) nor DES (3DES) should be used
+#pragma warning restore SYSLIB0021
         private static readonly byte[] RgbKey = { 0x21, 0x63, 0x54, 0x5a, 0x91, 0xac, 110, 0xcc };
         private static readonly byte[] RgbIv = Encoding.UTF8.GetBytes("&％#@?,:*!~^.");
 
