@@ -7,15 +7,12 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
-    using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
+
     public partial class DynamicRepository
     {
-        private static readonly HttpClient Client;
-
         private static readonly JsonSerializerSettings JsonSerializerSettings;
 
         private static readonly JsonSerializer JsonSerializer;
@@ -24,28 +21,6 @@
 
         static DynamicRepository()
         {
-#if NET5_0_OR_GREATER
-            var handler = new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Brotli
-            };
-#else
-            var handler = new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip
-            };
-#endif
-
-            Client = new HttpClient(handler)
-            {
-                BaseAddress = DbSettingProviderManager.ServiceApiUri
-            };
-#if NET5_0_OR_GREATER
-            Client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
-#else
-            Client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-#endif
-
             JsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = ShouldSerializeContractResolver.Instance
@@ -179,7 +154,9 @@
             var requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
             try
             {
-                return await Client.PostAsync(endpoint, requestJsonContent).ConfigureAwait(false);
+                return await HttpClientFactory
+                    .Client
+                    .PostAsync(endpoint, requestJsonContent).ConfigureAwait(false);
             }
             catch (Exception e)
             {

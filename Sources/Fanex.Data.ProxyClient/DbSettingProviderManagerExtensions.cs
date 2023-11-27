@@ -49,7 +49,7 @@
                 .StartNewSession()
                 .Register(configuration)
                 .Run();
-
+            
             return services;
         }
 #endif

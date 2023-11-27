@@ -6,9 +6,9 @@
 
     public static class ObjectExtensionMethods
     {
-        public static void CopyValueFrom(this object self, object parent)
+        public static void CopyValueFrom(this object self, object source)
         {
-            var fromProperties = parent.GetType().GetProperties().Where(x => x.CanRead).ToList();
+            var fromProperties = source.GetType().GetProperties().Where(x => x.CanRead).ToList();
             var toProperties = self.GetType().GetProperties()
                 .Where(x => x.CanWrite)
                 .ToList();
@@ -17,13 +17,13 @@
             {
                 var fromProperty = fromProperties.First(x => x.Name == toProperty.Name);
 
-                if (IsIgnored(fromProperty, parent))
+                if (IsIgnored(fromProperty, source))
                 {
                     continue;
                 }
 
-                var value = fromProperty.GetValue(parent, null);
-                toProperty.SetValue(self,value, null);
+                var value = fromProperty.GetValue(source, null);
+                toProperty.SetValue(self, value, null);
             }
         }
 
@@ -31,7 +31,7 @@
         {
             if (!(Attribute.GetCustomAttribute(propertyInfo, typeof(SpParamAttribute)) is SpParamAttribute map))
             {
-                return IsPropertyNull(instance, propertyInfo);
+                return IsPropertyNull(propertyInfo, instance);
             }
 
             if (map.Ignored)
@@ -39,10 +39,10 @@
                 return true;
             }
 
-            return !(map.AllowNull || !IsPropertyNull(instance, propertyInfo));
+            return !(map.AllowNull || !IsPropertyNull(propertyInfo, instance));
         }
 
-        private static bool IsPropertyNull(object instance, PropertyInfo property)
+        private static bool IsPropertyNull(PropertyInfo property, object instance)
         {
             if (instance == null || property == null)
             {

@@ -11,7 +11,6 @@ using System.Data;
 [ApiController]
 public class DynamicRepositoryController : ControllerBase
 {
-
     [HttpPost("fetch")]
     public async Task<IActionResult> Fetch(ProxyParameter proxyParameter)
     {

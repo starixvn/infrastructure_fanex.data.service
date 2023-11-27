@@ -5,6 +5,8 @@ namespace Fanex.Data
     using Repository;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using Models;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class DbSettingProviderManager
@@ -49,6 +51,21 @@ namespace Fanex.Data
                 DbSetting = dbSetting,
                 TypeNames = typeNames
             };
+        }
+
+        internal static List<StoredProcedureDefinition> GetAllStoredProcedures()
+        {
+            var settingDataSources = currentSession
+                .settingProvider
+                .SettingDataSource
+                .Values;
+
+            return settingDataSources
+                .Select(v => new StoredProcedureDefinition
+                {
+                    ConnectionString = v.ConnectionString,
+                    StoreProcedureName = v.SpName
+                }).ToList();
         }
 
         internal static Uri ServiceApiUri => currentSession.serviceApiUri;
@@ -117,6 +134,8 @@ namespace Fanex.Data
 
             settingProvider.ConnectionStringProvider = connectionStringProvider;
             settingProvider.Start();
+
+            CacheManager.ClearCache();
         }
     }
 }
