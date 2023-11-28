@@ -118,7 +118,7 @@ namespace Fanex.Data.ProxyClient.Tests.Extensions
             _connectionStringBuilder.SetDatabase(newDatabaseName);
 
             // Assert.
-            const string expectedConnectionString = "data source=FakeNewDatabaseName";
+            const string expectedConnectionString = "initial catalog=FakeNewDatabaseName";
 
             Assert.Equal(expectedConnectionString, _connectionStringBuilder.ToString());
         }
@@ -178,7 +178,7 @@ namespace Fanex.Data.ProxyClient.Tests.Extensions
             _connectionStringBuilder.SetUserId(newUserId);
 
             // Assert.
-            const string expectedConnectionString = "uid=FakeUserId";
+            const string expectedConnectionString = "user id=FakeUserId";
 
             Assert.Equal(expectedConnectionString, _connectionStringBuilder.ToString());
         }

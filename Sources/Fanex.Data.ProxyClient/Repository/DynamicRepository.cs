@@ -47,7 +47,7 @@
 
             var typeNames = new List<string> { typeof(T).Name };
             var result = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
-            return result.ToCollection<T>(typeof(T), JsonSerializer);
+            return result.ToList<T>(typeof(T), JsonSerializer);
         }
 
         public async Task<DataSet> FetchDataSetAsync(ICriteria criteria, string serverName = "")
