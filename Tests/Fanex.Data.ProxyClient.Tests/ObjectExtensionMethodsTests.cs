@@ -1,13 +1,6 @@
-﻿using Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
-using Fanex.Data.Repository;
-using Fanex.Data.SampleData.Models;
-
-namespace Fanex.Data.ProxyClient.Tests
+﻿namespace Fanex.Data.ProxyClient.Tests
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Criteria;
     using Data.Extensions;
     using Xunit;

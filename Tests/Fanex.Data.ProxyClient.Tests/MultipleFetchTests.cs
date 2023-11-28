@@ -154,7 +154,7 @@ namespace Fanex.Data.ProxyClient.Tests
         public async Task FetchMultipleAsync_WithSimpleType_ReturnCorrectly()
         {
             // Arrange.
-            var parameterSet = new GetMultipleTypesCriteria() { Top = 10 };
+            var parameterSet = new GetMultipleTypesCriteria { Top = 10 };
             var expectedDateTime = new DateTime(2023, 12, 1, 0, 0, 0, DateTimeKind.Local);
 
             // Act.
@@ -173,7 +173,7 @@ namespace Fanex.Data.ProxyClient.Tests
         public async Task FetchMultipleAsync_EmptyCollectionSingleType_ReturnCorrectly()
         {
             // Arrange.
-            var parameterSet = new GetMultipleTypesCriteria() { Top = 0 };
+            var parameterSet = new GetMultipleTypesCriteria { Top = 0 };
 
             // Act.
             var (_bool, _dateTime, _decimal, _double, _int, _string) = await proxy.FetchMultipleAsync<bool, DateTime, decimal, double, int, string>(parameterSet);

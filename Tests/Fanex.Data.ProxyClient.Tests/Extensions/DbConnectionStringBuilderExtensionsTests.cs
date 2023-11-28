@@ -66,7 +66,7 @@ namespace Fanex.Data.ProxyClient.Tests.Extensions
             _connectionStringBuilder.SetServer(newServerName);
 
             // Assert.
-            var expectedConnectionString = $"{DbConnectionStringBuilderExtensions.DefaultServerKeyword}={newServerName}";
+            const string expectedConnectionString = "data source=FakeNewServerName";
 
             Assert.Equal(expectedConnectionString, _connectionStringBuilder.ToString());
         }
@@ -118,7 +118,7 @@ namespace Fanex.Data.ProxyClient.Tests.Extensions
             _connectionStringBuilder.SetDatabase(newDatabaseName);
 
             // Assert.
-            var expectedConnectionString = $"{DbConnectionStringBuilderExtensions.DefaultDatabaseKeyword}={newDatabaseName}";
+            const string expectedConnectionString = "data source=FakeNewDatabaseName";
 
             Assert.Equal(expectedConnectionString, _connectionStringBuilder.ToString());
         }
@@ -178,7 +178,7 @@ namespace Fanex.Data.ProxyClient.Tests.Extensions
             _connectionStringBuilder.SetUserId(newUserId);
 
             // Assert.
-            var expectedConnectionString = $"{DbConnectionStringBuilderExtensions.DefaultUserIdKeyword}={newUserId}";
+            const string expectedConnectionString = "uid=FakeUserId";
 
             Assert.Equal(expectedConnectionString, _connectionStringBuilder.ToString());
         }
@@ -230,7 +230,7 @@ namespace Fanex.Data.ProxyClient.Tests.Extensions
             _connectionStringBuilder.SetPassword(newPassword);
 
             // Assert.
-            var expectedConnectionString = $"{DbConnectionStringBuilderExtensions.DefaultPasswordKeyword}={newPassword}";
+            const string expectedConnectionString = "password=FakeNewPassword";
 
             Assert.Equal(expectedConnectionString, _connectionStringBuilder.ToString());
         }

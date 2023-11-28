@@ -13,21 +13,14 @@
 
     public partial class DynamicRepository
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings;
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        {
+            ContractResolver = ShouldSerializeContractResolver.Instance
+        };
 
-        private static readonly JsonSerializer JsonSerializer;
+        private static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(JsonSerializerSettings);
 
         public string DebugInformation { get; set; }
-
-        static DynamicRepository()
-        {
-            JsonSerializerSettings = new JsonSerializerSettings
-            {
-                ContractResolver = ShouldSerializeContractResolver.Instance
-            };
-
-            JsonSerializer = JsonSerializer.Create(JsonSerializerSettings);
-        }
 
         #region sync
 
@@ -54,7 +47,7 @@
 
             var typeNames = new List<string> { typeof(T).Name };
             var result = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
-            return MapperExtension.MapCollection<T>(result, typeof(T), JsonSerializer);
+            return result.ToCollection<T>(typeof(T), JsonSerializer);
         }
 
         public async Task<DataSet> FetchDataSetAsync(ICriteria criteria, string serverName = "")
@@ -80,7 +73,7 @@
 
             var typeNames = new List<string> { typeof(T).Name };
             var result = await ExecuteApiService<JObject>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
-            return MapperExtension.MapSingleData<T>(result, typeof(T), JsonSerializer);
+            return result.ToSingleData<T>(typeof(T), JsonSerializer);
         }
 
         public async Task<int> ExecuteAsync(INonQueryCommand command, string serverName = "")

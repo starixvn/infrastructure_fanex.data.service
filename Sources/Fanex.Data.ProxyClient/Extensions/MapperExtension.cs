@@ -9,22 +9,22 @@ namespace Fanex.Data
 {
     public static class MapperExtension
     {
-        public static IEnumerable<T> MapCollection<T>(JToken token, Type type, JsonSerializer jsonSerializer)
+        public static IEnumerable<T> ToCollection<T>(this JToken token, Type type, JsonSerializer jsonSerializer)
         {
-            return IsSimpleType(type) ? MapSimpleType<T>(token) : token.ToObject<IEnumerable<T>>(jsonSerializer);
+            return IsSimpleType(type) ? ToSimpleType<T>(token) : token.ToObject<IEnumerable<T>>(jsonSerializer);
         }
 
-        public static T MapSingleData<T>(JObject token, Type type, JsonSerializer jsonSerializer)
+        public static T ToSingleData<T>(this JObject token, Type type, JsonSerializer jsonSerializer)
         {
             if (token is null)
             {
                 return default;
             }
 
-            return IsSimpleType(type) ? MapSimpleType<T>(token).First() : token.ToObject<T>(jsonSerializer);
+            return IsSimpleType(type) ? ToSimpleType<T>(token).First() : token.ToObject<T>(jsonSerializer);
         }
 
-        private static IEnumerable<T> MapSimpleType<T>(JToken token)
+        private static IEnumerable<T> ToSimpleType<T>(this JToken token)
         {
             if (token is JObject)
             {
@@ -37,6 +37,7 @@ namespace Fanex.Data
             var enumerable = dictionaries.Select(d => d.First().Value);
             return enumerable.Values<T>();
         }
+
         private static bool IsSimpleType(Type type)
         {
             return type.IsPrimitive || type.IsEnum || type == typeof(decimal)

@@ -4,16 +4,14 @@
     using System.Text;
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using Models;
     using Newtonsoft.Json;
-    using static System.Net.Mime.MediaTypeNames;
 
     public static class CacheManager
     {
-        public static async Task<string> ClearCache(int maxRetries = 1000)
+        public static async Task<string> ClearCache(int maxRetries = 100)
         {
             var serverStatus = new Dictionary<string, DateTimeOffset>();
             var clearedServers = new List<string>();
@@ -25,7 +23,7 @@
                 {
                     serverStatus = removeCacheStatus.ServerStatus;
                     var clearedServer = removeCacheStatus.ServerName;
-                    TryToAddToList(clearedServers, clearedServer);
+                    TryToAddToCollection(clearedServers, clearedServer);
                 }
 
                 if (AreTwoCollectionsEqual(clearedServers, serverStatus.Keys))
@@ -48,11 +46,11 @@
             return sortedFirst.SequenceEqual(sortedSecond);
         }
 
-        private static void TryToAddToList(List<string> clearedServers, string clearedServer)
+        private static void TryToAddToCollection(ICollection<string> collection, string item)
         {
-            if (!clearedServers.Contains(clearedServer))
+            if (!collection.Contains(item))
             {
-                clearedServers.Add(clearedServer);
+                collection.Add(item);
             }
         }
 
