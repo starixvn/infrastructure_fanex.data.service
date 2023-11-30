@@ -33,11 +33,27 @@ public class CacheController(ICache cache) : ControllerBase
         });
     }
 
-    [HttpGet("clear")]
-    public async Task<IActionResult> Clear()
+    [HttpGet("clear-server-status")]
+    public async Task<IActionResult> ClearServerStatus()
     {
         await cache.RemoveAsync(CacheKey.ServerStatusCacheKey);
         return Ok();
+    }
+
+    [HttpGet("clear-all-fanex-data-cache")]
+    [HttpPost("clear-all-fanex-data-cache")]
+    public async Task<IActionResult> ClearAllFanexDataCache()
+    {
+        DbParameterDefinitionCache.Clear();
+        var serverName = Environment.MachineName;
+
+        var serverStatus = await GetServerStatus();
+
+        return Ok(new
+        {
+            ServerName = serverName,
+            ServerStatus = serverStatus
+        });
     }
 
     [HttpGet("Log")]
