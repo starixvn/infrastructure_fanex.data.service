@@ -4,6 +4,8 @@ using Fanex.Caching;
 
 namespace Fanex.Data.Services;
 
+using Logging;
+
 [Route("api/cache")]
 [ApiController]
 public class CacheController(ICache cache) : ControllerBase
@@ -37,6 +39,14 @@ public class CacheController(ICache cache) : ControllerBase
         await cache.RemoveAsync(CacheKey.ServerStatusCacheKey);
         return Ok();
     }
+
+    [HttpGet("Log")]
+    public async Task<IActionResult> Log()
+    {
+        await Logger.Log.InfoAsync("Test Log");
+        return Ok("Log is written");
+    }
+
 
     private async Task<Dictionary<string, DateTimeOffset>> GetServerStatus()
     {

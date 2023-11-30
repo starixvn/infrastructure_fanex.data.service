@@ -2,7 +2,7 @@
 
 using Data;
 
-public class ErrorHandler(RequestDelegate next)
+public class ErrorHandlerMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context)
     {

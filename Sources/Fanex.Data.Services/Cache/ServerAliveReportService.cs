@@ -20,27 +20,39 @@ public class ServerAliveReportService : IHostedService, IDisposable
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        timer = new Timer(Report, null, TimeSpan.Zero, TimeSpan.FromSeconds(timerPeriod));
+        timer = new Timer(TryToReportStatus, null, TimeSpan.Zero, TimeSpan.FromSeconds(timerPeriod));
 
         await Task.CompletedTask;
     }
 
-    private async void Report(object state)
+    private async void TryToReportStatus(object state)
     {
-        var serverStatus = await GetServerAliveStatus();
+        try
+        {
+            await ReportStatus().ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception when try to report status. Exception message: {e.Message}");
+        }
+    }
+    private async Task ReportStatus()
+    {
+        var serverStatus = await GetServerAliveStatus().ConfigureAwait(false);
         CheckExpiredServer(serverStatus);
 
         var cacheItemOptions = new CacheItemOptions
         {
             AbsoluteExpiration = DateTimeOffset.Now.AddDays(1)
         };
-        await cache.SetAsync(CacheKey.ServerStatusCacheKey, serverStatus, cacheItemOptions);
+        await cache.SetAsync(CacheKey.ServerStatusCacheKey, serverStatus, cacheItemOptions).ConfigureAwait(false);
     }
 
     private async Task<Dictionary<string, DateTimeOffset>> GetServerAliveStatus()
     {
         var (found, serverStatus) =
-            await cache.TryGetAsync<Dictionary<string, DateTimeOffset>>(CacheKey.ServerStatusCacheKey);
+            await cache.TryGetAsync<Dictionary<string, DateTimeOffset>>(CacheKey.ServerStatusCacheKey)
+                        .ConfigureAwait(false);
         if (!found)
         {
             serverStatus = new Dictionary<string, DateTimeOffset>();
