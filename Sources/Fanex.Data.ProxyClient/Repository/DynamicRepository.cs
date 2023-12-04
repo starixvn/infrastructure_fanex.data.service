@@ -15,10 +15,12 @@
     {
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
-            ContractResolver = ShouldSerializeContractResolver.Instance
+            ContractResolver = ShouldSerializeContractResolver.Instance,
+            DateFormatString = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss"
         };
 
         private static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(JsonSerializerSettings);
+
 
         public string DebugInformation { get; set; }
 

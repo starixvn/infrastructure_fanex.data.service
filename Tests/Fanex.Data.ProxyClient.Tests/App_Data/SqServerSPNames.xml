@@ -41,6 +41,8 @@
   <Setting Key="GetCustomerFromTableInput" SpName="GetCustomerFromTableInput" DbName="FanexDataTests">
     <Mapping DataField="CustomerID" ObjectProperty="Id" />
   </Setting>
+  <Setting Key="GetDateTimeNow" SpName="GetDateTimeNow" DbName="FanexDataTests" />
+  
   <Setting Key="FetchMultipleTables" SpName="FetchMultipleTables" DbName="FanexDataTests" />
   <Setting Key="TestScalarInt" SpName="TestScalarInt" DbName="FanexDataTests" />
   <Setting Key="TestScalarString" SpName="TestScalarString" DbName="FanexDataTests" />

@@ -4,10 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 namespace Fanex.Data.ProxyClient.Tests
 {
     using Models;
+    using ParameterSets.Query;
     using Repository;
     using System;
     using System.Threading.Tasks;
-    using ParameterSets.Query;
     using Xunit;
 
     [Collection("Fanex Data Client collection")]
@@ -194,6 +194,23 @@ namespace Fanex.Data.ProxyClient.Tests
 
             // Assert.
             Assert.Null(actualResult);
+        }
+
+        [Fact]
+        public async Task GetAsync_DateTimeInput_ReturnCorrectly()
+        {
+            // Arrange.
+
+            var criteria = new GetDateTimeNowCriteria()
+            {
+                Now = DateTime.Today
+            };
+
+            // Act.
+            var actualResult = await proxy.GetAsync<DateTime>(criteria);
+
+            // Assert.
+            Assert.Equal(criteria.Now, actualResult);
         }
     }
 }
