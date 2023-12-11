@@ -1,6 +1,7 @@
 ﻿namespace Fanex.Data.Services.Middleware;
 
 using Data;
+using Newtonsoft.Json;
 
 public class ErrorHandlerMiddleware(RequestDelegate next)
 {
@@ -40,7 +41,8 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
             ["UserId"] = connectionStringBuilder.GetUserId(),
             [nameof(exception.SpName)] = exception.SpName,
             ["Parameters"] = GetParameters(exception.Parameters),
-            [nameof(exception.CommandTimeout)] = exception.CommandTimeout
+            [nameof(exception.CommandTimeout)] = exception.CommandTimeout,
+            ["CommandDefinition"] = JsonConvert.SerializeObject(exception.CommandDefinition),
         };
     }
 

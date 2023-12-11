@@ -4,7 +4,7 @@
     using System.Net.Http;
     using System.Net.Http.Headers;
 
-    internal class HttpClientFactory
+    internal static class HttpClientFactory
     {
         internal static HttpClient Client { get; }
         

@@ -75,4 +75,10 @@ public class CacheController(ICache cache) : ControllerBase
 
         return serverStatus;
     }
+
+    [HttpGet("caching-storage")]
+    public IActionResult GetCachingStorage()
+    {
+        return Ok(DbParameterDefinitionCache.GetCachingStorage());
+    }
 }
