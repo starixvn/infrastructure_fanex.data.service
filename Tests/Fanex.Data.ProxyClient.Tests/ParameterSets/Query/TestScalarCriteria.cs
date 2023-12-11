@@ -50,4 +50,11 @@
 
         public override bool IsValid() => true;
     }
+
+    public class TestGetNullValueCriteria : CriteriaBase
+    {
+        public override string GetSettingKey() => "TestGetListNull";
+
+        public override bool IsValid() => true;
+    }
 }

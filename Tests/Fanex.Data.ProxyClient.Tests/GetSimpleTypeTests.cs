@@ -2,10 +2,10 @@
 
 namespace Fanex.Data.ProxyClient.Tests
 {
+    using ParameterSets.Query;
     using Repository;
     using System;
     using System.Threading.Tasks;
-    using ParameterSets.Query;
     using Xunit;
 
     [Collection("Fanex Data Client collection")]
@@ -86,6 +86,7 @@ namespace Fanex.Data.ProxyClient.Tests
             // Assert.
             Assert.Equal(10.5m, actualResult);
         }
+
         [Fact]
         public async Task GetAsync_DateTime_ReturnValueCorrectly()
         {
@@ -100,5 +101,30 @@ namespace Fanex.Data.ProxyClient.Tests
             Assert.Equal(expected, actualResult);
         }
 
+        [Fact]
+        public async Task GetAsync_Null_ReturnNull()
+        {
+
+            // Assert.
+            await GetNullValue<DateTime?>();
+            await GetNullValue<int?>();
+            await GetNullValue<string>();
+            await GetNullValue<decimal?>();
+            await GetNullValue<bool?>();
+            await GetNullValue<byte?>();
+            await GetNullValue<double?>();
+        }
+
+        private async Task GetNullValue<T>()
+        {
+            // Arrange.
+            var parameterSet = new TestGetNullValueCriteria();
+
+            // Act.
+            var actualResult = await proxy.GetAsync<T>(parameterSet);
+
+            // Assert.
+            Assert.Null(actualResult);
+        }
     }
 }

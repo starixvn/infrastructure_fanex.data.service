@@ -102,5 +102,31 @@ namespace Fanex.Data.ProxyClient.Tests
             Assert.Equal(expected, actualResult.First());
         }
 
+        [Fact]
+        public async Task FetchAsync_Null_ReturnNull()
+        {
+
+            // Assert.
+            await FetchNullValue<DateTime?>();
+            await FetchNullValue<int?>();
+            await FetchNullValue<string>();
+            await FetchNullValue<decimal?>();
+            await FetchNullValue<bool?>();
+            await FetchNullValue<byte?>();
+            await FetchNullValue<double?>();
+        }
+
+        private async Task FetchNullValue<T>()
+        {
+            // Arrange.
+            var parameterSet = new TestGetNullValueCriteria();
+
+            // Act.
+            var actualResult = await proxy.FetchAsync<T>(parameterSet);
+
+            // Assert.
+            Assert.Null(actualResult.First());
+        }
+
     }
 }

@@ -5,7 +5,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>Fanex.Data</RootNamespace>
-    <Version>0.0.2-alpha07</Version>
+    <Version>0.0.2-alpha08</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Fanex.Data.ProxyClient</Title>
     <Description>A proxy client for fanex data, connects to fanex data services and asks it helps to query database</Description>
