@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Data
 {
+    using System;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -10,6 +11,9 @@
         
         static HttpClientFactory()
         {
+            var serviceApiUri = DbSettingProviderManager.ServiceApiUri;
+            var timeout = TimeSpan.FromSeconds(DbSettingProviderManager.GetMaxSpTimeout() + 30);
+
 #if NET5_0_OR_GREATER
             var handler = new HttpClientHandler
             {
@@ -24,7 +28,8 @@
 
             Client = new HttpClient(handler)
             {
-                BaseAddress = DbSettingProviderManager.ServiceApiUri
+                BaseAddress = serviceApiUri,
+                Timeout = timeout
             };
 #if NET5_0_OR_GREATER
             Client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));

@@ -8,6 +8,8 @@
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class DbSetting
     {
+        public const int DefaultCommandTimeout = 120;
+
         public DbSetting(
             string key,
             string provider,
@@ -23,7 +25,7 @@
             DbName = dbName;
             ConnectionString = connectionString;
             SpName = spName;
-            CommandTimeout = commandTimeout;
+            CommandTimeout = commandTimeout ?? DefaultCommandTimeout;
             ColumnMaps = columnMaps;
             FirmParameters = firmParameters;
         }
@@ -38,7 +40,7 @@
 
         public string SpName { get; }
 
-        public int? CommandTimeout { get; }
+        public int CommandTimeout { get; }
 
         public IDictionary<string, string> ColumnMaps { get; set; }
 

@@ -68,6 +68,16 @@ namespace Fanex.Data
                 }).ToList();
         }
 
+        internal static int GetMaxSpTimeout()
+        {
+            var settingDataSources = currentSession
+                .settingProvider
+                .SettingDataSource
+                .Values;
+
+            return settingDataSources.Max(s => s.CommandTimeout);
+        }
+
         internal static Uri ServiceApiUri => currentSession.serviceApiUri;
 
         public DbSettingProviderManager Register(
