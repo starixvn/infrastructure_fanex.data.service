@@ -9,6 +9,8 @@
 
         public bool Ignored { get; set; }
 
+        public bool IsSpecialType { get; set; }
+
         public bool AllowNull
         {
             get => ForcePassingNull ?? default;

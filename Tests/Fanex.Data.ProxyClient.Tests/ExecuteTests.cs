@@ -1,6 +1,7 @@
 ﻿using Fanex.Data.ProxyClient.Tests.Models;
 using Fanex.Data.ProxyClient.Tests.ParameterSets.Commands;
 using Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
+using System.Linq;
 
 namespace Fanex.Data.ProxyClient.Tests
 {
@@ -83,6 +84,24 @@ namespace Fanex.Data.ProxyClient.Tests
 
             // Assert.
             Assert.Equal(default, result);
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_ByteArray_ExecuteSuccess()
+        {
+            // Arrange.
+            var command = new PassByteArray()
+            {
+                ImageId = 1,
+                Image = new byte[] { 1, 5, 4, 6, 8 }
+
+            };
+
+            // Act.
+            await proxy.ExecuteAsync(command);
+
+            // Assert.
+            Assert.True(command.Image.SequenceEqual(command.Response));
         }
 
         private async Task DeleteEmployeeTerritory()

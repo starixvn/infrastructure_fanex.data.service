@@ -1,6 +1,7 @@
 ﻿namespace Fanex.Data.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
@@ -40,6 +41,21 @@
             }
 
             return !(map.AllowNull || !IsPropertyNull(propertyInfo, instance));
+        }
+
+        public static Dictionary<string, string> GetSpecialTypes(this object self)
+        {
+            var properties = self.GetType().GetProperties().Where(p =>
+            {
+                if (p.GetCustomAttributes(false).OfType<SpParamAttribute>().Any())
+                {
+                    return p.GetCustomAttributes(false).OfType<SpParamAttribute>().FirstOrDefault(a => a.IsSpecialType) != null;
+                }
+
+                return false;
+            });
+
+            return properties.ToDictionary(p => p.Name, p => p.PropertyType.Name);
         }
 
         private static bool IsPropertyNull(PropertyInfo property, object instance)

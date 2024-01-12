@@ -118,7 +118,6 @@ public class DynamicRepositoryController : ControllerBase
     {
         using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
         var model = await objectDb.ExecuteNonQueryAsync(proxyParameter.ParameterSet);
-
         var proxyResult = new ProxyResult<int>
         {
             Result = model,

@@ -11,5 +11,7 @@
         public dynamic ParameterSet { get; set; }
 
         public List<string> TypeNames { get; set; } = new List<string>();
+
+        public Dictionary<string, string> SpecialTypes { get; set; }
     }
 }

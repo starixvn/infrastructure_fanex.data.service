@@ -212,5 +212,18 @@ namespace Fanex.Data.ProxyClient.Tests
             // Assert.
             Assert.Equal(criteria.Now, actualResult);
         }
+
+        [Fact]
+        public async Task GetAsync_ByteArray_GetSuccess()
+        {
+            // Arrange.
+            var criteria = new GetImageCriteria();
+
+            // Act.
+            var actualResult = await proxy.GetAsync<Image>(criteria);
+
+            // Assert.
+            Assert.NotNull(actualResult);
+        }
     }
 }

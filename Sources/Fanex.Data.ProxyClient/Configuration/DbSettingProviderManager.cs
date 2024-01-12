@@ -1,12 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Fanex.Data.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Fanex.Data
 {
+    using Models;
     using Repository;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Models;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class DbSettingProviderManager
@@ -49,7 +50,8 @@ namespace Fanex.Data
                 IgnoreRedundantParameters = currentSession.IgnoreRedundantParameters,
                 ParameterSet = criteria,
                 DbSetting = dbSetting,
-                TypeNames = typeNames
+                TypeNames = typeNames,
+                SpecialTypes = criteria.GetSpecialTypes()
             };
         }
 

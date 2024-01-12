@@ -113,5 +113,18 @@ namespace Fanex.Data.ProxyClient.Tests
             // Assert.
             Assert.NotNull(actualResult.First().Id);
         }
+
+        [Fact]
+        public async Task FetchAsync_ByteArray_FetchSuccess()
+        {
+            // Arrange.
+            var criteria = new GetImageCriteria();
+
+            // Act.
+            var actualResult = await proxy.FetchAsync<Image>(criteria);
+
+            // Assert.
+            Assert.Equal(10, actualResult.Count());
+        }
     }
 }
