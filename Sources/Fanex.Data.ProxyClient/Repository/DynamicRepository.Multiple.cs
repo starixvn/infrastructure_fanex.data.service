@@ -3,6 +3,7 @@
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     public partial class DynamicRepository : IDynamicRepository
     {
@@ -21,6 +22,13 @@
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=2";
 
+            if (!criteria.IsValid())
+            {
+                return (
+                    Enumerable.Empty<T1>(),
+                    Enumerable.Empty<T2>()
+                );
+            }
             var typeNames = new List<Type>
             {
                 typeof(T1),
@@ -36,6 +44,15 @@
         public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>)> FetchMultipleAsync<T1, T2, T3>(ICriteria criteria, string serverName = "")
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=3";
+
+            if (!criteria.IsValid())
+            {
+                return (
+                    Enumerable.Empty<T1>(),
+                    Enumerable.Empty<T2>(),
+                    Enumerable.Empty<T3>()
+                );
+            }
 
             var typeNames = new List<Type>
             {
@@ -55,6 +72,16 @@
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=4";
 
+            if (!criteria.IsValid())
+            {
+                return (
+                    Enumerable.Empty<T1>(),
+                    Enumerable.Empty<T2>(),
+                    Enumerable.Empty<T3>(),
+                    Enumerable.Empty<T4>()
+                );
+            }
+
             var typeNames = new List<Type>
             {
                 typeof(T1),
@@ -73,6 +100,17 @@
         public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>)> FetchMultipleAsync<T1, T2, T3, T4, T5>(ICriteria criteria, string serverName = "")
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=5";
+
+            if (!criteria.IsValid())
+            {
+                return (
+                    Enumerable.Empty<T1>(),
+                    Enumerable.Empty<T2>(),
+                    Enumerable.Empty<T3>(),
+                    Enumerable.Empty<T4>(),
+                    Enumerable.Empty<T5>()
+                );
+            }
 
             var typeNames = new List<Type>
             {
@@ -94,6 +132,18 @@
         public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>)> FetchMultipleAsync<T1, T2, T3, T4, T5, T6>(ICriteria criteria, string serverName = "")
         {
             const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=6";
+
+            if (!criteria.IsValid())
+            {
+                return (
+                    Enumerable.Empty<T1>(),
+                    Enumerable.Empty<T2>(),
+                    Enumerable.Empty<T3>(),
+                    Enumerable.Empty<T4>(),
+                    Enumerable.Empty<T5>(),
+                    Enumerable.Empty<T6>()
+                    );
+            }
 
             var typeNames = new List<Type>
             {
