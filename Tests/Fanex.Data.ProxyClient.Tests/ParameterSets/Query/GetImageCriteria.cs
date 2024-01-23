@@ -1,9 +1,12 @@
-﻿using Fanex.Data.Repository;
-
-namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
-public class GetImageCriteria : CriteriaBase
+﻿
+namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query
 {
-    public override string GetSettingKey() => "GenerateImages";
+    using Repository;
 
-    public override bool IsValid() => true;
+    public class GetImageCriteria : CriteriaBase
+    {
+        public override string GetSettingKey() => "GenerateImages";
+
+        public override bool IsValid() => true;
+    }
 }

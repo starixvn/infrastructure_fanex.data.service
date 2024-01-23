@@ -27,19 +27,19 @@
 
         #region sync
 
-        public IEnumerable<T> Fetch<T>(ICriteria criteria, string serverName = "") => FetchAsync<T>(criteria, serverName).Result;
+        public IEnumerable<T> Fetch<T>(ICriteria criteria, string serverIp = "") => FetchAsync<T>(criteria, serverIp).Result;
 
-        public DataSet FetchDataSet(ICriteria criteria, string serverName = "") => FetchDataSetAsync(criteria, serverName).Result;
+        public DataSet FetchDataSet(ICriteria criteria, string serverIp = "") => FetchDataSetAsync(criteria, serverIp).Result;
 
-        public T Get<T>(ICriteria criteria, string serverName = "") => GetAsync<T>(criteria, serverName).Result;
+        public T Get<T>(ICriteria criteria, string serverIp = "") => GetAsync<T>(criteria, serverIp).Result;
 
-        public int Execute(INonQueryCommand command, string serverName = "") => ExecuteAsync(command, serverName).Result;
+        public int Execute(INonQueryCommand command, string serverIp = "") => ExecuteAsync(command, serverIp).Result;
 
         #endregion
 
         #region async
 
-        public async Task<IEnumerable<T>> FetchAsync<T>(ICriteria criteria, string serverName = "")
+        public async Task<IEnumerable<T>> FetchAsync<T>(ICriteria criteria, string serverIp = "")
         {
             const string endpoint = "api/dynamic-repository/fetch";
 
@@ -49,11 +49,11 @@
             }
 
             var typeNames = new List<string> { typeof(T).Name };
-            var result = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
+            var result = await ExecuteApiService<JArray>(endpoint, criteria, typeNames, serverIp).ConfigureAwait(false);
             return result.ToList<T>(typeof(T), JsonSerializer);
         }
 
-        public async Task<DataSet> FetchDataSetAsync(ICriteria criteria, string serverName = "")
+        public async Task<DataSet> FetchDataSetAsync(ICriteria criteria, string serverIp = "")
         {
             const string endpoint = "api/dynamic-repository/fetch-dataset";
 
@@ -62,10 +62,10 @@
                 return new DataSet();
             }
 
-            return await ExecuteApiService<DataSet>(endpoint, criteria, new List<string>(), serverName).ConfigureAwait(false);
+            return await ExecuteApiService<DataSet>(endpoint, criteria, new List<string>(), serverIp).ConfigureAwait(false);
         }
 
-        public async Task<T> GetAsync<T>(ICriteria criteria, string serverName = "")
+        public async Task<T> GetAsync<T>(ICriteria criteria, string serverIp = "")
         {
             const string endpoint = "api/dynamic-repository/get";
 
@@ -75,11 +75,11 @@
             }
 
             var typeNames = new List<string> { typeof(T).Name };
-            var result = await ExecuteApiService<JObject>(endpoint, criteria, typeNames, serverName).ConfigureAwait(false);
+            var result = await ExecuteApiService<JObject>(endpoint, criteria, typeNames, serverIp).ConfigureAwait(false);
             return result.ToSingleData<T>(typeof(T), JsonSerializer);
         }
 
-        public async Task<int> ExecuteAsync(INonQueryCommand command, string serverName = "")
+        public async Task<int> ExecuteAsync(INonQueryCommand command, string serverIp = "")
         {
             const string endpoint = "api/dynamic-repository/execute";
             if (!command.IsValid())
@@ -87,23 +87,23 @@
                 return default;
             }
 
-            return await ExecuteApiService<int>(endpoint, command, new List<string>(), serverName).ConfigureAwait(false);
+            return await ExecuteApiService<int>(endpoint, command, new List<string>(), serverIp).ConfigureAwait(false);
         }
 
         #endregion
 
         #region utility
 
-        private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<string> typeNames, string serverName)
+        private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<string> typeNames, string serverIp)
         {
-            var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverName, typeNames);
+            var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverIp, typeNames);
             return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
         }
 
-        private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverName)
+        private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverIp)
         {
             var typeNames = types.Select(t => t.Name).ToList();
-            var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverName, typeNames);
+            var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverIp, typeNames);
 
             return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
         }

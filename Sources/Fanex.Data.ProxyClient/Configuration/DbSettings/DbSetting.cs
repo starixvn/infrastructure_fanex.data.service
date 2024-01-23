@@ -89,9 +89,9 @@
                 FirmParameters);
         }
 
-        public void ReplaceServerName(string serverName)
+        public void ReplaceServerIp(string serverIp)
         {
-            if (string.IsNullOrWhiteSpace(serverName))
+            if (string.IsNullOrWhiteSpace(serverIp))
             {
                 return;
             }
@@ -100,7 +100,7 @@
             {
                 ConnectionString = ConnectionString
             };
-            builder.SetServer(serverName);
+            builder.SetServer(serverIp);
 
             ConnectionString = builder.ToString();
         }

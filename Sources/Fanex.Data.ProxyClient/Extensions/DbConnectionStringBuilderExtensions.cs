@@ -19,11 +19,11 @@
         public static string GetServer(this DbConnectionStringBuilder connectionStringBuilder)
             => GetValue(connectionStringBuilder, ServerAliases);
 
-        public static void SetServer(this DbConnectionStringBuilder connectionStringBuilder, string serverName)
+        public static void SetServer(this DbConnectionStringBuilder connectionStringBuilder, string serverIp)
         {
-            if (!ChangeValue(connectionStringBuilder, ServerAliases, serverName))
+            if (!ChangeValue(connectionStringBuilder, ServerAliases, serverIp))
             {
-                connectionStringBuilder[DefaultServerKeyword] = serverName;
+                connectionStringBuilder[DefaultServerKeyword] = serverIp;
             }
         }
 

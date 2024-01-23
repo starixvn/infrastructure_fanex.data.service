@@ -34,7 +34,7 @@ namespace Fanex.Data
             currentSession = null;
         }
 
-        internal static ProxyParameter GetProxyParameter(ICriteria criteria, string serverName, List<string> typeNames)
+        internal static ProxyParameter GetProxyParameter(ICriteria criteria, string serverIp, List<string> typeNames)
         {
             if (criteria == null)
             {
@@ -43,7 +43,7 @@ namespace Fanex.Data
 
             var key = criteria.GetSettingKey();
             var dbSetting = currentSession.settingProvider.GetSetting(key);
-            dbSetting.ReplaceServerName(serverName);
+            dbSetting.ReplaceServerIp(serverIp);
 
             return new ProxyParameter
             {
