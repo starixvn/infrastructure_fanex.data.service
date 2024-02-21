@@ -1,6 +1,7 @@
 ﻿namespace Fanex.Data.Services.Middleware;
 
 using Data;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 public class ErrorHandlerMiddleware(RequestDelegate next)
@@ -19,14 +20,30 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
 
     private static async Task HandleException(HttpContext context, ObjectDbException exception)
     {
-        var exceptionInfo = GetObjectDbExceptionInfo(exception);
+
 
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "text/plain";
         await context.Response.WriteAsync(exception.Message + Environment.NewLine);
+        await context.Response.WriteAsync(GetInfoException(exception));
+        var exceptionInfo = GetObjectDbExceptionInfo(exception);
         foreach (var pair in exceptionInfo)
         {
             await context.Response.WriteAsync($"{pair.Key}={pair.Value}{Environment.NewLine}");
+        }
+
+    }
+
+    private static string GetInfoException(Exception exception)
+    {
+        try
+        {
+            string[] lines = exception.StackTrace.Split("\n");
+            return lines.Length > 0 ? lines[0] + Environment.NewLine : string.Empty;
+        }
+        catch (Exception)
+        {
+            return string.Empty;
         }
     }
 
