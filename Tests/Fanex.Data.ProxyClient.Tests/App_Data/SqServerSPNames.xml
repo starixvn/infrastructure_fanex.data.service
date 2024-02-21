@@ -1,0 +1,59 @@
+﻿<Function Name="test">
+  <Setting Key="GetCustomer" SpName="CustomerByID" DbName="FanexDataTests">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+  <Setting Key="GetCustomerWithFakeServerName" SpName="CustomerByID" DbName="FanexDataTestsWithFakeServerName">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+  <Setting Key="TenMostExpensiveProducts" SpName="TenMostExpensiveProducts" DbName="FanexDataTests">
+    <Mapping DataField="TenMostExpensiveProducts" ObjectProperty="ProductName" />
+  </Setting>
+  <Setting Key="Get100kItems" SpName="Get100kItems" DbName="FanexDataTests">
+    <Mapping DataField="Name" ObjectProperty="CompanyName" class="Customer" />
+  </Setting>
+  <Setting Key="GetTopCustomers" SpName="GetTopCustomers" DbName="FanexDataTests" TimeOut="2" />
+  <Setting Key="GetTopCustomersWithMapping" SpName="GetTopCustomers" DbName="FanexDataTests" TimeOut="2" >
+    <Mapping DataField="CustomerID" ObjectProperty="Id" Class="CustomerWithMappingProperty"/>
+    <Mapping DataField="ContactTitle" ObjectProperty="Title" Class="CustomerWithMappingProperty"/>
+    <Mapping DataField="PostalCode" ObjectProperty="Code" Class="CustomerWithMappingProperty" />
+    <Mapping DataField="CustomerID" ObjectProperty="Code" Class="CustomerWithFakeMappingProperty" />
+  </Setting>
+
+  <Setting Key="GetTopCustomersWithMappingClassEmpty" SpName="GetTopCustomers" DbName="FanexDataTests" TimeOut="2" >
+    <Mapping DataField="CustomerID" ObjectProperty="Id" Class=""/>
+  </Setting>
+
+  <Setting Key="SpNotExist" SpName="SpNotExist" DbName="FanexDataTests" />
+  <Setting Key="allowPassingNull" SpName="GetCustomerByContactTitle" DbName="FanexDataTests">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+
+  <Function Name="EmployeeTerritory">
+    <Setting Key="GetEmployeeTerritory" SpName="GetEmployeeTerritory" DbName="FanexDataTests" />
+    <Setting Key="InsertEmployeeTerritory" SpName="InsertEmployeeTerritory" DbName="FanexDataTests" />
+    <Setting Key="DeleteEmployeeTerritory" SpName="DeleteEmployeeTerritory" DbName="FanexDataTests" />
+  </Function>
+
+  <Setting Key="SupplierAndShipperByCustomerID" SpName="SupplierAndShipperByCustomerID" DbName="FanexDataTests">
+    <Mapping DataField="ShipperID" ObjectProperty="Id" Class="Shipper" />
+    <Mapping DataField="SupplierID" ObjectProperty="Id" Class="Supplier" />
+  </Setting>
+  <Setting Key="GetCustomerFromTableInput" SpName="GetCustomerFromTableInput" DbName="FanexDataTests">
+    <Mapping DataField="CustomerID" ObjectProperty="Id" />
+  </Setting>
+  <Setting Key="GetDateTimeNow" SpName="GetDateTimeNow" DbName="FanexDataTests" />
+  
+  <Setting Key="FetchMultipleTables" SpName="FetchMultipleTables" DbName="FanexDataTests" />
+  <Setting Key="TestScalarInt" SpName="TestScalarInt" DbName="FanexDataTests" />
+  <Setting Key="TestScalarString" SpName="TestScalarString" DbName="FanexDataTests" />
+  <Setting Key="TestScalarBoolean" SpName="TestScalarBoolean" DbName="FanexDataTests" />
+  <Setting Key="TestScalarByte" SpName="TestScalarByte" DbName="FanexDataTests" />
+  <Setting Key="TestScalarDouble" SpName="TestScalarDouble" DbName="FanexDataTests" />
+  <Setting Key="TestScalarDecimal" SpName="TestScalarDecimal" DbName="FanexDataTests" />
+  <Setting Key="TestScalarDateTime" SpName="TestScalarDateTime" DbName="FanexDataTests" />
+  <Setting Key="GetMultipleTypes" SpName="GetMultipleTypes" DbName="FanexDataTests" />
+  <Setting Key="TestGetListNull" SpName="TestGetListNull" DbName="FanexDataTests" />
+  <Setting Key="TestByteArray" SpName="TestByteArray" DbName="FanexDataTests" />
+  <Setting Key="GenerateImages" SpName="GenerateImages" DbName="FanexDataTests" />
+</Function>
+

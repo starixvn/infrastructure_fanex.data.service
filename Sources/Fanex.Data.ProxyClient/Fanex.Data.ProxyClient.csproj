@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472;netstandard2.0;net5.0;net7.0;</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Fanex.Data</RootNamespace>
+    <Version>0.0.3-alpha02</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Fanex.Data.ProxyClient</Title>
+    <Description>A proxy client for fanex data, connects to fanex data services and asks it helps to query database</Description>
+    <Copyright>NexDev</Copyright>
+    <PackageProjectUrl>https://gitlab.nexdev.net/infrastructure/fanex.data.service</PackageProjectUrl>
+    <PackageIcon></PackageIcon>
+    <RepositoryUrl>https://gitlab.nexdev.net/infrastructure/fanex.data.service</RepositoryUrl>
+    <PackageTags>fanexdata</PackageTags>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CacheController\" />
+  </ItemGroup>
+</Project>

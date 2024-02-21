@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Functions>
+  <Function Name="Customer">
+    <Setting Key="CustomerByID" SpName="CustomerByID" DbName="MSSQL.FanexDataTests">
+      <Mapping DataField="CustomerID" ObjectProperty="Id" />
+    </Setting>
+    <Setting Key="GetTopCustomers" SpName="GetTopCustomers" DbName="MSSQL.FanexDataTests" TimeOut="2" />
+    <Setting Key="OrderCountByProduct" SpName="OrderCountByProduct" DbName="MSSQL.FanexDataTests" />
+    <Setting Key="TenMostExpensiveProducts" SpName="TenMostExpensiveProducts" DbName="MSSQL.FanexDataTests">
+      <Mapping DataField="TenMostExpensiveProducts" ObjectProperty="ProductName" />
+    </Setting>
+    <Setting Key="SupplierAndShipperByCustomerID" SpName="SupplierAndShipperByCustomerID" DbName="MSSQL.FanexDataTests">
+      <Mapping DataField="SupplierID" ObjectProperty="Id" Class="Supplier" />
+      <Mapping DataField="ShipperID" ObjectProperty="Id" Class="Shipper" />
+    </Setting>
+  </Function>
+  <Function Name="EmployeeTerritory">
+    <Setting Key="GetEmployeeTerritory" SpName="GetEmployeeTerritory" DbName="MSSQL.FanexDataTests" />
+    <Setting Key="InsertEmployeeTerritory" SpName="InsertEmployeeTerritory" DbName="MSSQL.FanexDataTests" />
+    <Setting Key="DeleteEmployeeTerritory" SpName="DeleteEmployeeTerritory" DbName="MSSQL.FanexDataTests" />
+  </Function>
+
+  <Setting Key="Get100kItems" SpName="Get100kItems" DbName="MSSQL.FanexDataTests">
+    <Mapping DataField="Name" ObjectProperty="CompanyName" />
+  </Setting>
+  <Setting Key="FetchMultipleTables" SpName="FetchMultipleTables" DbName="MSSQL.FanexDataTests" />
+  <Setting Key="SpNotExist" SpName="SpNotExist" DbName="MSSQL.FanexDataTests" />
+  <Setting Key="allowPassingNull" SpName="GetCustomerByContactTitle" DbName="MSSQL.FanexDataTests" />
+</Functions>
