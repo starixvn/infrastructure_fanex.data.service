@@ -147,7 +147,12 @@ namespace Fanex.Data
             settingProvider.ConnectionStringProvider = connectionStringProvider;
             settingProvider.Start();
 
-            CacheManager.ClearCache();
+            #if (DEBUG)
+                CacheManager.ClearCache().Wait();
+            #else
+            
+                CacheManager.ClearCache();
+            #endif
         }
     }
 }

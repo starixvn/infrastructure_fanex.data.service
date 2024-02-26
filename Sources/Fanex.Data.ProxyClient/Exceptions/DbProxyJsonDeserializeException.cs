@@ -23,7 +23,7 @@ namespace Fanex.Data
                           + $"Exception Message: {e.Message}" + Environment.NewLine
                           + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine
                           + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
-                          + $"responseJson: {responseJson}";
+                          + $"responseJson: {responseJson}" + Environment.NewLine;
 
             return new DbProxyJsonDeserializeException(message, e);
         }
