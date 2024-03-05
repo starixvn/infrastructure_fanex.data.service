@@ -11,4 +11,12 @@ public class HomeController : ControllerBase
     {
         return Ok(Environment.MachineName);
     }
+
+    [HttpGet]
+    [Route("gc")]
+    public IActionResult Gc()
+    {
+        GC.Collect();
+        return Ok("Done Gc");
+    }
 }
