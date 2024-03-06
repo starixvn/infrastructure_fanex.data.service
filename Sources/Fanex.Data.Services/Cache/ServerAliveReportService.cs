@@ -2,30 +2,31 @@
 
 using Caching;
 
-public class ServerAliveReportService : IHostedService, IDisposable
+public class ServerAliveReportService : BackgroundService
 {
     private readonly ICache cache;
 
     private readonly int timerPeriod;
-
-    private Timer timer;
-
+    
     public ServerAliveReportService(ICache cache)
     {
         this.cache = cache;
 
         var random = new Random();
-        timerPeriod = random.Next(10, 20);
+        timerPeriod = random.Next(13, 29);
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        timer = new Timer(TryToReportStatus, null, TimeSpan.Zero, TimeSpan.FromSeconds(timerPeriod));
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await TryToReportStatus();
 
-        await Task.CompletedTask;
+            await Task.Delay(timerPeriod, stoppingToken).ConfigureAwait(false);
+        }
     }
 
-    private async void TryToReportStatus(object state)
+    private async Task TryToReportStatus()
     {
         try
         {
@@ -36,10 +37,11 @@ public class ServerAliveReportService : IHostedService, IDisposable
             Console.WriteLine($"Exception when try to report status. Exception message: {e.Message}");
         }
     }
+
     private async Task ReportStatus()
     {
         var serverStatus = await GetServerAliveStatus().ConfigureAwait(false);
-        CheckExpiredServer(serverStatus);
+        RemoveExpiredServer(serverStatus);
 
         var cacheItemOptions = new CacheItemOptions
         {
@@ -55,7 +57,7 @@ public class ServerAliveReportService : IHostedService, IDisposable
                         .ConfigureAwait(false);
         if (!found)
         {
-            serverStatus = new Dictionary<string, DateTimeOffset>();
+            serverStatus = [];
         }
 
         var currentMachineName = Environment.MachineName;
@@ -64,7 +66,7 @@ public class ServerAliveReportService : IHostedService, IDisposable
         return serverStatus;
     }
 
-    private static void CheckExpiredServer(Dictionary<string, DateTimeOffset> serverStatus)
+    private static void RemoveExpiredServer(Dictionary<string, DateTimeOffset> serverStatus)
     {
         var keySet = new HashSet<string>(serverStatus.Keys);
         foreach (var machineName in keySet)
@@ -75,22 +77,5 @@ public class ServerAliveReportService : IHostedService, IDisposable
                 serverStatus.Remove(machineName);
             }
         }
-    }
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        timer?.Change(Timeout.Infinite, 0);
-        await Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        timer?.Dispose();
     }
 }
