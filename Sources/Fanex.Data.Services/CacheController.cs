@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Fanex.Data.Services.Cache;
+﻿using Dapper;
 using Fanex.Caching;
+using Fanex.Data.Services.Cache;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fanex.Data.Services;
 
 using Logging;
+using System.Diagnostics;
 
 [Route("api/cache")]
 [ApiController]
@@ -13,8 +15,8 @@ public class CacheController(ICache cache) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Status()
     {
-        var serverStatus= await GetServerStatus();
-        
+        var serverStatus = await GetServerStatus();
+
         return Ok(serverStatus);
     }
 
@@ -80,5 +82,22 @@ public class CacheController(ICache cache) : ControllerBase
     public IActionResult GetCachingStorage()
     {
         return Ok(DbParameterDefinitionCache.GetCachingStorage());
+    }
+
+    [HttpGet("pure-cache")]
+    public IActionResult PureCache()
+    {
+        SqlMapper.PurgeQueryCache();
+
+        return Ok();
+    }
+
+
+    [HttpGet("get-current-memory")]
+    public IActionResult GetCurrentMemory()
+    {
+        Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+        currentProcess.Refresh();
+        return Ok($"MB: {currentProcess.WorkingSet64 / 1000000}");
     }
 }
