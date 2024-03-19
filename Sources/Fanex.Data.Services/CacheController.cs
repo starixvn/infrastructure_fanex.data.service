@@ -2,6 +2,7 @@
 using Fanex.Caching;
 using Fanex.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace Fanex.Data.Services;
 
@@ -100,4 +101,21 @@ public class CacheController(ICache cache) : ControllerBase
         currentProcess.Refresh();
         return Ok($"MB: {currentProcess.WorkingSet64 / 1000000}");
     }
+
+    [HttpGet("get-dapper-cached")]
+    public IActionResult GetDapperCached()
+    {
+        var cached = SqlMapper.GetCachedSQL();
+
+        var info = new StringBuilder();
+
+        info.AppendLine($"Count: {SqlMapper.GetCachedSQLCount()}");
+        foreach (var tuple in cached)
+        {
+            info.AppendLine($"Key: {tuple.Item2}, HitCount: {tuple.Item3}");
+        }
+
+        return Ok(info.ToString());
+    }
+
 }
