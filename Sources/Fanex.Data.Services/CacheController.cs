@@ -58,15 +58,7 @@ public class CacheController(ICache cache) : ControllerBase
             ServerStatus = serverStatus
         });
     }
-
-    [HttpGet("Log")]
-    public async Task<IActionResult> Log()
-    {
-        await Logger.Log.InfoAsync("Test Log");
-        return Ok("Log is written");
-    }
-
-
+   
     private async Task<Dictionary<string, DateTimeOffset>> GetServerStatus()
     {
         var (found, serverStatus) =
@@ -76,7 +68,17 @@ public class CacheController(ICache cache) : ControllerBase
             serverStatus = new Dictionary<string, DateTimeOffset>();
         }
 
-        return serverStatus;
+        var dockerSwarmServiceName = GetDockerSwarmServiceName();
+        return serverStatus
+            .Where(v => v.Key.StartsWith(dockerSwarmServiceName))
+            .ToDictionary(v => v.Key, v => v.Value);
+    }
+
+    private string GetDockerSwarmServiceName()
+    {
+        var currentMachineName = Environment.MachineName;
+        var index = currentMachineName.LastIndexOf("-");
+        return currentMachineName.Substring(0, index);
     }
 
     [HttpGet("caching-storage")]
@@ -85,7 +87,7 @@ public class CacheController(ICache cache) : ControllerBase
         return Ok(DbParameterDefinitionCache.GetCachingStorage());
     }
 
-    [HttpGet("pure-cache")]
+    [HttpGet("purge-cache")]
     public IActionResult PureCache()
     {
         SqlMapper.PurgeQueryCache();

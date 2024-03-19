@@ -1,4 +1,5 @@
 using Fanex.Caching.Redis;
+using Fanex.Data.Services;
 using Fanex.Data.Services.Cache;
 using Fanex.Data.Services.Extensions;
 using Fanex.Data.Services.Middleware;
@@ -38,5 +39,6 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 app.MapControllers();
 
 
+HomeController.StartTime = DateTimeOffset.UtcNow;
 
 app.Run();
