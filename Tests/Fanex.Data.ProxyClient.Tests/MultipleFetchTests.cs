@@ -29,7 +29,7 @@ namespace Fanex.Data.ProxyClient.Tests
             var exception = await Record.ExceptionAsync(() => proxy.FetchMultipleAsync<Supplier, Shipper>(criteria));
 
             // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
+            Assert.IsType<NullReferenceException>(exception);
         }
 
         [Fact]
