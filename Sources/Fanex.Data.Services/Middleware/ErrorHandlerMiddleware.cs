@@ -20,18 +20,19 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
 
     private static async Task HandleException(HttpContext context, ObjectDbException exception)
     {
-
-
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        context.Response.ContentType = "text/plain";
-        await context.Response.WriteAsync(exception.Message + Environment.NewLine);
-        await context.Response.WriteAsync(GetInfoException(exception));
-        var exceptionInfo = GetObjectDbExceptionInfo(exception);
-        foreach (var pair in exceptionInfo)
+        try
         {
-            await context.Response.WriteAsync($"{pair.Key}={pair.Value}{Environment.NewLine}");
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync(exception.Message + Environment.NewLine);
+            await context.Response.WriteAsync(GetInfoException(exception));
+            var exceptionInfo = GetObjectDbExceptionInfo(exception);
+            foreach (var pair in exceptionInfo)
+            {
+                await context.Response.WriteAsync($"{pair.Key}={pair.Value}{Environment.NewLine}");
+            }
         }
-
+        catch { }        
     }
 
     private static string GetInfoException(Exception exception)

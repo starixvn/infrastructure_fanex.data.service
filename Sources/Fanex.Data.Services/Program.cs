@@ -1,5 +1,4 @@
 using Fanex.Caching.Redis;
-using Fanex.Data.Services;
 using Fanex.Data.Services.Cache;
 using Fanex.Data.Services.Extensions;
 using Fanex.Data.Services.Middleware;
@@ -19,11 +18,15 @@ services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
 });
+
 services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
 });
-
+services.Configure<HostOptions>(options =>
+{
+    options.ShutdownTimeout = TimeSpan.FromMinutes(5);
+});
 services.AddHostedService<ServerAliveReportService>();
 
 var app = builder.Build();
@@ -38,7 +41,17 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.MapControllers();
 
+var serviceProvider = app.Services;
+var life = serviceProvider.GetService<IHostApplicationLifetime>();
 
-HomeController.StartTime = DateTimeOffset.UtcNow;
+life.ApplicationStopped.Register(() =>
+{
+    Console.WriteLine($"Application is stopped at ${DateTimeOffset.Now}");
+});
+life.ApplicationStopping.Register(() =>
+{
+    Console.WriteLine($"Application is being stopped at {DateTimeOffset.Now}");
+});
+Monitoring.StartTime = DateTimeOffset.UtcNow;
 
 app.Run();

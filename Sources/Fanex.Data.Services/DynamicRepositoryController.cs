@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Fanex.Data.Services;
 
 using Extensions;
+using Fanex.Data.Services.Cache;
 using Newtonsoft.Json;
 using System.Data;
+using System.Reflection;
 
 [Route("api/dynamic-repository")]
 [ApiController]
@@ -16,7 +18,7 @@ public class DynamicRepositoryController : ControllerBase
     {
         using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
 
-        var models = await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet);
+        var models = (await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet)).ToList();
         var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
         var typeNames = proxyParameter.TypeNames ?? new List<string>();
         columnMaps.MapCollection(typeNames.Any() ? typeNames[0] : string.Empty, models);
@@ -26,6 +28,9 @@ public class DynamicRepositoryController : ControllerBase
             Result = models,
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
+
+        Monitoring.UpdateResponseStatistic(models);
+        Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
     }
@@ -41,6 +46,9 @@ public class DynamicRepositoryController : ControllerBase
             Result = model,
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
+
+        Monitoring.UpdateResponseStatistic(model);
+        Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
     }
@@ -62,12 +70,15 @@ public class DynamicRepositoryController : ControllerBase
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
+        Monitoring.UpdateResponseStatistic(fetchedData);
+        Monitoring.UpdateRequestStatistic();
+
         return Ok(proxyResult);
     }
 
     private static async Task<List<dynamic>[]> FetchMultipleAsync(ProxyParameter proxyParameter, int collectionCount)
     {
-        var result = InitializeFetchMultipleResultSet(collectionCount);
+        var fetchedData = InitializeFetchMultipleResultSet(collectionCount);
 
         using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
         using var multiResultReader = await objectDb.QueryMultipleAsync(proxyParameter.ParameterSet);
@@ -76,11 +87,11 @@ public class DynamicRepositoryController : ControllerBase
 
         while (!multiResultReader.IsEmptyOrClosed && index < collectionCount)
         {
-            result[index] = (await multiResultReader.ReadAsync<dynamic>()).ToList();
+            fetchedData[index] = (await multiResultReader.ReadAsync<dynamic>()).ToList();
             index++;
         }
-
-        return result;
+        
+        return fetchedData;
     }
 
     private static List<dynamic>[] InitializeFetchMultipleResultSet(int collectionCount)
@@ -110,6 +121,8 @@ public class DynamicRepositoryController : ControllerBase
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
+        Monitoring.UpdateRequestStatistic();
+
         return Ok(proxyResult);
     }
 
@@ -123,6 +136,8 @@ public class DynamicRepositoryController : ControllerBase
             Result = model,
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
+
+        Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
     }
