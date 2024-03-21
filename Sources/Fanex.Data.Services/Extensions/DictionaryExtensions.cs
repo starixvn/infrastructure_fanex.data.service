@@ -28,12 +28,12 @@ public static class DictionaryExtensions
         {
             var keyByTypeName = $"{key};{typeName}";
 
-            if (TryGetValue(columnMaps, keyByTypeName, out var newKeyByTypeName))
+            if (TryGetValue(columnMaps, keyByTypeName, out var newKeyByTypeName) && !result.ContainsKey(newKeyByTypeName))
             {
                 result[newKeyByTypeName] = value;
             }
 
-            if (TryGetValue(columnMaps, key, out var newKey))
+            if (TryGetValue(columnMaps, key, out var newKey) && !result.ContainsKey(newKey))
             {
                 result[newKey] = value;
             }

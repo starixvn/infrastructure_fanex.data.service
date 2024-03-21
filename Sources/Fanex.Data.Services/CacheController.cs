@@ -88,7 +88,7 @@ public class CacheController(ICache cache) : ControllerBase
     }
 
     [HttpGet("purge-cache")]
-    public IActionResult PureCache()
+    public IActionResult PurgeCache()
     {
         SqlMapper.PurgeQueryCache();
 
