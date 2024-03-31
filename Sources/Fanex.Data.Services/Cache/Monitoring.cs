@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Data;
-using System.Reflection;
+﻿using System.Data;
 
 namespace Fanex.Data.Services.Cache
 {
@@ -31,6 +29,7 @@ namespace Fanex.Data.Services.Cache
         {
             var minute = (DateTimeOffset.UtcNow - StartTime).TotalMinutes;
             var index = (int)Math.Floor(minute);
+            index %= RequestStatisticSize;
             Interlocked.Increment(ref RequestStatistics[index]);
 
             var next = (index + 1) % RequestStatisticSize;
