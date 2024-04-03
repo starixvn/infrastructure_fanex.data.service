@@ -21,11 +21,11 @@ public class DynamicRepositoryController : ControllerBase
         var models = (await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet)).ToList();
         var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
         var typeNames = proxyParameter.TypeNames ?? new List<string>();
-        columnMaps.MapCollection(typeNames.Any() ? typeNames[0] : string.Empty, models);
+        var result = columnMaps.MapCollection(typeNames.Any() ? typeNames[0] : string.Empty, models.ToList());
 
         var proxyResult = new ProxyResult<IEnumerable<dynamic>>
         {
-            Result = models,
+            Result = result,
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
@@ -113,11 +113,10 @@ public class DynamicRepositoryController : ControllerBase
         var model = await objectDb.QueryEntityAsync<dynamic>(proxyParameter.ParameterSet);
 
         var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
-        DictionaryExtensions.MapSingle(columnMaps, string.Empty, model);
 
         var proxyResult = new ProxyResult<dynamic>
         {
-            Result = model,
+            Result = DictionaryExtensions.MapSingle(columnMaps, string.Empty, model),
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 

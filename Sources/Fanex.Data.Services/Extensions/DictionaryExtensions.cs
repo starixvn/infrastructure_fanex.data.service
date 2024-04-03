@@ -2,29 +2,31 @@
 
 public static class DictionaryExtensions
 {
-    public static void MapCollection(this IDictionary<string, string> columnMaps, string typeName, IEnumerable<dynamic> sources)
+    public static IEnumerable<dynamic> MapCollection(this IDictionary<string, string> columnMaps, string typeName, List<dynamic> sources)
     {
         if (sources is null)
         {
-            return;
+            return null;
         }
 
-        foreach (var item in sources)
+        for (var i = 0; i < sources.Count; i++)
         {
-            MapSingle(columnMaps, typeName, item);
+            sources[i] = MapSingle(columnMaps, typeName, sources[i]);
         }
+
+        return sources;
     }
 
-    public static void MapSingle(this IDictionary<string, string> columnMaps, string typeName, dynamic source)
+    public static dynamic MapSingle(this IDictionary<string, string> columnMaps, string typeName, dynamic source)
     {
-        if (source is not IDictionary<string, object>)
+        if (source is not IDictionary<string, object> dictionary)
         {
-            return;
+            return source;
         }
 
-        IDictionary<string, object> result = source;
+        var result = new Dictionary<string, object>();
 
-        foreach (var (key, value) in result)
+        foreach (var (key, value) in dictionary)
         {
             var keyByTypeName = $"{key};{typeName}";
 
@@ -37,7 +39,11 @@ public static class DictionaryExtensions
             {
                 result[newKey] = value;
             }
+
+            result[key] = value;
         }
+
+        return result;
     }
 
     private static bool TryGetValue(IDictionary<string, string> columnMaps, string key, out string value)
