@@ -16,7 +16,6 @@ public class HomeController : ControllerBase
     {
         if ((DateTimeOffset.UtcNow - Monitoring.StartTime).TotalMinutes > longevityMinute)
         {
-            SqlMapper.PurgeQueryCache();
             return Problem(
                 detail: "Time to shutdown",
                 instance: Environment.MachineName,
@@ -30,7 +29,8 @@ public class HomeController : ControllerBase
     [Route("gc")]
     public IActionResult Gc()
     {
-        GC.Collect();
+        GC.Collect(2, GCCollectionMode.Forced, true);
+        GC.Collect(2, GCCollectionMode.Aggressive, true);        
         return Ok("Done Gc");
     }
 

@@ -28,7 +28,7 @@ namespace Fanex.Data.Services.Cache
         public static void UpdateRequestStatistic()
         {
             var minute = (DateTimeOffset.UtcNow - StartTime).TotalMinutes;
-            var index = (int)Math.Floor(minute);
+            var index = (int)Math.Floor(Math.Abs(minute));
             index %= RequestStatisticSize;
             Interlocked.Increment(ref RequestStatistics[index]);
 
