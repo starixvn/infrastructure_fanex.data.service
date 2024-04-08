@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Fanex.Data.Services.Cache;
+﻿using Dapper;
 using Fanex.Caching;
+using Fanex.Data.Services.Cache;
+using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace Fanex.Data.Services;
 
 using Logging;
+using System.Diagnostics;
 
 [Route("api/cache")]
 [ApiController]
@@ -13,8 +16,8 @@ public class CacheController(ICache cache) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Status()
     {
-        var serverStatus= await GetServerStatus();
-        
+        var serverStatus = await GetServerStatus();
+
         return Ok(serverStatus);
     }
 
@@ -55,15 +58,7 @@ public class CacheController(ICache cache) : ControllerBase
             ServerStatus = serverStatus
         });
     }
-
-    [HttpGet("Log")]
-    public async Task<IActionResult> Log()
-    {
-        await Logger.Log.InfoAsync("Test Log");
-        return Ok("Log is written");
-    }
-
-
+   
     private async Task<Dictionary<string, DateTimeOffset>> GetServerStatus()
     {
         var (found, serverStatus) =
@@ -73,7 +68,17 @@ public class CacheController(ICache cache) : ControllerBase
             serverStatus = new Dictionary<string, DateTimeOffset>();
         }
 
-        return serverStatus;
+        var dockerSwarmServiceName = GetDockerSwarmServiceName();
+        return serverStatus
+            .Where(v => v.Key.StartsWith(dockerSwarmServiceName))
+            .ToDictionary(v => v.Key, v => v.Value);
+    }
+
+    private string GetDockerSwarmServiceName()
+    {
+        var currentMachineName = Environment.MachineName;
+        var index = currentMachineName.LastIndexOf("-");
+        return currentMachineName.Substring(0, index);
     }
 
     [HttpGet("caching-storage")]
@@ -81,4 +86,38 @@ public class CacheController(ICache cache) : ControllerBase
     {
         return Ok(DbParameterDefinitionCache.GetCachingStorage());
     }
+
+    [HttpGet("purge-cache")]
+    public IActionResult PurgeCache()
+    {
+        SqlMapper.PurgeQueryCache();
+
+        return Ok();
+    }
+
+
+    [HttpGet("get-current-memory")]
+    public IActionResult GetCurrentMemory()
+    {
+        Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+        currentProcess.Refresh();
+        return Ok($"MB: {currentProcess.WorkingSet64 / 1000000}");
+    }
+
+    [HttpGet("get-dapper-cached")]
+    public IActionResult GetDapperCached()
+    {
+        var cached = SqlMapper.GetCachedSQL();
+
+        var info = new StringBuilder();
+
+        info.AppendLine($"Count: {SqlMapper.GetCachedSQLCount()}");
+        foreach (var tuple in cached)
+        {
+            info.AppendLine($"Key: {tuple.Item2}, HitCount: {tuple.Item3}");
+        }
+
+        return Ok(info.ToString());
+    }
+
 }
