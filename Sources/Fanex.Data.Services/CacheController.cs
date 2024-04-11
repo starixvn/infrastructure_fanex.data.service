@@ -6,7 +6,6 @@ using System.Text;
 
 namespace Fanex.Data.Services;
 
-using Logging;
 using System.Diagnostics;
 
 [Route("api/cache")]
@@ -74,11 +73,11 @@ public class CacheController(ICache cache) : ControllerBase
             .ToDictionary(v => v.Key, v => v.Value);
     }
 
-    private string GetDockerSwarmServiceName()
+    private static string GetDockerSwarmServiceName()
     {
         var currentMachineName = Environment.MachineName;
         var index = currentMachineName.LastIndexOf("-");
-        return currentMachineName.Substring(0, index);
+        return currentMachineName[..index];
     }
 
     [HttpGet("caching-storage")]
@@ -96,15 +95,15 @@ public class CacheController(ICache cache) : ControllerBase
     }
 
 
-    [HttpGet("get-current-memory")]
+    [HttpGet("memory")]
     public IActionResult GetCurrentMemory()
     {
-        Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+        using var currentProcess = Process.GetCurrentProcess();
         currentProcess.Refresh();
         return Ok($"MB: {currentProcess.WorkingSet64 / 1000000}");
     }
 
-    [HttpGet("get-dapper-cached")]
+    [HttpGet("dapper-cached")]
     public IActionResult GetDapperCached()
     {
         var cached = SqlMapper.GetCachedSQL();

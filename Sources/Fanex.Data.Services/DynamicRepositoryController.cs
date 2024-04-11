@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Fanex.Data.Services;
 
 using Extensions;
-using Fanex.Data.Services.Cache;
+using Cache;
 using Newtonsoft.Json;
 using System.Data;
 

@@ -38,7 +38,7 @@ public class HomeController : ControllerBase
     [HttpGet("Log")]
     public async Task<IActionResult> Log()
     {
-        await Fanex.Logging.Logger.Log.InfoAsync("Test Log");
+        await Logging.Logger.Log.InfoAsync("Test Log");
         return Ok("Log is written");
     }
 
