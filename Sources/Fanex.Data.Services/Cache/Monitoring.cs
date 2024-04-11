@@ -1,84 +1,83 @@
 ﻿using System.Data;
 
-namespace Fanex.Data.Services.Cache
+namespace Fanex.Data.Services.Cache;
+
+public static class Monitoring
 {
-    public static class Monitoring
+    public static DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
+
+    private const int ResponseStatisticSize = 20;
+
+    private const int RequestStatisticSize = 3 * 24 * 60;
+
+    public static int[] ResponseStatistics { get; set; } = CreateResponseStatistics();
+
+    public static int[] RequestStatistics { get; set; } = CreateRequestStatistics();
+
+
+    public static int[] CreateResponseStatistics()
     {
-        public static DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
+        return Enumerable.Repeat(0, ResponseStatisticSize).ToArray();
+    }
 
-        private const int ResponseStatisticSize = 20;
+    public static int[] CreateRequestStatistics()
+    {
+        return Enumerable.Repeat(0, RequestStatisticSize).ToArray();
+    }
 
-        private const int RequestStatisticSize = 3 * 24 * 60;
+    public static void UpdateRequestStatistic()
+    {
+        var minute = (DateTimeOffset.UtcNow - StartTime).TotalMinutes;
+        var index = (int)Math.Floor(Math.Abs(minute));
+        index %= RequestStatisticSize;
+        Interlocked.Increment(ref RequestStatistics[index]);
 
-        public static int[] ResponseStatistics { get; set; } = CreateResponseStatistics();
+        var next = (index + 1) % RequestStatisticSize;
+        RequestStatistics[next] = 0;
+    }
 
-        public static int[] RequestStatistics { get; set; } = CreateRequestStatistics();
-
-
-        public static int[] CreateResponseStatistics()
+    public static void UpdateResponseStatistic(DataSet dataset)
+    {
+        if (dataset == null || dataset.Tables == null)
         {
-            return Enumerable.Repeat(0, ResponseStatisticSize).ToArray();
+            return;
         }
 
-        public static int[] CreateRequestStatistics()
+        var maxCount = 0;
+        foreach (DataTable table in dataset.Tables)
         {
-            return Enumerable.Repeat(0, RequestStatisticSize).ToArray();
+            maxCount = Math.Max(maxCount, table.Rows.Count);
         }
 
-        public static void UpdateRequestStatistic()
-        {
-            var minute = (DateTimeOffset.UtcNow - StartTime).TotalMinutes;
-            var index = (int)Math.Floor(Math.Abs(minute));
-            index %= RequestStatisticSize;
-            Interlocked.Increment(ref RequestStatistics[index]);
+        UpdateResponseStatistic(maxCount);
+    }
 
-            var next = (index + 1) % RequestStatisticSize;
-            RequestStatistics[next] = 0;
+    public static void UpdateResponseStatistic(List<dynamic> models)
+    {
+        if (models == null)
+        {
+            return;
         }
 
-        public static void UpdateResponseStatistic(DataSet dataset)
+        UpdateResponseStatistic(models.Count);
+    }
+
+    public static void UpdateResponseStatistic(List<dynamic>[] models)
+    {
+        if (models == null)
         {
-            if (dataset == null || dataset.Tables == null)
-            {
-                return;
-            }
-
-            var maxCount = 0;
-            foreach (DataTable table in dataset.Tables)
-            {
-                maxCount = Math.Max(maxCount, table.Rows.Count);
-            }
-
-            UpdateResponseStatistic(maxCount);
+            return;
         }
 
-        public static void UpdateResponseStatistic(List<dynamic> models)
-        {
-            if (models == null)
-            {
-                return;
-            }
+        var maxCount = models.Select(m => m != null ? m.Count : 0).Max();
+        UpdateResponseStatistic(maxCount);
+    }
 
-            UpdateResponseStatistic(models.Count);
-        }
+    private static void UpdateResponseStatistic(int dataLength)
+    {
+        var index = (int)Math.Floor((decimal)dataLength / 500);
+        index = index >= ResponseStatisticSize ? ResponseStatisticSize - 1 : index;
 
-        public static void UpdateResponseStatistic(List<dynamic>[] models)
-        {
-            if (models == null)
-            {
-                return;
-            }
-
-            var maxCount = models.Select(m => m != null ? m.Count : 0).Max();
-            UpdateResponseStatistic(maxCount);
-        }
-
-        private static void UpdateResponseStatistic(int dataLength)
-        {
-            var index = (int)Math.Floor((decimal)dataLength / 500);
-            index = index >= ResponseStatisticSize ? ResponseStatisticSize - 1 : index;
-
-            Interlocked.Increment(ref ResponseStatistics[index]);
-        }
+        Interlocked.Increment(ref ResponseStatistics[index]);
     }
 }

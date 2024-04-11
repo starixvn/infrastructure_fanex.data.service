@@ -38,7 +38,7 @@ public class HomeController : ControllerBase
     [HttpGet("Log")]
     public async Task<IActionResult> Log()
     {
-        await Fanex.Logging.Logger.Log.InfoAsync("Test Log");
+        await Logging.Logger.Log.InfoAsync("Test Log");
         return Ok("Log is written");
     }
 
@@ -75,6 +75,6 @@ public class HomeController : ControllerBase
     private static int GetRandomMinute()
     {
         var random = new Random(DateTime.Now.Second);
-        return random.Next(8 * 60, 16 * 60);
+        return random.Next(4 * 60, 6 * 60);
     }
 }

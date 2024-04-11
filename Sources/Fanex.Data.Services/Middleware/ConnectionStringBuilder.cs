@@ -6,15 +6,17 @@ internal class ConnectionStringBuilder(string connectionString)
     private const string DefaultServerKeyword = "data source";
     private const string DefaultUserIdKeyword = "user id";
 
-    private static readonly string[] ServerAliases = { DefaultServerKeyword, "server", "host", "datasource", "address", "addr", "network address" };
-    private static readonly string[] UserIdAliases = { DefaultUserIdKeyword, "uid", "username", "user name", "user", "userid" };
+    private static readonly string[] ServerAliases = [DefaultServerKeyword, "server", "host", "datasource", "address", "addr", "network address"
+    ];
+    private static readonly string[] UserIdAliases = [DefaultUserIdKeyword, "uid", "username", "user name", "user", "userid"
+    ];
 
     private readonly IDictionary<string, string> connectionStringKeyValuePairs = BuildConnectionStringKeyValues(connectionString);
 
     private static IDictionary<string, string> BuildConnectionStringKeyValues(string connectionString)
         => connectionString.Split(';')
             .Where(kvp => kvp.Contains('='))
-            .Select(kvp => kvp.Split(new[] { '=' }, SplitIndex))
+            .Select(kvp => kvp.Split(['='], SplitIndex))
             .ToDictionary(kvp => kvp[0].Trim(),
                 kvp => kvp[1].Trim(),
                 StringComparer.InvariantCultureIgnoreCase);

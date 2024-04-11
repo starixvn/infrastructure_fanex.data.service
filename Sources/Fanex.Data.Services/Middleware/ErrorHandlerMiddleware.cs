@@ -39,7 +39,7 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
     {
         try
         {
-            string[] lines = exception.StackTrace.Split("\n");
+            var lines = exception.StackTrace.Split("\n");
             return lines.Length > 0 ? lines[0] + Environment.NewLine : string.Empty;
         }
         catch (Exception)
@@ -60,7 +60,7 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
             [nameof(exception.SpName)] = exception.SpName,
             ["Parameters"] = GetParameters(exception.Parameters),
             [nameof(exception.CommandTimeout)] = exception.CommandTimeout,
-            ["CommandDefinition"] = JsonConvert.SerializeObject(exception.CommandDefinition),
+            ["CommandDefinition"] = JsonConvert.SerializeObject(exception.CommandDefinition)
         };
     }
 
