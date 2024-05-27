@@ -114,7 +114,7 @@ namespace Fanex.Data.Repository.Tests
         public async Task FetchAsync_100kItem_ReturnNormally()
         {
             // Arrange.
-            var criteria = new Get100kItemsCriteria();
+            var criteria = new Get100ThousandItemsCriteria();
 
             // Act.
             var actualResult = await repository

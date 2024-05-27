@@ -1,4 +1,5 @@
-﻿using Fanex.Data.Models;
+﻿using Constants;
+using Fanex.Data.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -21,7 +22,7 @@ namespace Fanex.Data
                 return default;
             }
 
-            return TypeHelpers.IsSimpleType(type) ? ToSimpleType<T>(token).First() : token.ToObject<T>(jsonSerializer);
+            return TypeHelpers.IsSimpleType(type) ? ToSimpleType<T>(token)[0] : token.ToObject<T>(jsonSerializer);
         }
 
         private static IList<T> ToSimpleType<T>(this JToken token)

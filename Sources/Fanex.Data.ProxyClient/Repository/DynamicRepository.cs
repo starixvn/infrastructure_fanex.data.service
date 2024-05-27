@@ -27,13 +27,13 @@
 
         #region sync
 
-        public IEnumerable<T> Fetch<T>(ICriteria criteria, string serverIp = "") => FetchAsync<T>(criteria, serverIp).Result;
+        public IEnumerable<T> Fetch<T>(ICriteria criteria, string serverIp = "") => FetchAsync<T>(criteria, serverIp).GetAwaiter().GetResult();
 
-        public DataSet FetchDataSet(ICriteria criteria, string serverIp = "") => FetchDataSetAsync(criteria, serverIp).Result;
+        public DataSet FetchDataSet(ICriteria criteria, string serverIp = "") => FetchDataSetAsync(criteria, serverIp).GetAwaiter().GetResult();
 
-        public T Get<T>(ICriteria criteria, string serverIp = "") => GetAsync<T>(criteria, serverIp).Result;
+        public T Get<T>(ICriteria criteria, string serverIp = "") => GetAsync<T>(criteria, serverIp).GetAwaiter().GetResult();
 
-        public int Execute(INonQueryCommand command, string serverIp = "") => ExecuteAsync(command, serverIp).Result;
+        public int Execute(INonQueryCommand command, string serverIp = "") => ExecuteAsync(command, serverIp).GetAwaiter().GetResult();
 
         #endregion
 
@@ -114,7 +114,7 @@
             var response = await PostAsync(endpoint, requestJson).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
-                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false) + $". Status code: {response.StatusCode}";
                 throw DbProxyNotSuccessHttpException.Create(endpoint, requestJson, json);
             }
 
