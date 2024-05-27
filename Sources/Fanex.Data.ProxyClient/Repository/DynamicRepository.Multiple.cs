@@ -7,16 +7,16 @@
     using System.Threading.Tasks;
     public partial class DynamicRepository : IDynamicRepository
     {
-        public (IEnumerable<T1>, IEnumerable<T2>) FetchMultiple<T1, T2>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2>(criteria, serverIp).Result;
+        public (IEnumerable<T1>, IEnumerable<T2>) FetchMultiple<T1, T2>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2>(criteria, serverIp).GetAwaiter().GetResult();
 
-        public (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>) FetchMultiple<T1, T2, T3>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2, T3>(criteria, serverIp).Result;
+        public (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>) FetchMultiple<T1, T2, T3>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2, T3>(criteria, serverIp).GetAwaiter().GetResult();
 
         public (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>) FetchMultiple<T1, T2, T3, T4>(ICriteria criteria, string serverIp = "")
-            => FetchMultipleAsync<T1, T2, T3, T4>(criteria, serverIp).Result;
+            => FetchMultipleAsync<T1, T2, T3, T4>(criteria, serverIp).GetAwaiter().GetResult();
 
-        public (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>) FetchMultiple<T1, T2, T3, T4, T5>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2, T3, T4, T5>(criteria, serverIp).Result;
+        public (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>) FetchMultiple<T1, T2, T3, T4, T5>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2, T3, T4, T5>(criteria, serverIp).GetAwaiter().GetResult();
 
-        public (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>) FetchMultiple<T1, T2, T3, T4, T5, T6>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2, T3, T4, T5, T6>(criteria, serverIp).Result;
+        public (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>) FetchMultiple<T1, T2, T3, T4, T5, T6>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2, T3, T4, T5, T6>(criteria, serverIp).GetAwaiter().GetResult();
 
         public async Task<(IEnumerable<T1>, IEnumerable<T2>)> FetchMultipleAsync<T1, T2>(ICriteria criteria, string serverIp = "")
         {
