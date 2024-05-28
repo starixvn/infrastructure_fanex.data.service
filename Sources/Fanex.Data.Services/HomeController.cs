@@ -49,7 +49,7 @@ public class HomeController : ControllerBase
         var workedMinute = (DateTimeOffset.UtcNow - Monitoring.StartTime).TotalMinutes;
         var remainMinute = longevityMinute - workedMinute;
 
-        return Ok(new { longevityMinute, workedMinute, remainMinute });
+        return Ok(new { longevityMinute, workedMinute, remainMinute, server = Environment.MachineName });
     }
 
     [HttpGet("statistic")]
@@ -68,7 +68,8 @@ public class HomeController : ControllerBase
                     Longevity = longevityMinute,
                     WorkedMinute = workedMinute,
                     RemainMinute = remainMinute
-                }
+                },
+                server = Environment.MachineName
             });
     }
 

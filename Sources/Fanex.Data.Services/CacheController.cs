@@ -39,7 +39,7 @@ public class CacheController(ICache cache) : ControllerBase
     public async Task<IActionResult> ClearServerStatus()
     {
         await cache.RemoveAsync(CacheKey.ServerStatusCacheKey);
-        return Ok();
+        return Ok(Environment.MachineName);
     }
 
     [HttpGet("clear-all-fanex-data-cache")]
@@ -57,7 +57,7 @@ public class CacheController(ICache cache) : ControllerBase
             ServerStatus = serverStatus
         });
     }
-   
+
     private async Task<Dictionary<string, DateTimeOffset>> GetServerStatus()
     {
         var (found, serverStatus) =
@@ -91,9 +91,17 @@ public class CacheController(ICache cache) : ControllerBase
     {
         SqlMapper.PurgeQueryCache();
 
-        return Ok();
+        return Ok(Environment.MachineName);
     }
 
+    [HttpGet("clean")]
+    public IActionResult CleanCache()
+    {
+        SqlMapper.PurgeQueryCache();
+        DbParameterDefinitionCache.Clear();
+
+        return Ok(Environment.MachineName);
+    }
 
     [HttpGet("memory")]
     public IActionResult GetCurrentMemory()

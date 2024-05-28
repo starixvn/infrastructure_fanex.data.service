@@ -16,6 +16,10 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
         {
             await HandleException(context, exception);
         }
+        catch (Exception exception)
+        {
+            await HandleException(context, exception);
+        }
     }
 
     private static async Task HandleException(HttpContext context, ObjectDbException exception)
@@ -25,6 +29,7 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "text/plain";
             await context.Response.WriteAsync(exception.Message + Environment.NewLine);
+            await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
             await context.Response.WriteAsync(GetInfoException(exception));
             var exceptionInfo = GetObjectDbExceptionInfo(exception);
             foreach (var pair in exceptionInfo)
@@ -70,4 +75,16 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
                 .Select(parameter => $"{parameter.Key}={parameter.Value}")
                 .Aggregate((firstPair, secondPair) => $"{firstPair};{secondPair}")
             : string.Empty;
+
+    private static async Task HandleException(HttpContext context, Exception exception)
+    {
+        try
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync(exception.Message + Environment.NewLine);
+            await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
+        }
+        catch { }
+    }
 }
