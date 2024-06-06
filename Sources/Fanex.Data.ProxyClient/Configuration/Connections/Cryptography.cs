@@ -1,6 +1,7 @@
 ﻿namespace Fanex.Data
 {
     using System;
+    using System.Buffers.Text;
     using System.Data.Common;
     using System.IO;
     using System.Security.Cryptography;
@@ -73,7 +74,7 @@
             };
             var encryptedPassword = connectionStringBuilder.GetPassword();
 
-            if (!string.IsNullOrEmpty(encryptedPassword))
+            if (!string.IsNullOrEmpty(encryptedPassword) && IsBase64String(encryptedPassword))
             {
                 var decryptedPassword = DecryptPassword(encryptedPassword);
 
@@ -83,6 +84,25 @@
             }
 
             return connectionString;
+        }
+
+        private static bool IsBase64String(string value)
+        {
+            value = StandardizeEncryptedPasswordLength(value);
+#if NET5_0_OR_GREATER
+            var buffer = new Span<byte>(new byte[value.Length]);
+            return Convert.TryFromBase64String(value, buffer, out int bytesParsed);
+#else
+            try
+            {
+                Convert.FromBase64String(value);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+#endif
         }
 
         /// <summary>

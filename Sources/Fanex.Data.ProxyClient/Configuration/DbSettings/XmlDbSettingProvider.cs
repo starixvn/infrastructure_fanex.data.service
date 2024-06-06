@@ -27,7 +27,7 @@ namespace Fanex.Data
         public XmlDbSettingProvider(string resourcePath, Dictionary<string, ConnectionConfiguration> connectionMaps)
             : base(resourcePath)
         {
-            ConnectionStringProvider = new XmlConnectionStringProvider(connectionMaps);
+            ConnectionStringProvider = new DefaultConnectionStringProvider(connectionMaps);
         }
 
         public override IDictionary<string, DbSetting> SettingDataSource => settingDataSource;

@@ -18,7 +18,20 @@ namespace Fanex.Data
         protected Dictionary<string, ConnectionConfiguration> ConnectionMaps { get; set; }
 
         internal void Initialize(Dictionary<string, ConnectionConfiguration> connectionMaps)
-            => ConnectionMaps = connectionMaps;
+        {
+            if (connectionMaps == null)
+            {
+                throw new ArgumentNullException(nameof(connectionMaps));
+            }
+
+            if (connectionMaps.Count == 0)
+            {
+                throw new ArgumentException($"The passed {nameof(connectionMaps)} contains no connection configuration.", nameof(connectionMaps));
+            }
+
+            ConnectionMaps = connectionMaps;
+            connectionCache.Clear();
+        }
 
         public virtual string GetConnectionString(string connectionAlias, bool isEncrypted = true)
         {

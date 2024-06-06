@@ -86,5 +86,7 @@
     <Mapping DataField="givenCredit" ObjectProperty="GivenCredit" />
     <Mapping DataField="memberCredit" ObjectProperty="MemberCredit" />
   </Setting>
+  <Setting Key="FanexDataIpById" SpName="FanexDataIpById" DbName="DBACC.bodb02.wsv_nap" />    
+  
 </Function>
 

@@ -119,7 +119,7 @@
 
         private static async Task<RemoveCacheResult> RemoveAllStoredProcedureCache()
         {
-            const string endpoint = "api/cache/clear-all-fanex-data-cache";
+            const string endpoint = "api/cache/clean";
             try
             {
                 var requestJsonContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
