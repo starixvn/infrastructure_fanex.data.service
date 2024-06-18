@@ -100,6 +100,43 @@ namespace Fanex.Data.ProxyClient.Tests
             Assert.Contains("user id=newUser", updatedConnection.ConnectionString);
             Assert.Contains("password=newPass", updatedConnection.ConnectionString);
         }
+
+        [Fact]
+        public async Task TryLoadAsync_LoadsCredentialsSuccessfully()
+        {
+            // Arrange
+            var vaultProvider = Substitute.For<VaultProvider>();
+            var connectionAliases = new List<string> { "alias1", "alias2" };
+            var expectedCredentials = new List<DatabaseCredential>
+            {
+                new DatabaseCredential("alias1") { IP = "ip1", Username = "user1", Password = "pass1" },
+                new DatabaseCredential("alias2") { IP = "ip2", Username = "user2", Password = "pass2" }
+            };
+            vaultProvider.LoadAsync(connectionAliases).Returns(expectedCredentials);
+
+            var vaultService = new VaultServiceImp(vaultProvider);
+
+            // Act
+            var actualCredentials = await vaultService.TryLoadAsync(connectionAliases, 1);
+
+            // Assert
+            Assert.Equal(expectedCredentials, actualCredentials);
+        }
+
+        [Fact]
+        public async Task TryLoadAsync_RetriesOnFailure()
+        {
+            // Arrange
+            var vaultProvider = Substitute.For<VaultProvider>();
+            var connectionAliases = new List<string> { "alias1", "alias2" };
+            vaultProvider.When(x => x.LoadAsync(connectionAliases)).Do(x => { throw new Exception(); });
+
+            var vaultService = new VaultServiceImp(vaultProvider);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(() => vaultService.TryLoadAsync(connectionAliases, 2));
+            await vaultProvider.Received(2).LoadAsync(connectionAliases);
+        }
     }
 }
 #endif
