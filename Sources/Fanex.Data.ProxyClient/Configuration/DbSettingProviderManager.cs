@@ -113,7 +113,7 @@ namespace Fanex.Data
 
         public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps)
         {
-            this.ConnectionMaps = connectionMaps ?? throw new ArgumentNullException(nameof(connectionMaps));
+            ConnectionMaps = connectionMaps ?? throw new ArgumentNullException(nameof(connectionMaps));
             connectionStringProvider = new DefaultConnectionStringProvider(connectionMaps);
             connectionStringProvider.Initialize(connectionMaps);
 

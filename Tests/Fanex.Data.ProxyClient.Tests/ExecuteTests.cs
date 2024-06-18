@@ -90,7 +90,7 @@ namespace Fanex.Data.ProxyClient.Tests
         public async Task ExecuteAsync_ByteArray_ExecuteSuccess()
         {
             // Arrange.
-            var command = new PassByteArray()
+            var command = new PassByteArray
             {
                 ImageId = 1,
                 Image = new byte[] { 1, 5, 4, 6, 8 }

@@ -6,7 +6,7 @@ namespace Constants
 {
     internal static class TypeHelpers
     {
-        private static readonly IList<Type> SimpleTypes = new List<Type>()
+        private static readonly IList<Type> SimpleTypes = new List<Type>
         {
             typeof(byte),
             typeof(sbyte),
@@ -45,7 +45,7 @@ namespace Constants
             typeof(SqlDecimal),
             typeof(SqlDecimal?),
             typeof(SqlMoney),
-            typeof(SqlMoney?),
+            typeof(SqlMoney?)
         };
 
         public static bool IsSimpleType(Type type)

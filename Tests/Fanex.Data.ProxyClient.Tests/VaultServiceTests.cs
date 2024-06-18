@@ -41,7 +41,7 @@ namespace Fanex.Data.ProxyClient.Tests
             var vaultProvider = Substitute.For<VaultProvider>();
             var callCount = 0;
             vaultProvider.LoadAsync(Arg.Any<List<string>>())
-                .Returns(async (x) =>
+                .Returns(async _ =>
                     callCount++ == 0
                         ? throw new Exception("Exception at function LoadAsync")
                         : new List<DatabaseCredential>());
@@ -56,7 +56,7 @@ namespace Fanex.Data.ProxyClient.Tests
         {
             var vaultProvider = Substitute.For<VaultProvider>();
             vaultProvider.LoadAsync(Arg.Any<List<string>>())
-                .Returns(async (x) => throw new Exception("Exception at function LoadAsync"));
+                .Returns(async _ => throw new Exception("Exception at function LoadAsync"));
             var vaultService = new VaultServiceImp(vaultProvider);
 
             await Assert.ThrowsAsync<Exception>(async () => await vaultService.TryLoadAsync(new List<string>(), 2));
@@ -72,8 +72,7 @@ namespace Fanex.Data.ProxyClient.Tests
             await vaultService.UpdateConnectionMaps();
 
             var actualConnectionString = DbSettingProviderManager.CurrentSession.ConnectionMaps["DBACC.bodb02.wsv_nap"].ConnectionString;
-            var expected =
-                "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
+            const string expected = "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
             Assert.Equal(expected, actualConnectionString);
         }
     }

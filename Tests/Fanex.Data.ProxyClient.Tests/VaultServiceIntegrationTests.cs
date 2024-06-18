@@ -13,7 +13,7 @@ namespace Fanex.Data.ProxyClient.Tests
     /*
     CREATE PROCEDURE FanexDataIpById
     AS
-    SELECT 1 AS Id, '10.18.200.58' AS [IP], SUSER_NAME() AS [Username]
+    SELECT 1 AS ID, '10.18.200.58' AS [IP], SUSER_NAME() AS [Username]
 
     GO
     GRANT EXECUTE ON FanexDataIpById TO wsv_nap

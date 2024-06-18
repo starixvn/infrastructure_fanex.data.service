@@ -22,7 +22,7 @@ namespace Fanex.Data.ProxyClient.Tests
                 Role = "4b985f89-4ec5-abf9-ebaa-f49bdb743d43",
                 SecretId = "caaa9926-4a84-5253-a01d-e8698440dd10"
             };
-            var aliases = new List<string>()
+            var aliases = new List<string>
             {
                 "DBACC.bodb02.wsv_nap"
             };

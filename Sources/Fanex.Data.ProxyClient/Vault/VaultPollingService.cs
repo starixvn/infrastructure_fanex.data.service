@@ -17,11 +17,11 @@ namespace Fanex.Data.Vault
 
     internal class VaultPollingServiceImp : VaultPollingService
     {
-        private Thread pollingThread = null;
+        private Thread pollingThread;
 
-        private bool running = false;
+        private bool running;
 
-        private int secondsDelay = 5 * 60;
+        private int delay = 5 * 60;
 
         private readonly VaultProvider provider;
 
@@ -37,7 +37,7 @@ namespace Fanex.Data.Vault
             Stop();
 
             running = true;
-            this.secondsDelay = secondsDelay;
+            delay = secondsDelay;
             pollingThread = new Thread(Poll);
             pollingThread.Start();
         }
@@ -58,7 +58,7 @@ namespace Fanex.Data.Vault
             while (running)
             {
                 SafeReloadDbSettingProvider(vaultService);
-                Thread.Sleep(secondsDelay * 1000);
+                Thread.Sleep(delay * 1000);
             }
         }
 

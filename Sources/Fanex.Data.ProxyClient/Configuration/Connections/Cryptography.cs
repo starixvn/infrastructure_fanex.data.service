@@ -1,7 +1,6 @@
 ﻿namespace Fanex.Data
 {
     using System;
-    using System.Buffers.Text;
     using System.Data.Common;
     using System.IO;
     using System.Security.Cryptography;
@@ -91,7 +90,7 @@
             value = StandardizeEncryptedPasswordLength(value);
 #if NET5_0_OR_GREATER
             var buffer = new Span<byte>(new byte[value.Length]);
-            return Convert.TryFromBase64String(value, buffer, out int bytesParsed);
+            return Convert.TryFromBase64String(value, buffer, out _);
 #else
             try
             {

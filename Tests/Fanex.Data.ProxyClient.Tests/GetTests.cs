@@ -217,7 +217,7 @@ namespace Fanex.Data.ProxyClient.Tests
         {
             // Arrange.
 
-            var criteria = new GetDateTimeNowCriteria()
+            var criteria = new GetDateTimeNowCriteria
             {
                 Now = DateTime.Today
             };

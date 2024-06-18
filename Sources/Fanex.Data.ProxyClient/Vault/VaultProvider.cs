@@ -9,23 +9,25 @@
     public interface VaultProvider
     {
         Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases);
+
+        void ResetVaultToken();
     }
 
     public class VaultProviderImp : VaultProvider
     {
         private readonly VaultOptions vaultOptions;
-
+        private readonly VaultClient vaultClient;
         public VaultProviderImp(VaultOptions vaultOptions)
         {
             this.vaultOptions = vaultOptions;
+            this.vaultClient = CreateVaultClient(vaultOptions);
         }
 
         public async Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases)
         {
-            var client = CreateVaultClient();
             var result = new List<DatabaseCredential>();
             const string dbAliasPath = "database/alias";
-            var aliasSecrets = await client.V1.Secrets.KeyValue.V2
+            var aliasSecrets = await vaultClient.V1.Secrets.KeyValue.V2
                 .ReadSecretAsync(dbAliasPath, null, vaultOptions.MountPath)
                 .ConfigureAwait(false);
 
@@ -41,13 +43,13 @@
 
                 var dbLogin = parts[2];
                 var credentialPath = $"database/credentials/{dbLogin}";
-                var credentialSecrets = await client.V1.Secrets.KeyValue.V2
+                var credentialSecrets = await vaultClient.V1.Secrets.KeyValue.V2
                     .ReadSecretAsync(credentialPath, null, vaultOptions.MountPath)
                     .ConfigureAwait(false);
                 var username = credentialSecrets.Data.Data["username"].ToString();
                 var password = credentialSecrets.Data.Data["password"].ToString();
 
-                var ip = aliasSecrets.Data.Data.ContainsKey(dbAlias) ? aliasSecrets.Data.Data[dbAlias].ToString() : string.Empty;
+                var ip = aliasSecrets.Data.Data.TryGetValue(dbAlias, out var value) ? value.ToString() : string.Empty;
 
                 var item = new DatabaseCredential(alias)
                 {
@@ -62,7 +64,7 @@
             return result.OrderBy(v => v.Key).ToList();
         }
 
-        private VaultClient CreateVaultClient()
+        private static VaultClient CreateVaultClient(VaultOptions vaultOptions)
         {
             var vaultClientSettings = new VaultClientSettings(
                 vaultOptions.Address,
@@ -70,6 +72,11 @@
             );
 
             return new VaultClient(vaultClientSettings);
+        }
+
+        public void ResetVaultToken()
+        {
+            vaultClient.V1.Auth.ResetVaultToken();
         }
     }
 }

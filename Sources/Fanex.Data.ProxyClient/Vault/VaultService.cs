@@ -60,6 +60,7 @@ namespace Fanex.Data.Vault
                 catch (Exception e)
                 {
                     latestException = e;
+                    vaultProvider.ResetVaultToken();
                 }
 
                 await Task.Delay(5000).ConfigureAwait(false);
@@ -80,12 +81,7 @@ namespace Fanex.Data.Vault
                 return false;
             }
 
-            if (currentCredentials == null)
-            {
-                return true;
-            }
-
-            return currentCredentials.SequenceEqual(credentials);
+            return currentCredentials == null || currentCredentials.SequenceEqual(credentials);
         }
 
         private static void UpdateConnectionMapsByVaultCredentials(
@@ -94,12 +90,11 @@ namespace Fanex.Data.Vault
         {
             foreach (var item in credentials)
             {
-                if (!connectionMaps.ContainsKey(item.Key))
+                if (!connectionMaps.TryGetValue(item.Key, out var connection))
                 {
                     continue;
                 }
 
-                var connection = connectionMaps[item.Key];
                 var builder = new DbConnectionStringBuilder
                 {
                     ConnectionString = connection.ConnectionString
