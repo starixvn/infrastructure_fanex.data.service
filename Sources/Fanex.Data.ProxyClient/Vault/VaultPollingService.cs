@@ -23,11 +23,11 @@ namespace Fanex.Data.Vault
 
         private int delay = 5 * 60;
 
-        private readonly VaultProvider provider;
+        private readonly VaultService vaultService;
 
         internal VaultPollingServiceImp(VaultProvider provider)
         {
-            this.provider = provider;
+            vaultService = new VaultServiceImp(provider);
         }
 
         public Exception LatestException { get; private set; }
@@ -54,15 +54,14 @@ namespace Fanex.Data.Vault
 
         private void Poll()
         {
-            var vaultService = new VaultServiceImp(provider);
             while (running)
             {
-                SafeReloadDbSettingProvider(vaultService);
+                SafeReloadDbSettingProvider();
                 Thread.Sleep(delay * 1000);
             }
         }
 
-        private void SafeReloadDbSettingProvider(VaultService vaultService)
+        private void SafeReloadDbSettingProvider()
         {
             try
             {

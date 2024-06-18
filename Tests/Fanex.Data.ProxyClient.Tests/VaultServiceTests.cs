@@ -75,6 +75,31 @@ namespace Fanex.Data.ProxyClient.Tests
             const string expected = "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
             Assert.Equal(expected, actualConnectionString);
         }
+
+        [Fact]
+        public void UpdateConnectionMapsByVaultCredentials_UpdatesCorrectly()
+        {
+            // Arrange
+            var vaultProvider = Substitute.For<VaultProvider>();
+            var vaultService = new VaultServiceImp(vaultProvider);
+            var connectionMaps = new Dictionary<string, ConnectionConfiguration>
+            {
+                { "testKey", new ConnectionConfiguration("alias", "server=test;user id=test;password=test", "provider") }
+            };
+            var credentials = new List<DatabaseCredential>
+            {
+                new DatabaseCredential("testKey") {  IP = "newIP", Username = "newUser", Password = "newPass" }
+            };
+
+            // Act
+            vaultService.UpdateConnectionMapsByVaultCredentials(connectionMaps, credentials);
+
+            // Assert
+            var updatedConnection = connectionMaps["testKey"];
+            Assert.Contains("server=newIP", updatedConnection.ConnectionString);
+            Assert.Contains("user id=newUser", updatedConnection.ConnectionString);
+            Assert.Contains("password=newPass", updatedConnection.ConnectionString);
+        }
     }
 }
 #endif

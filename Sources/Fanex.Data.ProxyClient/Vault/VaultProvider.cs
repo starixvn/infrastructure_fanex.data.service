@@ -11,12 +11,18 @@
         Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases);
 
         void ResetVaultToken();
+
+        Task EnsureVaultTokenIsValid();
     }
 
     public class VaultProviderImp : VaultProvider
     {
+        private const int MinTimeToLive = 15;
+
         private readonly VaultOptions vaultOptions;
+        
         private readonly VaultClient vaultClient;
+
         public VaultProviderImp(VaultOptions vaultOptions)
         {
             this.vaultOptions = vaultOptions;
@@ -62,6 +68,16 @@
             }
 
             return result.OrderBy(v => v.Key).ToList();
+        }
+
+        public async Task EnsureVaultTokenIsValid()
+        {
+            var tokenData = await vaultClient.V1.Auth.Token.LookupSelfAsync();
+            var timeToLive = tokenData.Data.TimeToLive;
+            if (timeToLive < MinTimeToLive)
+            {
+                vaultClient.V1.Auth.ResetVaultToken();
+            }
         }
 
         private static VaultClient CreateVaultClient(VaultOptions vaultOptions)

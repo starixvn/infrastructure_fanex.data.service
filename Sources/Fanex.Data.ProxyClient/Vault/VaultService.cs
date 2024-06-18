@@ -15,6 +15,9 @@ namespace Fanex.Data.Vault
 
         Task<List<DatabaseCredential>> TryLoadAsync(List<string> connectionAliases, int tryCount);
 
+        bool IsCredentialChanged(List<DatabaseCredential> credentials);
+
+        void UpdateConnectionMapsByVaultCredentials(Dictionary<string, ConnectionConfiguration> connectionMaps, IEnumerable<DatabaseCredential> credentials);
     }
 
     internal class VaultServiceImp : VaultService
@@ -55,6 +58,7 @@ namespace Fanex.Data.Vault
             {
                 try
                 {
+                    await vaultProvider.EnsureVaultTokenIsValid().ConfigureAwait(false);
                     return await vaultProvider.LoadAsync(connectionAliases).ConfigureAwait(false);
                 }
                 catch (Exception e)
@@ -63,7 +67,7 @@ namespace Fanex.Data.Vault
                     vaultProvider.ResetVaultToken();
                 }
 
-                await Task.Delay(5000).ConfigureAwait(false);
+                await Task.Delay(3000).ConfigureAwait(false);
             }
 
             if (latestException != null)
@@ -74,7 +78,7 @@ namespace Fanex.Data.Vault
             return null;
         }
 
-        private bool IsCredentialChanged(List<DatabaseCredential> credentials)
+        public bool IsCredentialChanged(List<DatabaseCredential> credentials)
         {
             if (credentials == null)
             {
@@ -84,9 +88,7 @@ namespace Fanex.Data.Vault
             return currentCredentials == null || currentCredentials.SequenceEqual(credentials);
         }
 
-        private static void UpdateConnectionMapsByVaultCredentials(
-            Dictionary<string, ConnectionConfiguration> connectionMaps,
-            IEnumerable<DatabaseCredential> credentials)
+        public void UpdateConnectionMapsByVaultCredentials(Dictionary<string, ConnectionConfiguration> connectionMaps, IEnumerable<DatabaseCredential> credentials)
         {
             foreach (var item in credentials)
             {
