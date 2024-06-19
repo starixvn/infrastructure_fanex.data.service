@@ -75,7 +75,7 @@ public class HomeController : ControllerBase
 
     private static int GetRandomMinute()
     {
-        var random = new Random(DateTime.Now.Second);
+        var random = new Random(DateTime.Now.Millisecond);
         return random.Next(4 * 60, 6 * 60);
     }
 }
