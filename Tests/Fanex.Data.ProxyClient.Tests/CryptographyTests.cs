@@ -9,7 +9,7 @@
         public void TestDecryptConnectionString()
         {
             // Arrange.
-            var connectionString = "Data Source=10.18.200.58;Initial Catalog=bodb_MMS;integrated security=false; User ID=bodbAdminNet;Password=i9hNnaZltx04XF6oTNOKTnvvtLC/zfxr=";
+            var connectionString = "packet size=4096; Data Source=10.18.200.58;Initial Catalog=bodb02;Connect Timeout=600;integrated security=false; user id=wsv_alp; password=tMTqX4Jh8mPg0pKcjbLJHwfrTY60ti4j3+7jLOmC0KM==; TrustServerCertificate=True;";
 
             // Act.
             var plainText = Cryptography.DecryptConnectionString(connectionString);

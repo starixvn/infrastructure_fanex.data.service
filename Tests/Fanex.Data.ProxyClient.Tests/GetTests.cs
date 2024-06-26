@@ -64,6 +64,22 @@ namespace Fanex.Data.ProxyClient.Tests
             Assert.Equal(ExpectedData.ExpectedCustomer, actualResult);
         }
 
+        [Fact]
+        public void Get_WithValidCriteria_ReturnValueCorrectly()
+        {
+            // Arrange.
+            var parameterSet = new CustomerByIdCriteria
+            {
+                CustomerId = TestedCustomerId
+            };
+
+            // Act.
+            var actualResult = proxy.Get<Customer>(parameterSet);
+
+            // Assert.
+            Assert.Equal(ExpectedData.ExpectedCustomer, actualResult);
+        }
+
 
         [Fact]
         public async Task GetAsyncWithCorrectServerName_WithValidCriteria_ReturnValueCorrectly()

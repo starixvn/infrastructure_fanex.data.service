@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 
-internal static class TypeHelpers
+namespace Constants
 {
-    private static readonly IList<Type> SimpleTypes = new List<Type>()
+    internal static class TypeHelpers
+    {
+        private static readonly IList<Type> SimpleTypes = new List<Type>()
         {
             typeof(byte),
             typeof(sbyte),
@@ -46,8 +48,10 @@ internal static class TypeHelpers
             typeof(SqlMoney?),
         };
 
-    public static bool IsSimpleType(Type type)
-    {
-        return type.IsEnum || SimpleTypes.Contains(type);
+        public static bool IsSimpleType(Type type)
+        {
+            return type.IsEnum || SimpleTypes.Contains(type);
+        }
     }
 }
+
