@@ -2,6 +2,7 @@ using Fanex.Caching.Redis;
 using Fanex.Data.Services.Cache;
 using Fanex.Data.Services.Extensions;
 using Fanex.Data.Services.Middleware;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +22,12 @@ services.AddResponseCompression(options =>
 
 services.AddControllers().AddNewtonsoftJson(options =>
 {
+    var dateConverter = new IsoDateTimeConverter
+    {
+        DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff'Z'"
+    };
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+    options.SerializerSettings.Converters.Add(dateConverter);
 });
 services.Configure<HostOptions>(options =>
 {
