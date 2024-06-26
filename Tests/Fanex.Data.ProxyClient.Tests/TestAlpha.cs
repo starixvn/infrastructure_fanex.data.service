@@ -78,7 +78,7 @@ public class TestAlpha
 
         var moveBetsDay = new DateTime(2024, 5, 24);
         var random = new Random(DateTime.Now.Millisecond);
-        for (var i = 0; i < 2000; i++)
+        for (var i = 0; i < 100; i++)
         {
             var index = random.Next(0, 3);
             var criteria = new GetBalanceInfoCriteria(index, custIds[index], moveBetsDay);

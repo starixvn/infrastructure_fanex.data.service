@@ -230,6 +230,27 @@ namespace Fanex.Data.ProxyClient.Tests
         }
 
         [Fact]
+        public async Task GetAsync_DateTimeInputWithMilliSecond_ReturnCorrectly()
+        {
+            // Arrange.
+            var now = new DateTime(2024,6,16,8,12,15,587);
+            var criteria = new GetDateTimeNowCriteria()
+            {
+                Now = now
+            };
+
+            // Act.
+            var actualResult = await proxy.GetAsync<DateTime>(criteria);
+
+            // Assert.
+            Assert.Equal(now.Date, actualResult.Date);
+            Assert.Equal(now.Hour, actualResult.Hour);
+            Assert.Equal(now.Minute, actualResult.Minute);
+            Assert.Equal(now.Second, actualResult.Second);
+            Assert.Equal(now.Millisecond, actualResult.Millisecond);
+        }
+
+        [Fact]
         public async Task GetAsync_ByteArray_GetSuccess()
         {
             // Arrange.
