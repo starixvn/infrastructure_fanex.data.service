@@ -17,13 +17,12 @@ namespace Fanex.Data
             string responseJson,
             Exception e)
         {
-            const string messageHeader = "Json exception occurs when deserializing the json result";
-
-            var message = $"{messageHeader}" + Environment.NewLine
+            var message = $"responseJson: {responseJson}" + Environment.NewLine
+                          + "Json exception occurs when deserializing the json result" + Environment.NewLine
                           + $"Exception Message: {e.Message}" + Environment.NewLine
-                          + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine
                           + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
-                          + $"responseJson: {responseJson}" + Environment.NewLine;
+                          + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine;
+
 
             return new DbProxyJsonDeserializeException(message, e);
         }

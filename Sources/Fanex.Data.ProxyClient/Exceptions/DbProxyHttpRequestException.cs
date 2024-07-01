@@ -16,12 +16,11 @@ namespace Fanex.Data
             string requestJson,
             Exception e)
         {
-            const string messageHeader = "HttpRequestException occurs";
-            var message = $"{messageHeader}" + Environment.NewLine
-                          + $"Exception Message: {e.Message}" + Environment.NewLine
-                          + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine
-                          + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
-                          + "responseJson: Empty";
+            var message = $"Exception Message: {e.Message}" + Environment.NewLine
+                        + "HttpRequestException occurs" + Environment.NewLine
+                        + "responseJson: Empty"
+                        + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
+                        + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine;
 
             return new DbProxyHttpRequestException(message, e);
         }
