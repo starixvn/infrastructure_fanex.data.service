@@ -22,11 +22,7 @@ namespace Fanex.Data
         {
         }
 
-        protected DbProxyException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
+   
         protected static string ObscurePassword(string message)
         {
             message = PasswordRegex1.Replace(message, "password=xxxx-xxxx-xxxx-xxxx;");

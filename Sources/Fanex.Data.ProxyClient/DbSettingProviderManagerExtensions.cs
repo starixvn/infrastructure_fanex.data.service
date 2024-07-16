@@ -68,11 +68,11 @@ namespace Fanex.Data
         private static VaultOptions ReadVaultOptions(NameValueCollection appSettings)
         {
             var enable = appSettings["VaultOptions:Enable"] == "1" || appSettings["VaultOptions:Enable"] == "True" || appSettings["VaultOptions:Enable"] == "true";
-            var interval = 0;
-            if (!int.TryParse(appSettings["VaultOptions:MinutesPolling"], out interval))
+            if (!int.TryParse(appSettings["VaultOptions:MinutesPolling"], out var interval))
             {
                 interval = 5;
             }
+
             return new VaultOptions
             {
                 Address = appSettings["VaultOptions:Address"],

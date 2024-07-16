@@ -22,10 +22,5 @@ namespace Fanex.Data
                           + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine;
             return new DbProxyNotSuccessHttpException(message);
         }
-
-        private DbProxyNotSuccessHttpException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

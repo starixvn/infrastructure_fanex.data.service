@@ -44,7 +44,7 @@ namespace Fanex.Data.ProxyClient.Tests
                 .Returns(async _ =>
                     callCount++ == 0
                         ? throw new Exception("Exception at function LoadAsync")
-                        : new List<DatabaseCredential>());
+                        : await Task.FromResult(new List<DatabaseCredential>()));
             var vaultService = new VaultServiceImp(vaultProvider);
             var actual = await vaultService.TryLoadAsync(new List<string>(), 3);
 
@@ -56,7 +56,11 @@ namespace Fanex.Data.ProxyClient.Tests
         {
             var vaultProvider = Substitute.For<VaultProvider>();
             vaultProvider.LoadAsync(Arg.Any<List<string>>())
-                .Returns(async _ => throw new Exception("Exception at function LoadAsync"));
+                .Returns(async _ =>
+                {
+                    await Task.CompletedTask;
+                    throw new Exception("Exception at function LoadAsync");
+                });
             var vaultService = new VaultServiceImp(vaultProvider);
 
             await Assert.ThrowsAsync<Exception>(async () => await vaultService.TryLoadAsync(new List<string>(), 2));

@@ -19,10 +19,6 @@ namespace Fanex.Data
 
         private Uri serviceApiUri;
 
-        private VaultProvider vaultProvider;
-
-        private VaultService vaultService;
-
         private VaultPollingService vaultPollingService;
 
         protected bool IgnoreRedundantParameters { get; set; }
@@ -120,17 +116,9 @@ namespace Fanex.Data
             return this;
         }
 
-        public DbSettingProviderManager Use(VaultOptions vaultOptions, VaultProvider provider = null)
+        public DbSettingProviderManager Use(VaultOptions vaultOptions)
         {
             VaultOptions = vaultOptions;
-
-            vaultProvider = provider ?? new VaultProviderImp(vaultOptions);
-
-            vaultPollingService?.Stop();
-
-            vaultService = new VaultServiceImp(vaultProvider);
-            vaultPollingService = new VaultPollingServiceImp(vaultProvider);
-
             return this;
         }
 
@@ -156,7 +144,12 @@ namespace Fanex.Data
 
             if (VaultOptions?.Enable == true)
             {
+                var vaultProvider = new VaultProviderImp(VaultOptions);
+                var vaultService = new VaultServiceImp(vaultProvider);
                 vaultService.UpdateConnectionMaps().Wait();
+
+                vaultPollingService?.Stop();
+                vaultPollingService = new VaultPollingServiceImp(vaultProvider);
                 vaultPollingService.Start(VaultOptions.MinutesPolling * 60);
             }
 
