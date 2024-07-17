@@ -15,10 +15,7 @@ services.AddRedisCache(configuration.GetSection("Fanex.Caching.Redis"));
 services.AddOneBookUm(configuration);
 services.AddFanexLog(configuration);
 
-services.AddResponseCompression(options =>
-{
-    options.EnableForHttps = true;
-});
+services.AddResponseCompression();
 
 services.AddControllers().AddNewtonsoftJson(options =>
 {
