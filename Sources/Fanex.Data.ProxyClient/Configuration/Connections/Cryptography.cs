@@ -73,7 +73,7 @@
             };
             var encryptedPassword = connectionStringBuilder.GetPassword();
 
-            if (!string.IsNullOrEmpty(encryptedPassword))
+            if (!string.IsNullOrEmpty(encryptedPassword) && IsBase64String(encryptedPassword))
             {
                 var decryptedPassword = DecryptPassword(encryptedPassword);
 
@@ -83,6 +83,25 @@
             }
 
             return connectionString;
+        }
+
+        private static bool IsBase64String(string value)
+        {
+            value = StandardizeEncryptedPasswordLength(value);
+#if NET5_0_OR_GREATER
+            var buffer = new Span<byte>(new byte[value.Length]);
+            return Convert.TryFromBase64String(value, buffer, out _);
+#else
+            try
+            {
+                Convert.FromBase64String(value);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+#endif
         }
 
         /// <summary>

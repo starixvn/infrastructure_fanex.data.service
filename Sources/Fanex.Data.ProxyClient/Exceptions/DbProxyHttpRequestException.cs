@@ -24,10 +24,5 @@ namespace Fanex.Data
 
             return new DbProxyHttpRequestException(message, e);
         }
-
-        private DbProxyHttpRequestException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

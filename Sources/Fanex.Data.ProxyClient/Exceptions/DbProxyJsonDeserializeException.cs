@@ -26,10 +26,5 @@ namespace Fanex.Data
 
             return new DbProxyJsonDeserializeException(message, e);
         }
-
-        private DbProxyJsonDeserializeException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

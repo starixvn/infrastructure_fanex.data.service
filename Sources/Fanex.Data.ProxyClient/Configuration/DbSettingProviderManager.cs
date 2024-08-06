@@ -8,30 +8,36 @@ namespace Fanex.Data
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Vault;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class DbSettingProviderManager
     {
-        private static DbSettingProviderManager currentSession;
-
         private DbSettingProviderBase settingProvider;
 
-        private XmlConnectionStringProvider connectionStringProvider;
+        private ConnectionStringProviderBase connectionStringProvider;
 
         private Uri serviceApiUri;
 
+        private VaultPollingService vaultPollingService;
+
         protected bool IgnoreRedundantParameters { get; set; }
+
+        public static DbSettingProviderManager CurrentSession { get; private set; }
+
+        public Dictionary<string, ConnectionConfiguration> ConnectionMaps { get; private set; }
+
+        public VaultOptions VaultOptions { get; private set; }
 
         public static DbSettingProviderManager StartNewSession()
         {
-            currentSession = new DbSettingProviderManager();
-
-            return currentSession;
+            CurrentSession = new DbSettingProviderManager();
+            return CurrentSession;
         }
 
         public static void ClearSession()
         {
-            currentSession = null;
+            CurrentSession = null;
         }
 
         internal static ProxyParameter GetProxyParameter(ICriteria criteria, string serverIp, List<string> typeNames)
@@ -42,12 +48,12 @@ namespace Fanex.Data
             }
 
             var key = criteria.GetSettingKey();
-            var dbSetting = currentSession.settingProvider.GetSetting(key);
+            var dbSetting = CurrentSession.settingProvider.GetSetting(key);
             dbSetting.ReplaceServerIp(serverIp);
 
             return new ProxyParameter
             {
-                IgnoreRedundantParameters = currentSession.IgnoreRedundantParameters,
+                IgnoreRedundantParameters = CurrentSession.IgnoreRedundantParameters,
                 ParameterSet = criteria,
                 DbSetting = dbSetting,
                 TypeNames = typeNames,
@@ -57,7 +63,7 @@ namespace Fanex.Data
 
         internal static List<StoredProcedureDefinition> GetAllStoredProcedures()
         {
-            var settingDataSources = currentSession
+            var settingDataSources = CurrentSession
                 .settingProvider
                 .SettingDataSource
                 .Values;
@@ -72,7 +78,7 @@ namespace Fanex.Data
 
         internal static int GetMaxSpTimeout()
         {
-            var settingDataSources = currentSession
+            var settingDataSources = CurrentSession
                 .settingProvider
                 .SettingDataSource
                 .Values;
@@ -80,30 +86,16 @@ namespace Fanex.Data
             return settingDataSources.Max(s => s.CommandTimeout);
         }
 
-        internal static Uri ServiceApiUri => currentSession.serviceApiUri;
-
-        public DbSettingProviderManager Register(
-            string resourcePath,
-            bool ignoreRedundantParameters = false)
-        {
-            if (settingProvider == null)
-            {
-                UseDefaultDbSettingProvider(resourcePath);
-            }
-
-            IgnoreRedundantParameters = ignoreRedundantParameters;
-
-            return this;
-        }
+        internal static Uri ServiceApiUri => CurrentSession.serviceApiUri;
 
         // ReSharper disable once UnusedMethodReturnValue.Global
-        public DbSettingProviderManager UseDefaultDbSettingProvider(string resourcePath)
+        public DbSettingProviderManager UseDefaultDbSettingProvider(string resourcePath, bool ignoreRedundantParameters = false)
         {
             if (string.IsNullOrWhiteSpace(resourcePath))
             {
                 throw new ArgumentException("Resource path is null or empty.", nameof(resourcePath));
             }
-
+            IgnoreRedundantParameters = ignoreRedundantParameters;
             settingProvider = new XmlDbSettingProvider(resourcePath);
 
             return this;
@@ -111,22 +103,32 @@ namespace Fanex.Data
 
         public DbSettingProviderManager Use(string uri)
         {
-            currentSession.serviceApiUri = new Uri(uri);
+            CurrentSession.serviceApiUri = new Uri(uri);
             return this;
         }
 
-        public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionConfiguration)
+        public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps)
         {
-            if (connectionConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(connectionConfiguration));
-            }
-
-            connectionStringProvider = new XmlConnectionStringProvider(connectionConfiguration);
-            connectionStringProvider.Initialize(connectionConfiguration);
+            ConnectionMaps = connectionMaps ?? throw new ArgumentNullException(nameof(connectionMaps));
+            connectionStringProvider = new DefaultConnectionStringProvider(connectionMaps);
+            connectionStringProvider.Initialize(connectionMaps);
 
             return this;
         }
+
+        public DbSettingProviderManager Use(VaultOptions vaultOptions)
+        {
+            VaultOptions = vaultOptions;
+            return this;
+        }
+
+        public void RestartSettingProvider()
+        {
+            settingProvider.ConnectionStringProvider = connectionStringProvider;
+            settingProvider.SettingDataSource.Clear();
+            settingProvider.Restart();
+        }
+
 
         public void Run()
         {
@@ -137,22 +139,28 @@ namespace Fanex.Data
 
             if (connectionStringProvider == null)
             {
-#if NETFRAMEWORK
-                connectionStringProvider = new XmlConnectionStringProvider();
-#else
                 throw new InvalidOperationException($"No {nameof(ConnectionStringProviderBase)} was configured. Please call Use(Dictionary<string, ConnectionConfiguration> connectionConfiguration) first.");
-#endif
+            }
+
+            if (VaultOptions?.Enable == true)
+            {
+                var vaultProvider = new VaultProviderImp(VaultOptions);
+                var vaultService = new VaultServiceImp(vaultProvider);
+                vaultService.UpdateConnectionMaps().Wait();
+
+                vaultPollingService?.Stop();
+                vaultPollingService = new VaultPollingServiceImp(vaultProvider);
+                vaultPollingService.Start(VaultOptions.MinutesPolling * 60);
             }
 
             settingProvider.ConnectionStringProvider = connectionStringProvider;
             settingProvider.Start();
 
-            #if (DEBUG)
-                CacheManager.ClearCache().Wait();
-            #else
-            
-                CacheManager.ClearCache();
-            #endif
+#if (DEBUG)
+            CacheManager.ClearCache().Wait();
+#else
+            CacheManager.ClearCache();
+#endif
         }
     }
 }
