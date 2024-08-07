@@ -38,16 +38,12 @@ public static class Monitoring
 
     public static void UpdateResponseStatistic(DataSet dataset)
     {
-        if (dataset == null || dataset.Tables == null)
+        if (dataset == null || dataset.Tables.Count == 0)
         {
             return;
         }
 
-        var maxCount = 0;
-        foreach (DataTable table in dataset.Tables)
-        {
-            maxCount = Math.Max(maxCount, table.Rows.Count);
-        }
+        var maxCount = (from DataTable table in dataset.Tables select table.Rows.Count).Max();
 
         UpdateResponseStatistic(maxCount);
     }
@@ -69,7 +65,7 @@ public static class Monitoring
             return;
         }
 
-        var maxCount = models.Select(m => m != null ? m.Count : 0).Max();
+        var maxCount = models.Select(m => m?.Count ?? 0).Max();
         UpdateResponseStatistic(maxCount);
     }
 

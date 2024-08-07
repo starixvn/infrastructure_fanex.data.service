@@ -22,7 +22,7 @@ public class ServerAliveReportService : BackgroundService
         {
             await TryToReportStatus();
 
-            await Task.Delay(timerPeriod, stoppingToken).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromSeconds(timerPeriod), stoppingToken).ConfigureAwait(false);
         }
     }
 

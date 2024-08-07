@@ -30,8 +30,7 @@ public class HomeController : ControllerBase
     [Route("gc")]
     public IActionResult Gc()
     {
-        GC.Collect(2, GCCollectionMode.Forced, true);
-        GC.Collect(2, GCCollectionMode.Aggressive, true);
+        GC.Collect(2, GCCollectionMode.Aggressive, true, true);
         return Ok("Done Gc");
     }
 

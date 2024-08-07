@@ -37,7 +37,10 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
                 await context.Response.WriteAsync($"{pair.Key}={pair.Value}{Environment.NewLine}");
             }
         }
-        catch { }        
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     private static string GetInfoException(Exception exception)
@@ -85,6 +88,9 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
             await context.Response.WriteAsync(exception.Message + Environment.NewLine);
             await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
         }
-        catch { }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }

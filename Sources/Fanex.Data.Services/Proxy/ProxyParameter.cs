@@ -8,7 +8,7 @@ public class ProxyParameter
 
     public Dictionary<string, object> ParameterSet { get; set; } = new();
 
-    public List<string> TypeNames { get; set; } = new();
+    public List<string> TypeNames { get; set; } = [];
 
     public Dictionary<string, string> SpecialTypes { get; set; } = new();
 }
