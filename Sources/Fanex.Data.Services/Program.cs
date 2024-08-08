@@ -21,7 +21,7 @@ services.AddControllers().AddNewtonsoftJson(options =>
 {
     var dateConverter = new IsoDateTimeConverter
     {
-        DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff'Z'"
+        DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff"
     };
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
     options.SerializerSettings.Converters.Add(dateConverter);
