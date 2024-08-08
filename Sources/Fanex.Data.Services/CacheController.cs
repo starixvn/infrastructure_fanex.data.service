@@ -42,29 +42,13 @@ public class CacheController(ICache cache) : ControllerBase
         return Ok(Environment.MachineName);
     }
 
-    [HttpGet("clear-all-fanex-data-cache")]
-    [HttpPost("clear-all-fanex-data-cache")]
-    public async Task<IActionResult> ClearAllFanexDataCache()
-    {
-        DbParameterDefinitionCache.Clear();
-        var serverName = Environment.MachineName;
-
-        var serverStatus = await GetServerStatus();
-
-        return Ok(new
-        {
-            ServerName = serverName,
-            ServerStatus = serverStatus
-        });
-    }
-
     private async Task<Dictionary<string, DateTimeOffset>> GetServerStatus()
     {
         var (found, serverStatus) =
             await cache.TryGetAsync<Dictionary<string, DateTimeOffset>>(CacheKey.ServerStatusCacheKey);
         if (!found)
         {
-            serverStatus = new Dictionary<string, DateTimeOffset>();
+            serverStatus = new();
         }
 
         var dockerSwarmServiceName = GetDockerSwarmServiceName();
