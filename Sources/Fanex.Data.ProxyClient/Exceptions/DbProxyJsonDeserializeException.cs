@@ -1,9 +1,6 @@
 namespace Fanex.Data
 {
     using System;
-    using System.Runtime.Serialization;
-
-    [Serializable]
     public sealed class DbProxyJsonDeserializeException : DbProxyException
     {
         public DbProxyJsonDeserializeException(string message, Exception innerException)

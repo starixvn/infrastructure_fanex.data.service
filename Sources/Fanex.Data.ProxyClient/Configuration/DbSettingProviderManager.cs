@@ -103,7 +103,7 @@ namespace Fanex.Data
 
         public DbSettingProviderManager Use(string uri)
         {
-            CurrentSession.serviceApiUri = new Uri(uri);
+            CurrentSession.serviceApiUri = new Uri(uri.TrimEnd('/'));
             return this;
         }
 

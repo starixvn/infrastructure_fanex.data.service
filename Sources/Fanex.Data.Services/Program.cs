@@ -57,4 +57,4 @@ life.ApplicationStopping.Register(() =>
 });
 Monitoring.StartTime = DateTimeOffset.UtcNow;
 
-app.Run();
+await app.RunAsync();
