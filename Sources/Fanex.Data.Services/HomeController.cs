@@ -34,13 +34,6 @@ public class HomeController : ControllerBase
         return Ok("Done Gc");
     }
 
-    [HttpGet("Log")]
-    public async Task<IActionResult> Log()
-    {
-        await Logging.Logger.Log.InfoAsync("Test Log");
-        return Ok("Log is written");
-    }
-
     [HttpGet("alive")]
     public IActionResult Alive(int longevity)
     {
