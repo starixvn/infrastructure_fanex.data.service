@@ -10,12 +10,9 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 
 // Add services to the container.
-services.AddMemoryCache();
 services.AddRedisCache(configuration.GetSection("Fanex.Caching.Redis"));
 services.AddOneBookUm(configuration);
 services.AddFanexLog(configuration);
-
-services.AddResponseCompression();
 
 services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -35,8 +32,6 @@ services.AddHostedService<ServerAliveReportService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
-app.UseResponseCompression();
 
 app.UseRouting();
 
