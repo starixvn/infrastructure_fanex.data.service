@@ -43,7 +43,7 @@ namespace Fanex.Data.Vault
             if (isCredentialChanged)
             {
                 UpdateConnectionMapsByVaultCredentials(connectionMaps, credentials);
-                DbSettingProviderManager.CurrentSession.Use(connectionMaps);
+                DbSettingProviderManager.CurrentSession.Use(connectionMaps, true);
             }
 
             currentCredentials = credentials;

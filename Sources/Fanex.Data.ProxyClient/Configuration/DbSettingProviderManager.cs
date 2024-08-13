@@ -107,11 +107,11 @@ namespace Fanex.Data
             return this;
         }
 
-        public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps)
+        public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps, bool isPlainPassword = false)
         {
             ConnectionMaps = connectionMaps ?? throw new ArgumentNullException(nameof(connectionMaps));
             connectionStringProvider = new DefaultConnectionStringProvider(connectionMaps);
-            connectionStringProvider.Initialize(connectionMaps);
+            connectionStringProvider.Initialize(connectionMaps, isPlainPassword);
 
             return this;
         }
