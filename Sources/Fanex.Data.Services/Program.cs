@@ -1,6 +1,5 @@
 using Fanex.Caching.Redis;
 using Fanex.Data.Services.Cache;
-using Fanex.Data.Services.Extensions;
 using Fanex.Data.Services.Middleware;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -10,18 +9,13 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 
 // Add services to the container.
-services.AddMemoryCache();
 services.AddRedisCache(configuration.GetSection("Fanex.Caching.Redis"));
-services.AddOneBookUm(configuration);
-services.AddFanexLog(configuration);
-
-services.AddResponseCompression();
 
 services.AddControllers().AddNewtonsoftJson(options =>
 {
     var dateConverter = new IsoDateTimeConverter
     {
-        DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff'Z'"
+        DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff"
     };
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
     options.SerializerSettings.Converters.Add(dateConverter);
@@ -35,8 +29,6 @@ services.AddHostedService<ServerAliveReportService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
-app.UseResponseCompression();
 
 app.UseRouting();
 
@@ -57,4 +49,4 @@ life.ApplicationStopping.Register(() =>
 });
 Monitoring.StartTime = DateTimeOffset.UtcNow;
 
-app.Run();
+await app.RunAsync();

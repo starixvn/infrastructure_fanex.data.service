@@ -1,10 +1,8 @@
 namespace Fanex.Data
 {
     using System;
-    using System.Runtime.Serialization;
     using System.Text.RegularExpressions;
 
-    [Serializable]
     public class DbProxyException : Exception
     {
         private static readonly Regex PasswordRegex1 = new Regex(@"password\s*=\s*(.*?);", RegexOptions.IgnoreCase);

@@ -17,7 +17,9 @@ namespace Fanex.Data
 
         protected Dictionary<string, ConnectionConfiguration> ConnectionMaps { get; set; }
 
-        internal void Initialize(Dictionary<string, ConnectionConfiguration> connectionMaps)
+        protected bool IsPlainPassword { get; set; }
+
+        internal void Initialize(Dictionary<string, ConnectionConfiguration> connectionMaps, bool isPlainPassword = false)
         {
             if (connectionMaps == null)
             {
@@ -29,6 +31,7 @@ namespace Fanex.Data
                 throw new ArgumentException($"The passed {nameof(connectionMaps)} contains no connection configuration.", nameof(connectionMaps));
             }
 
+            IsPlainPassword = isPlainPassword;
             ConnectionMaps = connectionMaps;
             connectionCache.Clear();
         }
@@ -48,7 +51,7 @@ namespace Fanex.Data
             {
                 var connectionString = GetConnectionConfiguration(alias).ConnectionString;
 
-                if (isEncrypted)
+                if (isEncrypted && IsPlainPassword == false)
                 {
                     connectionString = PasswordDecryptor(connectionString);
                 }

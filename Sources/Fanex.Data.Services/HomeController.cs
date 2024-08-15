@@ -30,16 +30,8 @@ public class HomeController : ControllerBase
     [Route("gc")]
     public IActionResult Gc()
     {
-        GC.Collect(2, GCCollectionMode.Forced, true);
-        GC.Collect(2, GCCollectionMode.Aggressive, true);
+        GC.Collect(2, GCCollectionMode.Aggressive, true, true);
         return Ok("Done Gc");
-    }
-
-    [HttpGet("Log")]
-    public async Task<IActionResult> Log()
-    {
-        await Logging.Logger.Log.InfoAsync("Test Log");
-        return Ok("Log is written");
     }
 
     [HttpGet("alive")]

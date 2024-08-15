@@ -19,7 +19,7 @@ public class DynamicRepositoryController : ControllerBase
 
         var models = (await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet)).ToList();
         var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
-        var typeNames = proxyParameter.TypeNames ?? new List<string>();
+        var typeNames = proxyParameter.TypeNames ?? [];
         var result = columnMaps.MapCollection(typeNames.Any() ? typeNames[0] : string.Empty, models.ToList());
 
         var proxyResult = new ProxyResult<IEnumerable<dynamic>>
@@ -56,7 +56,7 @@ public class DynamicRepositoryController : ControllerBase
     public async Task<IActionResult> FetchMultiple([FromQuery] int collectionCount, ProxyParameter proxyParameter)
     {
         var fetchedData = await FetchMultipleAsync(proxyParameter, collectionCount).ConfigureAwait(false);
-        var typeNames = proxyParameter.TypeNames ?? new List<string>();
+        var typeNames = proxyParameter.TypeNames ?? [];
         var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
         for (var i = 0; i < typeNames.Count; i++)
         {

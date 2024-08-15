@@ -103,15 +103,15 @@ namespace Fanex.Data
 
         public DbSettingProviderManager Use(string uri)
         {
-            CurrentSession.serviceApiUri = new Uri(uri);
+            CurrentSession.serviceApiUri = new Uri(uri.TrimEnd('/'));
             return this;
         }
 
-        public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps)
+        public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps, bool isPlainPassword = false)
         {
             ConnectionMaps = connectionMaps ?? throw new ArgumentNullException(nameof(connectionMaps));
             connectionStringProvider = new DefaultConnectionStringProvider(connectionMaps);
-            connectionStringProvider.Initialize(connectionMaps);
+            connectionStringProvider.Initialize(connectionMaps, isPlainPassword);
 
             return this;
         }
