@@ -6,26 +6,17 @@ namespace Fanex.Data.Vault
     using System;
     using System.Threading;
 
-    internal interface VaultPollingService
-    {
-        void Start(int secondsDelay);
-
-        void Stop();
-
-        Exception LatestException { get; }
-    }
-
-    internal class VaultPollingServiceImp : VaultPollingService
+    internal class VaultPollingService
     {
         private Thread pollingThread;
 
         private bool running;
 
-        private int delay = 5 * 60;
+        private int intervalInSeconds = 5 * 60;
 
         private readonly VaultService vaultService;
 
-        internal VaultPollingServiceImp(VaultProvider provider)
+        internal VaultPollingService(VaultProvider provider)
         {
             vaultService = new VaultServiceImp(provider);
         }
@@ -37,7 +28,7 @@ namespace Fanex.Data.Vault
             Stop();
 
             running = true;
-            delay = secondsDelay;
+            intervalInSeconds = secondsDelay;
             pollingThread = new Thread(Poll);
             pollingThread.Start();
         }
@@ -57,7 +48,7 @@ namespace Fanex.Data.Vault
             while (running)
             {
                 SafeReloadDbSettingProvider();
-                Thread.Sleep(delay * 1000);
+                Thread.Sleep(intervalInSeconds * 1000);
             }
         }
 

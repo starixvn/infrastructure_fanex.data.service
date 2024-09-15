@@ -6,7 +6,7 @@
     using VaultSharp;
     using VaultSharp.V1.AuthMethods.AppRole;
 
-    public interface VaultProvider
+    internal interface VaultProvider
     {
         Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases);
 
@@ -15,7 +15,7 @@
         Task EnsureVaultTokenIsValid();
     }
 
-    public class VaultProviderImp : VaultProvider
+    internal class VaultProviderImp : VaultProvider
     {
         private const int MinTimeToLive = 15;
 

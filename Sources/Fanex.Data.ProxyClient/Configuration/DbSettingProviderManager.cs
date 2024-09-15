@@ -19,7 +19,7 @@ namespace Fanex.Data
 
         private Uri serviceApiUri;
 
-        private VaultPollingService vaultPollingService;
+        private static VaultPollingService vaultPollingService;
 
         protected bool IgnoreRedundantParameters { get; set; }
 
@@ -32,6 +32,7 @@ namespace Fanex.Data
         public static DbSettingProviderManager StartNewSession()
         {
             CurrentSession = new DbSettingProviderManager();
+            vaultPollingService?.Stop();
             return CurrentSession;
         }
 
@@ -149,7 +150,7 @@ namespace Fanex.Data
                 vaultService.UpdateConnectionMaps().Wait();
 
                 vaultPollingService?.Stop();
-                vaultPollingService = new VaultPollingServiceImp(vaultProvider);
+                vaultPollingService = new VaultPollingService(vaultProvider);
                 vaultPollingService.Start(VaultOptions.MinutesPolling * 60);
             }
 
