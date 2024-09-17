@@ -4,8 +4,6 @@ namespace Fanex.Data.Services.Cache;
 
 public static class Monitoring
 {
-    public static DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
-
     private const int ResponseStatisticSize = 20;
 
     private const int RequestStatisticSize = 3 * 24 * 60;
@@ -14,6 +12,7 @@ public static class Monitoring
 
     public static int[] RequestStatistics { get; set; } = CreateRequestStatistics();
 
+    private static DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
 
     public static int[] CreateResponseStatistics()
     {
