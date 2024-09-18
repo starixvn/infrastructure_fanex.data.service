@@ -93,7 +93,7 @@ namespace Fanex.Data.ProxyClient.Tests
         public async Task CallSp_AfterUpdateConnectionMaps_ChangeAliasIp()
         {
             var vaultProvider = Substitute.For<VaultProvider>();
-            var pollingService = new VaultPollingServiceImp(vaultProvider);
+            var pollingService = new VaultPollingService(vaultProvider);
             try
             {
                 vaultProvider.LoadAsync(Arg.Any<List<string>>()).ReturnsForAnyArgs(Credential58);
@@ -122,7 +122,7 @@ namespace Fanex.Data.ProxyClient.Tests
         public async Task CallSp_AfterUpdateConnectionMaps_ChangeCredential()
         {
             var vaultProvider = Substitute.For<VaultProvider>();
-            var pollingService = new VaultPollingServiceImp(vaultProvider);
+            var pollingService = new VaultPollingService(vaultProvider);
             try
             {
                 vaultProvider.LoadAsync(Arg.Any<List<string>>()).ReturnsForAnyArgs(Credential58);
