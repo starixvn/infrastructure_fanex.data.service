@@ -6,6 +6,8 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddConsole();
+
 var services = builder.Services;
 var configuration = builder.Configuration;
 
@@ -22,6 +24,7 @@ services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.Converters.Add(dateConverter);
 });
 
+services.AddSingleton<GarbageCollectorService>();
 services.AddHostedService<ServerAliveReportService>();
 services.AddHostedService<GarbageCollectorService>();
 
