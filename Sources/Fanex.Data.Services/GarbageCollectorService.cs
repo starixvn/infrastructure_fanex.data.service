@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime;
 
 namespace Fanex.Data.Services;
 
@@ -18,13 +19,20 @@ public class GarbageCollectorService(ILogger<GarbageCollectorService> logger) : 
 
             Stopwatch sw = Stopwatch.StartNew();
             sw.Start();
-            
-            GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+
             using var currentProcess = Process.GetCurrentProcess();
             currentProcess.Refresh();
             var memory = currentProcess.WorkingSet64 / megabyte;
-            sw.Stop();
-            
+            logger.LogInformation("=============Total memory - Before ==========: {Memory} Mb", memory);
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive | GCCollectionMode.Forced, true, true);
+            GC.WaitForPendingFinalizers();
+            GC.WaitForFullGCComplete();
+
+            currentProcess.Refresh();
+            memory = currentProcess.WorkingSet64 / megabyte;
+
             var duration = sw.ElapsedMilliseconds;
             logger.LogInformation("GC.Collected. Usage memory = {Memory}. Duration: {Duration} milliseconds", memory, duration);
         }

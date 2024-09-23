@@ -29,8 +29,9 @@ public class HomeController : ControllerBase
     [HttpGet("gc")]
     public IActionResult Gc()
     {
-        GC.Collect(2, GCCollectionMode.Aggressive, true, true);
-        
+        GC.Collect(2, GCCollectionMode.Aggressive | GCCollectionMode.Forced, true, true);
+        GC.WaitForPendingFinalizers();
+
         return Ok(Environment.MachineName);
     }
 }
