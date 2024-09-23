@@ -25,4 +25,12 @@ public class HomeController : ControllerBase
                 server = Environment.MachineName
             });
     }
+
+    [HttpGet("gc")]
+    public IActionResult Gc()
+    {
+        GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+        
+        return Ok(Environment.MachineName);
+    }
 }
