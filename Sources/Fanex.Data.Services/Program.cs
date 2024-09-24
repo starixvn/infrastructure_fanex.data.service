@@ -24,9 +24,8 @@ services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.Converters.Add(dateConverter);
 });
 
-services.AddSingleton<GarbageCollectorService>();
+services.AddSingleton<ServerAliveReportService>();
 services.AddHostedService<ServerAliveReportService>();
-services.AddHostedService<GarbageCollectorService>();
 
 var app = builder.Build();
 
