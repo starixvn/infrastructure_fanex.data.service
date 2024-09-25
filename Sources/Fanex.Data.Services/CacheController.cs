@@ -60,7 +60,7 @@ public class CacheController(ICache cache) : ControllerBase
     private static string GetDockerSwarmServiceName()
     {
         var currentMachineName = Environment.MachineName;
-        var index = currentMachineName.LastIndexOf("-", StringComparison.Ordinal);
+        var index = currentMachineName.LastIndexOf("-", StringComparison.Ordinal) + 1;
         return currentMachineName[..index];
     }
 
