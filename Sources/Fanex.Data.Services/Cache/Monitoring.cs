@@ -12,7 +12,7 @@ public static class Monitoring
 
     public static int[] RequestStatistics { get; set; } = CreateRequestStatistics();
 
-    private static DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
+    private static DateTimeOffset StartTime { get; } = DateTimeOffset.UtcNow;
 
     public static int[] CreateResponseStatistics()
     {

@@ -1,5 +1,4 @@
 using Fanex.Caching.Redis;
-using Fanex.Data.Services;
 using Fanex.Data.Services.Cache;
 using Fanex.Data.Services.Middleware;
 using Newtonsoft.Json.Converters;

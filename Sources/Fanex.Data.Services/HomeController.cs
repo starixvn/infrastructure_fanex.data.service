@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime;
-using System;
 using Fanex.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Fanex.Data.Services;
 
@@ -43,10 +41,10 @@ public class HomeController : ControllerBase
         currentProcess.Refresh();
         var memory = currentProcess.WorkingSet64 / megabyte;
 
-        stringBuilder.AppendFormat("Total memory - Before GC.Collect: {0} Mb", memory);
+        stringBuilder.Append($"Total memory - Before GC.Collect: {memory} Mb");
 
         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive | GCCollectionMode.Forced, true, true);
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
         GC.WaitForPendingFinalizers();
         GC.WaitForFullGCComplete();
 
@@ -54,7 +52,7 @@ public class HomeController : ControllerBase
         memory = currentProcess.WorkingSet64 / megabyte;
 
         var duration = sw.ElapsedMilliseconds;
-        stringBuilder.AppendFormat("GC.Collected. Usage memory = {0}. Duration: {1} milliseconds", memory, duration);
+        stringBuilder.Append($"GC.Collected. Usage memory = {memory}. Duration: {duration} milliseconds");
 
         return Ok(stringBuilder.ToString());
     }
