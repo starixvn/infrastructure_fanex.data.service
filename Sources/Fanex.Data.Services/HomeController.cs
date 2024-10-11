@@ -41,7 +41,7 @@ public class HomeController : ControllerBase
         currentProcess.Refresh();
         var memory = currentProcess.WorkingSet64 / megabyte;
 
-        stringBuilder.Append($"Total memory - Before GC.Collect: {memory} Mb");
+        stringBuilder.Append($"Before GC.Collect: {memory} Mb.\r\n");
 
         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
@@ -52,7 +52,8 @@ public class HomeController : ControllerBase
         memory = currentProcess.WorkingSet64 / megabyte;
 
         var duration = sw.ElapsedMilliseconds;
-        stringBuilder.Append($"GC.Collected. Usage memory = {memory}. Duration: {duration} milliseconds");
+        stringBuilder.Append($"After GC.Collect. Usage memory = {memory}.\r\n");
+        stringBuilder.Append($"Duration: {duration} milliseconds.\r\n");
 
         return Ok(stringBuilder.ToString());
     }
