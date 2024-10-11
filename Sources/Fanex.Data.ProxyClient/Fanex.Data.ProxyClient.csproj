@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;net5.0;net8.0;</TargetFrameworks>
+    <TargetFrameworks>net472;net6.0;net8.0;</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>Fanex.Data</RootNamespace>
-    <Version>0.0.4-beta5</Version>
+    <Version>0.0.4</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <Title>Fanex.Data.ProxyClient</Title>
@@ -22,11 +22,11 @@
     <Reference Include="System.Configuration" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
@@ -36,6 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="VaultSharp" Version="1.13.0.1" />
+    <PackageReference Include="VaultSharp" Version="1.17.5.1" />
   </ItemGroup>
 </Project>

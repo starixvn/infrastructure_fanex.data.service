@@ -1,6 +1,4 @@
-﻿#if NET5_0_OR_GREATER
-
-using Xunit;
+﻿using Xunit;
 using System.Threading.Tasks;
 using NSubstitute;
 using Fanex.Data.Vault;
@@ -63,7 +61,7 @@ namespace Fanex.Data.ProxyClient.Tests
                 });
             var vaultService = new VaultServiceImp(vaultProvider);
 
-            await Assert.ThrowsAsync<Exception>(async () => await vaultService.TryLoadAsync(new List<string>(), 2));
+            await Assert.ThrowsAsync<InvalidCastException>(async () => await vaultService.TryLoadAsync(new List<string>(), 2));
         }
 
         [Fact]
@@ -143,4 +141,3 @@ namespace Fanex.Data.ProxyClient.Tests
         }
     }
 }
-#endif

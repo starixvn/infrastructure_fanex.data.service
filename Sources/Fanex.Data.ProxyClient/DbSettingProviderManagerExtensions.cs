@@ -6,7 +6,7 @@ using System.Configuration;
 using System.Linq;
 #endif
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +86,7 @@ namespace Fanex.Data
         }
 #endif
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
 
         public static IServiceCollection AddFanexData(this IServiceCollection services, IConfiguration configuration, bool ignoreRedundantParameters = false)
         {
