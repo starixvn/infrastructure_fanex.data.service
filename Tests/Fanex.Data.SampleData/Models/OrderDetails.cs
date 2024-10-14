@@ -1,23 +1,22 @@
-﻿namespace Fanex.Data.SampleData.Models
+﻿namespace Fanex.Data.SampleData.Models;
+
+using System.Collections.Generic;
+using System.Linq;
+
+public class OrderDetails : Entity
 {
-    using System.Collections.Generic;
-    using System.Linq;
+    public Order Order { get; set; }
 
-    public class OrderDetails : Entity
+    [IncomparableProperty]
+    public IList<OrderedProduct> OrderedProducts { get; set; }
+
+    public override bool Equals(Entity other)
     {
-        public Order Order { get; set; }
-
-        [IncomparableProperty]
-        public IList<OrderedProduct> OrderedProducts { get; set; }
-
-        public override bool Equals(Entity other)
+        if (other is OrderDetails otherOrderedDetails)
         {
-            if (other is OrderDetails otherOrderedDetails)
-            {
-                return base.Equals(other) && OrderedProducts.SequenceEqual(otherOrderedDetails.OrderedProducts);
-            }
-
-            return false;
+            return base.Equals(other) && OrderedProducts.SequenceEqual(otherOrderedDetails.OrderedProducts);
         }
+
+        return false;
     }
 }

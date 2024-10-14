@@ -13,9 +13,9 @@ namespace Fanex.Data
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class DbSettingProviderManager
     {
-        private DbSettingProviderBase settingProvider;
+        private DbSettingProvider settingProvider;
 
-        private ConnectionStringProviderBase connectionStringProvider;
+        private ConnectionStringProvider connectionStringProvider;
 
         private Uri serviceApiUri;
 
@@ -97,7 +97,7 @@ namespace Fanex.Data
                 throw new ArgumentException("Resource path is null or empty.", nameof(resourcePath));
             }
             IgnoreRedundantParameters = ignoreRedundantParameters;
-            settingProvider = new XmlDbSettingProvider(resourcePath);
+            settingProvider = new DbSettingProvider(resourcePath);
 
             return this;
         }
@@ -111,7 +111,7 @@ namespace Fanex.Data
         public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps, bool isPlainPassword = false)
         {
             ConnectionMaps = connectionMaps ?? throw new ArgumentNullException(nameof(connectionMaps));
-            connectionStringProvider = new DefaultConnectionStringProvider(connectionMaps);
+            connectionStringProvider = new ConnectionStringProvider(connectionMaps);
             connectionStringProvider.Initialize(connectionMaps, isPlainPassword);
 
             return this;
@@ -123,11 +123,9 @@ namespace Fanex.Data
             return this;
         }
 
-        public void RestartSettingProvider()
+        public void ReloadConnectionStrings()
         {
-            settingProvider.ConnectionStringProvider = connectionStringProvider;
-            settingProvider.SettingDataSource.Clear();
-            settingProvider.Restart();
+            settingProvider.UpdateConnectionString(ConnectionMaps);
         }
 
 
@@ -135,12 +133,12 @@ namespace Fanex.Data
         {
             if (settingProvider == null)
             {
-                throw new InvalidOperationException($"No {nameof(DbSettingProviderBase)} was configured.");
+                throw new InvalidOperationException($"No {nameof(DbSettingProvider)} was configured.");
             }
 
             if (connectionStringProvider == null)
             {
-                throw new InvalidOperationException($"No {nameof(ConnectionStringProviderBase)} was configured. Please call Use(Dictionary<string, ConnectionConfiguration> connectionConfiguration) first.");
+                throw new InvalidOperationException($"No {nameof(ConnectionStringProvider)} was configured. Please call Use(Dictionary<string, ConnectionConfiguration> connectionConfiguration) first.");
             }
 
             if (VaultOptions?.Enable == true)

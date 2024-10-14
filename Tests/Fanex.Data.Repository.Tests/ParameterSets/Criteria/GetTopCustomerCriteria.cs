@@ -1,17 +1,16 @@
-﻿namespace Fanex.Data.Repository.Tests.ParameterSets.Criteria
+﻿namespace Fanex.Data.Repository.Tests.ParameterSets.Criteria;
+
+internal class GetTopCustomerCriteria : CriteriaBase
 {
-    internal class GetTopCustomerCriteria : CriteriaBase
-    {
-        public int Top { get; set; }
+    public int Top { get; set; }
 
-        public int RemainingCustomers { get; set; }
+    public int RemainingCustomers { get; set; }
 
-        public string WaitFor { get; set; } = string.Empty;
+    public string WaitFor { get; set; } = string.Empty;
 
-        public override string GetSettingKey()
-            => "GetTopCustomers";
+    public override string GetSettingKey()
+        => "GetTopCustomers";
 
-        public override bool IsValid()
-            => Top >= 0;
-    }
+    public override bool IsValid()
+        => Top >= 0;
 }

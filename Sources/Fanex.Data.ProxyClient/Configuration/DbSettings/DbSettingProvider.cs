@@ -8,45 +8,128 @@ namespace Fanex.Data
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Xml;
     using System.Xml.Linq;
     using System.Xml.Schema;
+    using System.Xml;
 
-    [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global"),
-    SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class XmlDbSettingProvider : DbSettingProviderBase
+    [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
+    public class DbSettingProvider
     {
         private readonly ConcurrentDictionary<string, DbSetting> settingDataSource
             = new ConcurrentDictionary<string, DbSetting>(StringComparer.OrdinalIgnoreCase);
 
-        public XmlDbSettingProvider(string resourcePath)
-            : base(resourcePath)
+        public DbSettingProvider(string resourcePath)
         {
+            if (string.IsNullOrWhiteSpace(resourcePath))
+            {
+                throw new ArgumentException(
+                    $"{nameof(resourcePath)} is required. We use this directory path to detach Stored Procedure configuration.",
+                    nameof(resourcePath));
+            }
+
+            ResourcePath = GetFullResourcePath(resourcePath);
         }
 
-        public XmlDbSettingProvider(string resourcePath, Dictionary<string, ConnectionConfiguration> connectionMaps)
-            : base(resourcePath)
+        public string ResourcePath { get; set; }
+
+        protected internal ConnectionStringProvider ConnectionStringProvider { get; set; }
+
+    
+        public virtual void Restart()
+            => Start();
+
+        public virtual DbSetting GetSetting(string key)
         {
-            ConnectionStringProvider = new DefaultConnectionStringProvider(connectionMaps);
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException("Key must not be null or empty.", nameof(key));
+            }
+
+            if (SettingDataSource == null)
+            {
+                throw new InvalidOperationException(
+                    $"No Stored Procedure configuration was detected! You have not invoked the {nameof(Start)} method.");
+            }
+
+            if (!SettingDataSource.ContainsKey(key))
+            {
+                throw new KeyNotFoundException($"There is no Stored Procedure configuration with the key named '{key}' found.");
+            }
+
+            var dbSetting = SettingDataSource[key];
+
+            if (dbSetting == null)
+            {
+                throw new InvalidOperationException($"The '{key}' is pointing to a null DbSetting.");
+            }
+
+            return dbSetting.Clone();
         }
 
-        public override IDictionary<string, DbSetting> SettingDataSource => settingDataSource;
+        protected static bool IsFolder(string path)
+        {
+            var fileAttribute = File.GetAttributes(path);
 
-        public override DbSettingProviderBase DeleteSetting(DbSetting setting)
+            return (fileAttribute & FileAttributes.Directory) == FileAttributes.Directory;
+        }
+
+        protected static string GetFullResourcePath(string resourcePath)
+        {
+            var fullResourcePath = resourcePath;
+
+            if (!Path.IsPathRooted(fullResourcePath))
+            {
+                var rootPath = AppDomain.CurrentDomain.BaseDirectory;
+
+                fullResourcePath = fullResourcePath.TrimStart('~', '\\', '/');
+                fullResourcePath = Path.Combine(rootPath, fullResourcePath);
+            }
+
+            EnsureResourceExist(fullResourcePath);
+
+            return fullResourcePath;
+        }
+
+        protected static void EnsureResourceExist(string resourcePath)
+        {
+            if (Directory.Exists(resourcePath))
+            {
+                if (Directory.GetFiles(resourcePath).Length == 0)
+                {
+                    throw new FileNotFoundException($"'{resourcePath}' does not contain any files.");
+                }
+
+                return;
+            }
+
+            if (File.Exists(resourcePath))
+            {
+                return;
+            }
+
+            throw new FileNotFoundException($"'{resourcePath}' was not found.");
+        }
+
+       
+        public virtual IDictionary<string, DbSetting> SettingDataSource => settingDataSource;
+
+        public virtual DbSettingProvider DeleteSetting(DbSetting setting)
         {
             settingDataSource.TryRemove(setting.Key, out _);
 
             return this;
         }
 
-        public override DbSettingProviderBase InsertSetting(DbSetting setting)
+        public virtual DbSettingProvider InsertSetting(DbSetting setting)
         {
             settingDataSource.TryAdd(setting.Key, setting);
 
             return this;
         }
 
-        public override DbSettingProviderBase UpdateSetting(DbSetting setting)
+        public virtual DbSettingProvider UpdateSetting(DbSetting setting)
         {
             if (settingDataSource.TryGetValue(setting.Key, out var oldSetting))
             {
@@ -56,7 +139,7 @@ namespace Fanex.Data
             return this;
         }
 
-        public override void Start()
+        public void Start()
             => LoadSettingDataSource(ResourcePath);
 
         protected static bool IsEncryptedConnection(XElement element)
@@ -202,6 +285,31 @@ namespace Fanex.Data
             }
 
             return firmParameters;
+        }
+
+        public void UpdateConnectionString(Dictionary<string, ConnectionConfiguration> connectionMaps)
+        {
+            var settingKeys = SettingDataSource.Keys.ToArray();
+            foreach (var settingKey in settingKeys)
+            {
+                var oldSetting = SettingDataSource[settingKey];
+                if (!connectionMaps.TryGetValue(oldSetting.DbName, out var connectionConfiguration))
+                {
+                    continue;
+                }
+
+                var newSetting = new DbSetting(
+                    settingKey,
+                    oldSetting.Provider,
+                    oldSetting.DbName,
+                    connectionConfiguration.ConnectionString,
+                    oldSetting.SpName,
+                    oldSetting.CommandTimeout,
+                    oldSetting.ColumnMaps,
+                    oldSetting.FirmParameters);
+
+                SettingDataSource[settingKey] = newSetting;
+            }
         }
     }
 }

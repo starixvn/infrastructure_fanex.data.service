@@ -1,11 +1,10 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query.ErrorCriteria
+﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query.ErrorCriteria;
+
+using Repository;
+
+internal class SpNameKeyEmptyCriteria : CriteriaBase
 {
-    using Repository;
+    public override string GetSettingKey() => string.Empty;
 
-    internal class SpNameKeyEmptyCriteria : CriteriaBase
-    {
-        public override string GetSettingKey() => string.Empty;
-
-        public override bool IsValid() => true;
-    }
+    public override bool IsValid() => true;
 }

@@ -2,14 +2,12 @@
 {
     public class DatabaseCredential
     {
-        private readonly string key;
-
         public DatabaseCredential(string key)
         {
-            this.key = key;
+            Key = key;
         }
 
-        public string Key => key;
+        public string Key { get; }
 
         public string IP { get; set; }
 
@@ -22,7 +20,7 @@
             var item = obj as DatabaseCredential;
 
             return item != null
-                   && key == item.Key
+                   && Key == item.Key
                    && IP == item.IP
                    && Username == item.Username
                    && Password == item.Password;
@@ -30,7 +28,7 @@
 
         public override int GetHashCode()
         {
-            return key.GetHashCode();
+            return Key.GetHashCode();
         }
     }
 }

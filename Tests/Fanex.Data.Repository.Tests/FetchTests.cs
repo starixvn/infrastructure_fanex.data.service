@@ -1,127 +1,123 @@
 ﻿using System.Linq;
 
-namespace Fanex.Data.Repository.Tests
+namespace Fanex.Data.Repository.Tests;
+
+using Fanex.Data.SampleData.Models;
+using ParameterSets.Criteria;
+using SampleData;
+using System;
+using System.Threading.Tasks;
+using Xunit;
+
+[Collection(nameof(FanexDataConfigurationManagerCollection))]
+public class FetchTests(DynamicRepositoryFixture fixture) : IClassFixture<DynamicRepositoryFixture>
 {
-    using Fanex.Data.SampleData.Models;
-    using ParameterSets.Criteria;
-    using SampleData;
-    using System;
-    using System.Threading.Tasks;
-    using Xunit;
+    private readonly IDynamicRepository repository = fixture.Repository;
 
-    [Collection(nameof(FanexDataConfigurationManagerCollection))]
-    public class FetchTests : IClassFixture<DynamicRepositoryFixture>
+    [Fact]
+    public void Fetch_NullCriteria_ThrowArgumentNullException()
     {
-        private readonly IDynamicRepository repository;
+        // Arrange.
+        var criteria = default(ICriteria);
 
-        public FetchTests(DynamicRepositoryFixture fixture)
-            => repository = fixture.Repository;
+        // Act.
+        var exception = Record.Exception(() => repository.Fetch<MostExpensiveProduct>(criteria));
 
-        [Fact]
-        public void Fetch_NullCriteria_ThrowArgumentNullException()
-        {
-            // Arrange.
-            var criteria = default(ICriteria);
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = Record.Exception(() => repository.Fetch<MostExpensiveProduct>(criteria));
+    [Fact]
+    public void Fetch_InvalidCriteria_ReturnsEmptyList()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria();
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var actualResult = repository.Fetch<Customer>(criteria);
 
-        [Fact]
-        public void Fetch_InvalidCriteria_ReturnsEmptyList()
-        {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria();
+        // Assert.
+        Assert.Empty(actualResult);
+    }
 
-            // Act.
-            var actualResult = repository.Fetch<Customer>(criteria);
+    [Fact]
+    public void Fetch_ValidCriteria_ReturnExceptedData()
+    {
+        // Arrange.
+        var criteria = new TenMostExpensiveProductCriteria();
 
-            // Assert.
-            Assert.Empty(actualResult);
-        }
+        // Act.
+        var actualResult = repository.Fetch<MostExpensiveProduct>(criteria);
 
-        [Fact]
-        public void Fetch_ValidCriteria_ReturnExceptedData()
-        {
-            // Arrange.
-            var criteria = new TenMostExpensiveProductCriteria();
+        // Assert.
+        Assert.Equal(ExpectedData.ExpectedMostExpensiveProducts, actualResult);
+    }
 
-            // Act.
-            var actualResult = repository.Fetch<MostExpensiveProduct>(criteria);
+    [Fact]
+    public async Task FetchAsync_NullCriteria_ThrowsArgumentNullException()
+    {
+        // Arrange.
+        var criteria = default(ICriteria);
 
-            // Assert.
-            Assert.Equal(ExpectedData.ExpectedMostExpensiveProducts, actualResult);
-        }
+        // Act.
+        var exception = await Record.ExceptionAsync(() => repository.FetchAsync<MostExpensiveProduct>(criteria));
 
-        [Fact]
-        public async Task FetchAsync_NullCriteria_ThrowsArgumentNullException()
-        {
-            // Arrange.
-            var criteria = default(ICriteria);
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = await Record.ExceptionAsync(() => repository.FetchAsync<MostExpensiveProduct>(criteria));
+    [Fact]
+    public async Task FetchAsync_InvalidCriteria_ReturnsEmptyList()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria();
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var actualResult = await repository.FetchAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task FetchAsync_InvalidCriteria_ReturnsEmptyList()
-        {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria();
+        // Assert.
+        Assert.Empty(actualResult);
+    }
 
-            // Act.
-            var actualResult = await repository.FetchAsync<Customer>(criteria);
+    [Fact]
+    public async Task FetchAsync_ValidCriteria_ReturnExceptedData()
+    {
+        // Arrange.
+        var criteria = new TenMostExpensiveProductCriteria();
 
-            // Assert.
-            Assert.Empty(actualResult);
-        }
+        // Act.
+        var actualResult = await repository
+            .FetchAsync<MostExpensiveProduct>(criteria);
 
-        [Fact]
-        public async Task FetchAsync_ValidCriteria_ReturnExceptedData()
-        {
-            // Arrange.
-            var criteria = new TenMostExpensiveProductCriteria();
+        // Assert.
+        Assert.Equal(ExpectedData.ExpectedMostExpensiveProducts, actualResult);
+    }
 
-            // Act.
-            var actualResult = await repository
-                .FetchAsync<MostExpensiveProduct>(criteria);
+    [Fact]
+    public async Task FetchAsync_EmptyCollection_ReturnEmpty()
+    {
+        // Arrange.
+        var criteria = new GetTopCustomerCriteria();
 
-            // Assert.
-            Assert.Equal(ExpectedData.ExpectedMostExpensiveProducts, actualResult);
-        }
+        // Act.
+        var actualResult = await repository
+            .FetchAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task FetchAsync_EmptyCollection_ReturnEmpty()
-        {
-            // Arrange.
-            var criteria = new GetTopCustomerCriteria();
+        // Assert.
+        Assert.Empty(actualResult);
+    }
 
-            // Act.
-            var actualResult = await repository
-                .FetchAsync<Customer>(criteria);
+    [Fact]
+    public async Task FetchAsync_100kItem_ReturnNormally()
+    {
+        // Arrange.
+        var criteria = new Get100ThousandItemsCriteria();
 
-            // Assert.
-            Assert.Empty(actualResult);
-        }
+        // Act.
+        var actualResult = await repository
+            .FetchAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task FetchAsync_100kItem_ReturnNormally()
-        {
-            // Arrange.
-            var criteria = new Get100ThousandItemsCriteria();
-
-            // Act.
-            var actualResult = await repository
-                .FetchAsync<Customer>(criteria);
-
-            // Assert.
-            Assert.Equal(100_000, actualResult.Count());
-        }
+        // Assert.
+        Assert.Equal(100_000, actualResult.Count());
     }
 }

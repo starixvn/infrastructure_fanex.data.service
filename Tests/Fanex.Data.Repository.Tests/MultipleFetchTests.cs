@@ -1,325 +1,321 @@
-﻿namespace Fanex.Data.Repository.Tests
+﻿namespace Fanex.Data.Repository.Tests;
+
+using Fanex.Data.SampleData.Models;
+using ParameterSets.Criteria;
+using SampleData;
+using System;
+using System.Threading.Tasks;
+using Xunit;
+
+[Collection(nameof(FanexDataConfigurationManagerCollection))]
+public class MultipleFetchTests(DynamicRepositoryFixture fixture) : IClassFixture<DynamicRepositoryFixture>
 {
-    using Fanex.Data.SampleData.Models;
-    using ParameterSets.Criteria;
-    using SampleData;
-    using System;
-    using System.Threading.Tasks;
-    using Xunit;
+    private const string TestedCustomerId = "VINET";
+    private const int ExpectedNumberOfOrders = 5;
 
-    [Collection(nameof(FanexDataConfigurationManagerCollection))]
-    public class MultipleFetchTests : IClassFixture<DynamicRepositoryFixture>
+    private readonly IDynamicRepository repository = fixture.Repository;
+
+    [Fact]
+    public void FetchMultiple_NullCriteria_ThrowArgumentNullException()
     {
-        private const string TestedCustomerId = "VINET";
-        private const int ExpectedNumberOfOrders = 5;
+        // Arrange.
+        var criteria = default(ICriteria);
 
-        private readonly IDynamicRepository repository;
+        // Act.
+        var exception = Record.Exception(() => repository.FetchMultiple<Supplier, Shipper>(criteria));
 
-        public MultipleFetchTests(DynamicRepositoryFixture fixture)
-            => repository = fixture.Repository;
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void FetchMultiple_NullCriteria_ThrowArgumentNullException()
+    [Fact]
+    public void FetchMultiple_InvalidCriteria_ReturnEmptyLists()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var criteria = default(ICriteria);
+            CustomerId = string.Empty
+        };
 
-            // Act.
-            var exception = Record.Exception(() => repository.FetchMultiple<Supplier, Shipper>(criteria));
+        // Act.
+        var (actualSuppliers, actualShippers) = repository.FetchMultiple<Supplier, Shipper>(criteria);
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        Assert.Empty(actualSuppliers);
+        Assert.Empty(actualShippers);
+    }
 
-        [Fact]
-        public void FetchMultiple_InvalidCriteria_ReturnEmptyLists()
+    [Fact]
+    public void FetchMultiple_ValidCriteria_ReturnExpectedLists()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = string.Empty
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var (actualSuppliers, actualShippers) = repository.FetchMultiple<Supplier, Shipper>(criteria);
+        // Act.
+        var (actualSuppliers, actualShippers) = repository.FetchMultiple<Supplier, Shipper>(criteria);
 
-            // Assert.
-            Assert.Empty(actualSuppliers);
-            Assert.Empty(actualShippers);
-        }
+        // Assert.
+        Assert.Equal(ExpectedData.ExpectedSuppliers, actualSuppliers);
+        Assert.Equal(ExpectedData.ExpectedShippers, actualShippers);
+    }
 
-        [Fact]
-        public void FetchMultiple_ValidCriteria_ReturnExpectedLists()
+    [Fact]
+    public void FetchMultiple_ValidCriteriaAndThreeMappingTypes_ReturnExpectedLists()
+    {
+        // Arrange.
+        var parameterSet = new MultiTablesCriteria();
+
+        // Act.
+        var (actualCategories, actualCustomers, actualEmployees) = repository.FetchMultiple<Category, Customer, Employee>(parameterSet);
+
+        // Assert.
+        Assert.NotEmpty(actualCategories);
+        Assert.NotEmpty(actualCustomers);
+        Assert.NotEmpty(actualEmployees);
+    }
+
+    [Fact]
+    public void FetchMultiple_ValidCriteria_ReturningMoreThan3Lists()
+    {
+        // Arrange.
+        var parameterSet = new MultiTablesCriteria();
+        var mappingTypes = new[]
         {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            typeof(Category),
+            typeof(Customer),
+            typeof(Employee),
+            typeof(Product)
+        };
 
-            // Act.
-            var (actualSuppliers, actualShippers) = repository.FetchMultiple<Supplier, Shipper>(criteria);
+        // Act.
+        var results = repository.FetchMultiple(parameterSet, mappingTypes);
 
-            // Assert.
-            Assert.Equal(ExpectedData.ExpectedSuppliers, actualSuppliers);
-            Assert.Equal(ExpectedData.ExpectedShippers, actualShippers);
-        }
+        // Assert.
+        const int expectedNumberOfResult = 4;
 
-        [Fact]
-        public void FetchMultiple_ValidCriteriaAndThreeMappingTypes_ReturnExpectedLists()
+        var firstResult = results[0];
+        var secondResult = results[1];
+        var thirdResult = results[2];
+        var forthResult = results[3];
+
+        Assert.Equal(expectedNumberOfResult, results.Length);
+        Assert.NotEmpty(firstResult);
+        Assert.NotEmpty(secondResult);
+        Assert.NotEmpty(thirdResult);
+        Assert.NotEmpty(forthResult);
+    }
+
+    [Fact]
+    public void FetchMultiple_ValidCriteria_GetsCorrectOutputs()
+    {
+        // Arrange.
+        var parameterSet = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var parameterSet = new MultiTablesCriteria();
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var (actualCategories, actualCustomers, actualEmployees) = repository.FetchMultiple<Category, Customer, Employee>(parameterSet);
+        // Act.
+        repository.FetchMultiple<Supplier, Shipper>(parameterSet);
 
-            // Assert.
-            Assert.NotEmpty(actualCategories);
-            Assert.NotEmpty(actualCustomers);
-            Assert.NotEmpty(actualEmployees);
-        }
+        // Assert.
+        Assert.Equal(ExpectedNumberOfOrders, parameterSet.NumberOfOrders);
+    }
 
-        [Fact]
-        public void FetchMultiple_ValidCriteria_ReturningMoreThan3Lists()
+    [Fact]
+    public void FetchMultiple_NumberOfMappingTypesIsMoreThanNumberOfDataTables_ReturnsEmptyListForMissingTables()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var parameterSet = new MultiTablesCriteria();
-            var mappingTypes = new[]
-            {
-                typeof(Category),
-                typeof(Customer),
-                typeof(Employee),
-                typeof(Product)
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var results = repository.FetchMultiple(parameterSet, mappingTypes);
+        // Act.
+        var (_, _, actualProducts) = repository.FetchMultiple<Supplier, Shipper, Product>(criteria);
 
-            // Assert.
-            const int expectedNumberOfResult = 4;
+        // Assert.
+        Assert.Empty(actualProducts);
+    }
 
-            var firstResult = results[0];
-            var secondResult = results[1];
-            var thirdResult = results[2];
-            var forthResult = results[3];
-
-            Assert.Equal(expectedNumberOfResult, results.Length);
-            Assert.NotEmpty(firstResult);
-            Assert.NotEmpty(secondResult);
-            Assert.NotEmpty(thirdResult);
-            Assert.NotEmpty(forthResult);
-        }
-
-        [Fact]
-        public void FetchMultiple_ValidCriteria_GetsCorrectOutputs()
+    [Fact]
+    public void FetchMultiple__NumberOfMappingTypesIsLessThanNumberOfDataTables_OnlyReturnDataMappingWithType()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var parameterSet = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            repository.FetchMultiple<Supplier, Shipper>(parameterSet);
+        // Act.
+        var actualResult = repository.FetchMultiple(criteria, [typeof(Supplier)]);
 
-            // Assert.
-            Assert.Equal(ExpectedNumberOfOrders, parameterSet.NumberOfOrders);
-        }
+        // Assert.
+        Assert.Single(actualResult);
+        Assert.Equal(ExpectedData.ExpectedSuppliers, actualResult[0]);
+    }
 
-        [Fact]
-        public void FetchMultiple_NumberOfMappingTypesIsMoreThanNumberOfDataTables_ReturnsEmptyListForMissingTables()
+    [Fact]
+    public void FetchMultiple_NullMappingTypes_ThrowArgumentException()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = TestedCustomerId
+        };
+        var mappingTypes = default(Type[]);
 
-            // Act.
-            var (_, _, actualProducts) = repository.FetchMultiple<Supplier, Shipper, Product>(criteria);
+        // Act.
+        var exception = Record.Exception(() => repository.FetchMultiple(criteria, mappingTypes));
 
-            // Assert.
-            Assert.Empty(actualProducts);
-        }
+        // Assert.
+        Assert.IsType<ArgumentException>(exception);
+    }
 
-        [Fact]
-        public void FetchMultiple__NumberOfMappingTypesIsLessThanNumberOfDataTables_OnlyReturnDataMappingWithType()
+    [Fact]
+    public void FetchMultiple_EmptyMappingTypes_ThrowArgumentException()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = TestedCustomerId
+        };
+        var mappingTypes = Type.EmptyTypes;
 
-            // Act.
-            var actualResult = repository.FetchMultiple(criteria, new[] { typeof(Supplier) });
+        // Act.
+        var exception = Record.Exception(() => repository.FetchMultiple(criteria, mappingTypes));
 
-            // Assert.
-            Assert.Single(actualResult);
-            Assert.Equal(ExpectedData.ExpectedSuppliers, actualResult[0]);
-        }
+        // Assert.
+        Assert.IsType<ArgumentException>(exception);
+    }
 
-        [Fact]
-        public void FetchMultiple_NullMappingTypes_ThrowArgumentException()
+    [Fact]
+    public void FetchMultiple_MappingTypesContainsNull_ThrowArgumentException()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
-            var mappingTypes = default(Type[]);
+            CustomerId = TestedCustomerId
+        };
+        var mappingTypes = new Type[] { null };
 
-            // Act.
-            var exception = Record.Exception(() => repository.FetchMultiple(criteria, mappingTypes));
+        // Act.
+        var exception = Record.Exception(() => repository.FetchMultiple(criteria, mappingTypes));
 
-            // Assert.
-            Assert.IsType<ArgumentException>(exception);
-        }
+        // Assert.
+        Assert.IsType<ArgumentException>(exception);
+    }
 
-        [Fact]
-        public void FetchMultiple_EmptyMappingTypes_ThrowArgumentException()
+    [Fact]
+    public async Task FetchMultipleAsync_NullCriteria_ThrowArgumentNullException()
+    {
+        // Arrange.
+        var criteria = default(ICriteria);
+
+        // Act.
+        var exception = await Record.ExceptionAsync(() => repository.FetchMultipleAsync<Supplier, Shipper>(criteria));
+
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
+    public async Task FetchMultipleAsync_InvalidCriteria_ReturnEmptyLists()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
-            var mappingTypes = Type.EmptyTypes;
+            CustomerId = string.Empty
+        };
 
-            // Act.
-            var exception = Record.Exception(() => repository.FetchMultiple(criteria, mappingTypes));
+        // Act.
+        var (actualSuppliers, actualShippers) = await repository.FetchMultipleAsync<Supplier, Shipper>(criteria);
 
-            // Assert.
-            Assert.IsType<ArgumentException>(exception);
-        }
+        // Assert.
+        Assert.Empty(actualSuppliers);
+        Assert.Empty(actualShippers);
+    }
 
-        [Fact]
-        public void FetchMultiple_MappingTypesContainsNull_ThrowArgumentException()
+    [Fact]
+    public async Task FetchMultipleAsync_TwoDataMapping_ReturnCorrectly()
+    {
+        // Arrange.
+        var criteria = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
-            var mappingTypes = new Type[] { null };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var exception = Record.Exception(() => repository.FetchMultiple(criteria, mappingTypes));
+        // Act.
+        var (actualSuppliers, actualShippers) = await repository.FetchMultipleAsync<Supplier, Shipper>(criteria);
 
-            // Assert.
-            Assert.IsType<ArgumentException>(exception);
-        }
+        // Assert.
+        Assert.Equal(ExpectedData.ExpectedSuppliers, actualSuppliers);
+        Assert.Equal(ExpectedData.ExpectedShippers, actualShippers);
+    }
 
-        [Fact]
-        public async Task FetchMultipleAsync_NullCriteria_ThrowArgumentNullException()
-        {
-            // Arrange.
-            var criteria = default(ICriteria);
+    [Fact]
+    public async Task FetchMultipleAsync_ThreeDataMapping_ReturnCorrectly()
+    {
+        // Arrange.
+        var parameterSet = new MultiTablesCriteria();
 
-            // Act.
-            var exception = await Record.ExceptionAsync(() => repository.FetchMultipleAsync<Supplier, Shipper>(criteria));
-
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
-
-        [Fact]
-        public async Task FetchMultipleAsync_InvalidCriteria_ReturnEmptyLists()
-        {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = string.Empty
-            };
-
-            // Act.
-            var (actualSuppliers, actualShippers) = await repository.FetchMultipleAsync<Supplier, Shipper>(criteria);
-
-            // Assert.
-            Assert.Empty(actualSuppliers);
-            Assert.Empty(actualShippers);
-        }
-
-        [Fact]
-        public async Task FetchMultipleAsync_TwoDataMapping_ReturnCorrectly()
-        {
-            // Arrange.
-            var criteria = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
-
-            // Act.
-            var (actualSuppliers, actualShippers) = await repository.FetchMultipleAsync<Supplier, Shipper>(criteria);
-
-            // Assert.
-            Assert.Equal(ExpectedData.ExpectedSuppliers, actualSuppliers);
-            Assert.Equal(ExpectedData.ExpectedShippers, actualShippers);
-        }
-
-        [Fact]
-        public async Task FetchMultipleAsync_ThreeDataMapping_ReturnCorrectly()
-        {
-            // Arrange.
-            var parameterSet = new MultiTablesCriteria();
-
-            // Act.
-            var (actualCategories, actualCustomers, actualEmployees) = await repository
+        // Act.
+        var (actualCategories, actualCustomers, actualEmployees) = await repository
                 .FetchMultipleAsync<Category, Customer, Employee>(parameterSet)
-                ;
+            ;
 
-            // Assert.
-            Assert.NotEmpty(actualCategories);
-            Assert.NotEmpty(actualCustomers);
-            Assert.NotEmpty(actualEmployees);
-        }
+        // Assert.
+        Assert.NotEmpty(actualCategories);
+        Assert.NotEmpty(actualCustomers);
+        Assert.NotEmpty(actualEmployees);
+    }
 
-        [Fact]
-        public async Task FetchMultipleAsync_MoreThanThreeDataMapping_ReturnCorrectly()
+    [Fact]
+    public async Task FetchMultipleAsync_MoreThanThreeDataMapping_ReturnCorrectly()
+    {
+        // Arrange.
+        var parameterSet = new MultiTablesCriteria();
+        var mappingTypes = new[]
         {
-            // Arrange.
-            var parameterSet = new MultiTablesCriteria();
-            var mappingTypes = new[]
-            {
-                typeof(Category),
-                typeof(Customer),
-                typeof(Employee),
-                typeof(Product)
-            };
+            typeof(Category),
+            typeof(Customer),
+            typeof(Employee),
+            typeof(Product)
+        };
 
-            // Act.
-            var results = await repository.FetchMultipleAsync(parameterSet, mappingTypes);
+        // Act.
+        var results = await repository.FetchMultipleAsync(parameterSet, mappingTypes);
 
-            // Assert.
-            const int expectedNumberOfResult = 4;
+        // Assert.
+        const int expectedNumberOfResult = 4;
 
-            var firstResult = results[0];
-            var secondResult = results[1];
-            var thirdResult = results[2];
-            var forthResult = results[3];
+        var firstResult = results[0];
+        var secondResult = results[1];
+        var thirdResult = results[2];
+        var forthResult = results[3];
 
-            Assert.Equal(expectedNumberOfResult, results.Length);
-            Assert.NotEmpty(firstResult);
-            Assert.NotEmpty(secondResult);
-            Assert.NotEmpty(thirdResult);
-            Assert.NotEmpty(forthResult);
-        }
+        Assert.Equal(expectedNumberOfResult, results.Length);
+        Assert.NotEmpty(firstResult);
+        Assert.NotEmpty(secondResult);
+        Assert.NotEmpty(thirdResult);
+        Assert.NotEmpty(forthResult);
+    }
 
-        [Fact]
-        public async Task FetchMultipleAsync_ValidCriteria_GetsCorrectOutputs()
+    [Fact]
+    public async Task FetchMultipleAsync_ValidCriteria_GetsCorrectOutputs()
+    {
+        // Arrange.
+        var parameterSet = new SupplierAndShipperByCustomerIdCriteria
         {
-            // Arrange.
-            var parameterSet = new SupplierAndShipperByCustomerIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            await repository.FetchMultipleAsync<Supplier, Shipper>(parameterSet);
+        // Act.
+        await repository.FetchMultipleAsync<Supplier, Shipper>(parameterSet);
 
-            // Assert.
-            Assert.Equal(ExpectedNumberOfOrders, parameterSet.NumberOfOrders);
-        }
+        // Assert.
+        Assert.Equal(ExpectedNumberOfOrders, parameterSet.NumberOfOrders);
     }
 }

@@ -59,7 +59,7 @@ namespace Fanex.Data.Vault
                 var isCredentialChanged = vaultService.UpdateConnectionMaps().GetAwaiter().GetResult();
                 if (isCredentialChanged)
                 {
-                    DbSettingProviderManager.CurrentSession.RestartSettingProvider();
+                    DbSettingProviderManager.CurrentSession.ReloadConnectionStrings();
                 }
             }
             catch (Exception e)

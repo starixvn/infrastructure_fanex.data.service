@@ -1,9 +1,6 @@
-﻿namespace Fanex.Data.Repository.Tests
-{
-    using Xunit;
+﻿namespace Fanex.Data.Repository.Tests;
 
-    [CollectionDefinition(nameof(FanexDataConfigurationManagerCollection))]
-    public class FanexDataConfigurationManagerCollection : ICollectionFixture<FanexDataConfigurationManager>
-    {
-    }
-}
+using Xunit;
+
+[CollectionDefinition(nameof(FanexDataConfigurationManagerCollection))]
+public class FanexDataConfigurationManagerCollection : ICollectionFixture<FanexDataConfigurationManager>;

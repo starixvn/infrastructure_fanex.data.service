@@ -1,25 +1,24 @@
-﻿namespace Fanex.Data.Repository.Tests
+﻿namespace Fanex.Data.Repository.Tests;
+
+using SqlServer;
+using System;
+
+using Microsoft.Extensions.Configuration;
+
+public sealed class FanexDataConfigurationManager : IDisposable
 {
-    using SqlServer;
-    using System;
-
-    using Microsoft.Extensions.Configuration;
-
-    public sealed class FanexDataConfigurationManager : IDisposable
+    public FanexDataConfigurationManager()
     {
-        public FanexDataConfigurationManager()
-        {
-            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false);
-            var configuration = builder.Build();
+        var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false);
+        var configuration = builder.Build();
 
-            DbSettingProviderManager
-              .StartNewSession()
-              .WithSqlServer(configuration)
-              .UseDefaultDbSettingProvider("App_Data")
-              .Run();
-        }
-
-        public void Dispose()
-            => DbSettingProviderManager.ClearSession();
+        DbSettingProviderManager
+            .StartNewSession()
+            .WithSqlServer(configuration)
+            .UseDefaultDbSettingProvider("App_Data")
+            .Run();
     }
+
+    public void Dispose()
+        => DbSettingProviderManager.ClearSession();
 }
