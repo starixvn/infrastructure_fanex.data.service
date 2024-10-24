@@ -11,9 +11,24 @@ using System.Text;
 [ApiController]
 public class HomeController : ControllerBase
 {
+    private static bool alive = true;
     [HttpGet]
     public IActionResult Index()
     {
+        return alive 
+            ? Ok(Environment.MachineName) 
+            : Problem(
+                "Alive is false", 
+                Environment.MachineName, 
+                400, 
+                "Alive is false", 
+                "Alive is false");
+    }
+
+    [HttpGet("kill")]
+    public IActionResult Kill()
+    {
+        alive = false;
         return Ok(Environment.MachineName);
     }
 
