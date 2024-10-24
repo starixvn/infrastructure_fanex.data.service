@@ -1,11 +1,10 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query.ErrorCriteria
+﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query.ErrorCriteria;
+
+using Repository;
+
+internal class SpNameNotConfiguredCriteria : CriteriaBase
 {
-    using Repository;
+    public override string GetSettingKey() => "testSpNameNotConfigured";
 
-    internal class SpNameNotConfiguredCriteria : CriteriaBase
-    {
-        public override string GetSettingKey() => "testSpNameNotConfigured";
-
-        public override bool IsValid() => true;
-    }
+    public override bool IsValid() => true;
 }

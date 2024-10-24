@@ -1,13 +1,12 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query
+﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
+
+using Repository;
+
+public class TenMostExpensiveProductCriteria : CriteriaBase
 {
-    using Repository;
+    public override string GetSettingKey()
+        => "TenMostExpensiveProducts";
 
-    public class TenMostExpensiveProductCriteria : CriteriaBase
-    {
-        public override string GetSettingKey()
-            => "TenMostExpensiveProducts";
-
-        public override bool IsValid()
-            => true;
-    }
+    public override bool IsValid()
+        => true;
 }

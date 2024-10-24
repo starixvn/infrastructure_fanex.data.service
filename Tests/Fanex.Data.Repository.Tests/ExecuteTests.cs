@@ -1,198 +1,191 @@
-﻿namespace Fanex.Data.Repository.Tests
+﻿namespace Fanex.Data.Repository.Tests;
+
+using Models;
+using ParameterSets.Commands;
+using System;
+using System.Threading.Tasks;
+using Xunit;
+
+[Collection(nameof(FanexDataConfigurationManagerCollection))]
+public class ExecuteTests(DynamicRepositoryFixture fixture) : IClassFixture<DynamicRepositoryFixture>
 {
-    using Models;
-    using ParameterSets.Commands;
-    using System;
-    using System.Threading.Tasks;
-    using Xunit;
+    private const int TestedEmployeeId = 1;
+    private const string TestedTerritoryId = "40222";
 
-    [Collection(nameof(FanexDataConfigurationManagerCollection))]
-    public class ExecuteTests : IClassFixture<DynamicRepositoryFixture>
+    private readonly IDynamicRepository repository = fixture.Repository;
+    private readonly dynamic _assertingParameterSet = new
     {
-        private const int TestedEmployeeId = 1;
-        private const string TestedTerritoryId = "40222";
+        EmployeeId = TestedEmployeeId,
+        TerritoryId = TestedTerritoryId
+    };
 
-        private readonly IDynamicRepository repository;
-        private readonly dynamic _assertingParameterSet;
+    [Fact]
+    public void Execute_NullCommand_ThrowArgumentNullException()
+    {
+        // Arrange.
+        var command = default(INonQueryCommand);
 
-        public ExecuteTests(DynamicRepositoryFixture fixture)
+        // Act.
+        var exception = Record.Exception(() => repository.Execute(command));
+
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
+    public void Execute_ValidCommand_ExecuteSP()
+    {
+        // Arrange.
+        EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
+
+        // Act.
+        repository.Execute(new NewEmployeeTerritoryCommand
         {
-            repository = fixture.Repository;
-            _assertingParameterSet = new
-            {
-                EmployeeId = TestedEmployeeId,
-                TerritoryId = TestedTerritoryId
-            };
-        }
+            EmployeeId = TestedEmployeeId,
+            TerritoryId = TestedTerritoryId
+        });
 
-        [Fact]
-        public void Execute_NullCommand_ThrowArgumentNullException()
+        // Assert.
+        var expectedData = GetEmployeeTerritory(_assertingParameterSet);
+
+        Assert.NotNull(expectedData);
+    }
+
+    [Fact]
+    public void Execute_InvalidCommand_DoesNotCallSp()
+    {
+        // Arrange.
+        EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
+
+        // Act.
+        repository.Execute(new NewEmployeeTerritoryCommand
         {
-            // Arrange.
-            var command = default(INonQueryCommand);
+            EmployeeId = 0,
+            TerritoryId = string.Empty
+        });
 
-            // Act.
-            var exception = Record.Exception(() => repository.Execute(command));
+        // Assert.
+        var expectedData = GetEmployeeTerritory(_assertingParameterSet);
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        Assert.Null(expectedData);
+    }
 
-        [Fact]
-        public void Execute_ValidCommand_ExecuteSP()
+    [Fact]
+    public void Execute_InvalidCommand_ReturnsZero()
+    {
+        // Arrange.
+        EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
+
+        // Act.
+        var affectedRows = repository.Execute(new NewEmployeeTerritoryCommand
         {
-            // Arrange.
-            EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
+            EmployeeId = 0,
+            TerritoryId = string.Empty
+        });
 
-            // Act.
-            repository.Execute(new NewEmployeeTerritoryCommand
-            {
-                EmployeeId = TestedEmployeeId,
-                TerritoryId = TestedTerritoryId
-            });
+        // Assert.
+        Assert.Equal(0, affectedRows);
+    }
 
-            // Assert.
-            var expectedData = GetEmployeeTerritory(_assertingParameterSet);
+    [Fact]
+    public async Task ExecuteAsync_NullCommand_ThrowArgumentNullException()
+    {
+        // Arrange.
+        var command = default(INonQueryCommand);
 
-            Assert.NotNull(expectedData);
-        }
-
-        [Fact]
-        public void Execute_InvalidCommand_DoesNotCallSp()
-        {
-            // Arrange.
-            EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
-
-            // Act.
-            repository.Execute(new NewEmployeeTerritoryCommand
-            {
-                EmployeeId = 0,
-                TerritoryId = string.Empty
-            });
-
-            // Assert.
-            var expectedData = GetEmployeeTerritory(_assertingParameterSet);
-
-            Assert.Null(expectedData);
-        }
-
-        [Fact]
-        public void Execute_InvalidCommand_ReturnsZero()
-        {
-            // Arrange.
-            EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
-
-            // Act.
-            var affectedRows = repository.Execute(new NewEmployeeTerritoryCommand
-            {
-                EmployeeId = 0,
-                TerritoryId = string.Empty
-            });
-
-            // Assert.
-            Assert.Equal(0, affectedRows);
-        }
-
-        [Fact]
-        public async Task ExecuteAsync_NullCommand_ThrowArgumentNullException()
-        {
-            // Arrange.
-            var command = default(INonQueryCommand);
-
-            // Act.
-            var exception = await Record
+        // Act.
+        var exception = await Record
                 .ExceptionAsync(() => repository.ExecuteAsync(command))
-                ;
+            ;
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public async Task ExecuteAsync_ValidCommand_ExecuteSP()
+    [Fact]
+    public async Task ExecuteAsync_ValidCommand_ExecuteSP()
+    {
+        // Arrange.
+        var parameterSet = new NewEmployeeTerritoryCommand
         {
-            // Arrange.
-            var parameterSet = new NewEmployeeTerritoryCommand
-            {
-                EmployeeId = TestedEmployeeId,
-                TerritoryId = TestedTerritoryId
-            };
-            EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
+            EmployeeId = TestedEmployeeId,
+            TerritoryId = TestedTerritoryId
+        };
+        EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
 
-            // Act.
-            await repository.ExecuteAsync(parameterSet);
+        // Act.
+        await repository.ExecuteAsync(parameterSet);
 
-            // Assert.
-            var expectedData = GetEmployeeTerritory(_assertingParameterSet);
+        // Assert.
+        var expectedData = GetEmployeeTerritory(_assertingParameterSet);
 
-            Assert.NotNull(expectedData);
-        }
+        Assert.NotNull(expectedData);
+    }
 
-        [Fact]
-        public async Task ExecuteAsync_InvalidCommand_DoesNotCallSp()
+    [Fact]
+    public async Task ExecuteAsync_InvalidCommand_DoesNotCallSp()
+    {
+        // Arrange.
+        var parameterSet = new NewEmployeeTerritoryCommand
         {
-            // Arrange.
-            var parameterSet = new NewEmployeeTerritoryCommand
-            {
-                EmployeeId = -1,
-                TerritoryId = string.Empty
-            };
+            EmployeeId = -1,
+            TerritoryId = string.Empty
+        };
 
-            EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
+        EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
 
-            // Act.
-            await repository.ExecuteAsync(parameterSet);
+        // Act.
+        await repository.ExecuteAsync(parameterSet);
 
-            // Assert.
-            var expectedData = GetEmployeeTerritory(_assertingParameterSet);
+        // Assert.
+        var expectedData = GetEmployeeTerritory(_assertingParameterSet);
 
-            Assert.Null(expectedData);
-        }
+        Assert.Null(expectedData);
+    }
 
-        [Fact]
-        public async Task ExecuteAsync_InvalidCommand_ReturnsZero()
+    [Fact]
+    public async Task ExecuteAsync_InvalidCommand_ReturnsZero()
+    {
+        // Arrange.
+        var parameterSet = new NewEmployeeTerritoryCommand
         {
-            // Arrange.
-            var parameterSet = new NewEmployeeTerritoryCommand
-            {
-                EmployeeId = 0,
-                TerritoryId = string.Empty
-            };
+            EmployeeId = 0,
+            TerritoryId = string.Empty
+        };
 
-            EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
+        EnsureExpectedDataHaveNotInserted(_assertingParameterSet);
 
-            // Act.
-            var affectedRows = await repository.ExecuteAsync(parameterSet);
+        // Act.
+        var affectedRows = await repository.ExecuteAsync(parameterSet);
 
-            // Assert.
-            Assert.Equal(0, affectedRows);
-        }
+        // Assert.
+        Assert.Equal(0, affectedRows);
+    }
 
-        private static void DeleteEmployeeTerritory(object parameterSet)
-        {
-            const string settingKey = "DeleteEmployeeTerritory";
+    private static void DeleteEmployeeTerritory(object parameterSet)
+    {
+        const string settingKey = "DeleteEmployeeTerritory";
 
-            ObjectDbFactory
-                .CreateInstance(settingKey)
-                .ExecuteNonQuery(parameterSet);
-        }
+        ObjectDbFactory
+            .CreateInstance(settingKey)
+            .ExecuteNonQuery(parameterSet);
+    }
 
-        private static EmployeeTerritory GetEmployeeTerritory(object parameterSet)
-        {
-            const string settingKey = "GetEmployeeTerritory";
+    private static EmployeeTerritory GetEmployeeTerritory(object parameterSet)
+    {
+        const string settingKey = "GetEmployeeTerritory";
 
-            return ObjectDbFactory
-                .CreateInstance(settingKey)
-                .QueryEntity<EmployeeTerritory>(parameterSet);
-        }
+        return ObjectDbFactory
+            .CreateInstance(settingKey)
+            .QueryEntity<EmployeeTerritory>(parameterSet);
+    }
 
-        private static void EnsureExpectedDataHaveNotInserted(object parameterSet)
-        {
-            DeleteEmployeeTerritory(parameterSet);
+    private static void EnsureExpectedDataHaveNotInserted(object parameterSet)
+    {
+        DeleteEmployeeTerritory(parameterSet);
 
-            var unexpectedData = GetEmployeeTerritory(parameterSet);
+        var unexpectedData = GetEmployeeTerritory(parameterSet);
 
-            Assert.Null(unexpectedData);
-        }
+        Assert.Null(unexpectedData);
     }
 }

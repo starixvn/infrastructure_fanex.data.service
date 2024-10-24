@@ -1,19 +1,18 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query
+﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
+
+using Repository;
+
+public class GetTopCustomerCriteria : CriteriaBase
 {
-    using Repository;
+    public int Top { get; set; }
 
-    public class GetTopCustomerCriteria : CriteriaBase
-    {
-        public int Top { get; set; }
+    public int RemainingCustomers { get; set; }
 
-        public int RemainingCustomers { get; set; }
+    public string WaitFor { get; set; }
 
-        public string WaitFor { get; set; }
+    public override string GetSettingKey()
+        => "GetTopCustomers";
 
-        public override string GetSettingKey()
-            => "GetTopCustomers";
-
-        public override bool IsValid()
-            => Top > 0;
-    }
+    public override bool IsValid()
+        => Top > 0;
 }

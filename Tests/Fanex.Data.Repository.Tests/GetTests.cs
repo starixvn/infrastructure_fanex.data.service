@@ -1,227 +1,223 @@
-﻿namespace Fanex.Data.Repository.Tests
+﻿namespace Fanex.Data.Repository.Tests;
+
+using Fanex.Data.SampleData.Models;
+using Models;
+using ParameterSets.Criteria;
+using SampleData;
+using System;
+using System.Threading.Tasks;
+using Xunit;
+
+[Collection(nameof(FanexDataConfigurationManagerCollection))]
+public class GetTests(DynamicRepositoryFixture fixture) : IClassFixture<DynamicRepositoryFixture>
 {
-    using Fanex.Data.SampleData.Models;
-    using Models;
-    using ParameterSets.Criteria;
-    using SampleData;
-    using System;
-    using System.Threading.Tasks;
-    using Xunit;
+    private const string TestedCustomerId = "VINET";
 
-    [Collection(nameof(FanexDataConfigurationManagerCollection))]
-    public class GetTests : IClassFixture<DynamicRepositoryFixture>
+    private readonly IDynamicRepository repository = fixture.Repository;
+
+    [Fact]
+    public void Get_NullCriteria_ThrowArgumentNullException()
     {
-        private const string TestedCustomerId = "VINET";
+        // Arrange.
+        var criteria = default(ICriteria);
 
-        private readonly IDynamicRepository repository;
+        // Act.
+        var exception = Record.Exception(() => repository.Get<Customer>(criteria));
 
-        public GetTests(DynamicRepositoryFixture fixture)
-            => repository = fixture.Repository;
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void Get_NullCriteria_ThrowArgumentNullException()
+    [Fact]
+    public void Get_InvalidCriteria_ReturnsNull()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria
         {
-            // Arrange.
-            var criteria = default(ICriteria);
+            CustomerId = string.Empty
+        };
 
-            // Act.
-            var exception = Record.Exception(() => repository.Get<Customer>(criteria));
+        // Act.
+        var actualResult = repository.Get<Customer>(criteria);
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        Assert.Null(actualResult);
+    }
 
-        [Fact]
-        public void Get_InvalidCriteria_ReturnsNull()
+    [Fact]
+    public void Get_ValidCriteria_GetCorrectData()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria
         {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria
-            {
-                CustomerId = string.Empty
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var actualResult = repository.Get<Customer>(criteria);
+        // Act.
+        var actualResult = repository.Get<Customer>(criteria);
 
-            // Assert.
-            Assert.Null(actualResult);
-        }
+        // Assert.
+        Assert.Equal(ExpectedData.ExpectedCustomer, actualResult);
+    }
 
-        [Fact]
-        public void Get_ValidCriteria_GetCorrectData()
+    [Fact]
+    public void Get_SpReturnEmpty_ReturnNull()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria
         {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = "test_id_not_exist"
+        };
 
-            // Act.
-            var actualResult = repository.Get<Customer>(criteria);
+        // Act.
+        var actualResult = repository.Get<Customer>(criteria);
 
-            // Assert.
-            Assert.Equal(ExpectedData.ExpectedCustomer, actualResult);
-        }
+        // Assert.
+        Assert.Null(actualResult);
+    }
 
-        [Fact]
-        public void Get_SpReturnEmpty_ReturnNull()
+    [Fact]
+    public void Get_RedundantProperties_ShouldBeNull()
+    {
+        // Arrange.
+        var parameterSet = new CustomerByIdCriteria
         {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria
-            {
-                CustomerId = "test_id_not_exist"
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var actualResult = repository.Get<Customer>(criteria);
+        // Act.
+        var actualResult = repository.Get<CustomerWithRedundantProperties>(parameterSet);
 
-            // Assert.
-            Assert.Null(actualResult);
-        }
+        // Assert.
+        Assert.Null(actualResult.Int);
+        Assert.Null(actualResult.String);
+        Assert.Null(actualResult.Object);
+    }
 
-        [Fact]
-        public void Get_RedundantProperties_ShouldBeNull()
+    [Fact]
+    public void Get_LackProperties_MapValueForRemainingProperties()
+    {
+        // Arrange.
+        var parameterSet = new CustomerByIdCriteria
         {
-            // Arrange.
-            var parameterSet = new CustomerByIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var actualResult = repository.Get<CustomerWithRedundantProperties>(parameterSet);
+        // Act.
+        var actualResult = repository.Get<CustomerWithLackProperty>(parameterSet);
 
-            // Assert.
-            Assert.Null(actualResult.Int);
-            Assert.Null(actualResult.String);
-            Assert.Null(actualResult.Object);
-        }
+        // Assert.
+        Assert.Equal(TestedCustomerId, actualResult.Id);
+    }
 
-        [Fact]
-        public void Get_LackProperties_MapValueForRemainingProperties()
+    [Fact]
+    public async Task GetAsync_NullCriteria_ThrowArgumentNullException()
+    {
+        // Arrange.
+        var criteria = default(ICriteria);
+
+        // Act.
+        var exception = await Record.ExceptionAsync(() => repository.GetAsync<Customer>(criteria));
+
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
+    public async Task GetAsync_InvalidCriteria_ReturnsNull()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria
         {
-            // Arrange.
-            var parameterSet = new CustomerByIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = string.Empty
+        };
 
-            // Act.
-            var actualResult = repository.Get<CustomerWithLackProperty>(parameterSet);
+        // Act.
+        var actualResult = await repository.GetAsync<Customer>(criteria);
 
-            // Assert.
-            Assert.Equal(TestedCustomerId, actualResult.Id);
-        }
+        // Assert.
+        Assert.Null(actualResult);
+    }
 
-        [Fact]
-        public async Task GetAsync_NullCriteria_ThrowArgumentNullException()
+    [Fact]
+    public async Task GetAsync_ValidCriteria_GetCorrectData()
+    {
+        // Arrange.
+        var parameterSet = new CustomerByIdCriteria
         {
-            // Arrange.
-            var criteria = default(ICriteria);
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var exception = await Record.ExceptionAsync(() => repository.GetAsync<Customer>(criteria));
+        // Act.
+        var actualResult = await repository.GetAsync<Customer>(parameterSet);
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        Assert.Equal(ExpectedData.ExpectedCustomer, actualResult);
+    }
 
-        [Fact]
-        public async Task GetAsync_InvalidCriteria_ReturnsNull()
+    [Fact]
+    public async Task GetAsync_InsensitiveColumn_MapCorrectly()
+    {
+        // Arrange.
+        var parameterSet = new CustomerByIdCriteria
         {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria
-            {
-                CustomerId = string.Empty
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var actualResult = await repository.GetAsync<Customer>(criteria);
+        // Act.
+        var actualResult = await repository.GetAsync<CustomerWithUpperProperties>(parameterSet);
 
-            // Assert.
-            Assert.Null(actualResult);
-        }
+        // Assert.
+        Assert.Equal(TestedCustomerId, actualResult.ID);
+    }
 
-        [Fact]
-        public async Task GetAsync_ValidCriteria_GetCorrectData()
+    [Fact]
+    public async Task GetAsync_RedundantProperties_ShouldBeNull()
+    {
+        // Arrange.
+        var parameterSet = new CustomerByIdCriteria
         {
-            // Arrange.
-            var parameterSet = new CustomerByIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var actualResult = await repository.GetAsync<Customer>(parameterSet);
+        // Act.
+        var actualResult = await repository.GetAsync<CustomerWithRedundantProperties>(parameterSet);
 
-            // Assert.
-            Assert.Equal(ExpectedData.ExpectedCustomer, actualResult);
-        }
+        // Assert.
+        Assert.Null(actualResult.Int);
+        Assert.Null(actualResult.String);
+        Assert.Null(actualResult.Object);
+    }
 
-        [Fact]
-        public async Task GetAsync_InsensitiveColumn_MapCorrectly()
+    [Fact]
+    public async Task GetAsync_LackProperties_MapValueForRemainingProperties()
+    {
+        // Arrange.
+        var parameterSet = new CustomerByIdCriteria
         {
-            // Arrange.
-            var parameterSet = new CustomerByIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = TestedCustomerId
+        };
 
-            // Act.
-            var actualResult = await repository.GetAsync<CustomerWithUpperProperties>(parameterSet);
+        // Act.
+        var actualResult = await repository.GetAsync<CustomerWithLackProperty>(parameterSet);
 
-            // Assert.
-            Assert.Equal(TestedCustomerId, actualResult.ID);
-        }
+        // Assert.
+        Assert.Equal(TestedCustomerId, actualResult.Id);
+    }
 
-        [Fact]
-        public async Task GetAsync_RedundantProperties_ShouldBeNull()
+    [Fact]
+    public async Task GetAsync_SpReturnEmpty_ReturnNull()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria
         {
-            // Arrange.
-            var parameterSet = new CustomerByIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
+            CustomerId = "test_id_not_exist"
+        };
 
-            // Act.
-            var actualResult = await repository.GetAsync<CustomerWithRedundantProperties>(parameterSet);
+        // Act.
+        var actualResult = await repository.GetAsync<Customer>(criteria);
 
-            // Assert.
-            Assert.Null(actualResult.Int);
-            Assert.Null(actualResult.String);
-            Assert.Null(actualResult.Object);
-        }
-
-        [Fact]
-        public async Task GetAsync_LackProperties_MapValueForRemainingProperties()
-        {
-            // Arrange.
-            var parameterSet = new CustomerByIdCriteria
-            {
-                CustomerId = TestedCustomerId
-            };
-
-            // Act.
-            var actualResult = await repository.GetAsync<CustomerWithLackProperty>(parameterSet);
-
-            // Assert.
-            Assert.Equal(TestedCustomerId, actualResult.Id);
-        }
-
-        [Fact]
-        public async Task GetAsync_SpReturnEmpty_ReturnNull()
-        {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria
-            {
-                CustomerId = "test_id_not_exist"
-            };
-
-            // Act.
-            var actualResult = await repository.GetAsync<Customer>(criteria);
-
-            // Assert.
-            Assert.Null(actualResult);
-        }
+        // Assert.
+        Assert.Null(actualResult);
     }
 }

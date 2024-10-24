@@ -1,54 +1,53 @@
 ﻿using Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
 
-namespace Fanex.Data.ProxyClient.Tests
+namespace Fanex.Data.ProxyClient.Tests;
+
+using Repository;
+using System;
+using System.Threading.Tasks;
+using Xunit;
+
+[Collection("Fanex Data Client collection")]
+public class FetchDataSetTests
 {
-    using Repository;
-    using System;
-    using System.Threading.Tasks;
-    using Xunit;
+    private readonly DynamicRepository proxy = new();
 
-    [Collection("Fanex Data Client collection")]
-    public class FetchDataSetTests
+    [Fact]
+    public async Task FetchDataSetAsync_NullCriteria_ThrowArgumentNullException()
     {
-        private readonly DynamicRepository proxy = new DynamicRepository();
+        // Arrange.
+        var criteria = default(ICriteria);
 
-        [Fact]
-        public async Task FetchDataSetAsync_NullCriteria_ThrowArgumentNullException()
-        {
-            // Arrange.
-            var criteria = default(ICriteria);
+        // Act.
+        var exception = await Record.ExceptionAsync(() => proxy.FetchDataSetAsync(criteria));
 
-            // Act.
-            var exception = await Record.ExceptionAsync(() => proxy.FetchDataSetAsync(criteria));
+        // Assert.
+        Assert.IsType<NullReferenceException>(exception);
+    }
 
-            // Assert.
-            Assert.IsType<NullReferenceException>(exception);
-        }
+    [Fact]
+    public async Task FetchDataSetAsync_InvalidCriteria_ReturnsEmptyListTable()
+    {
+        // Arrange.
+        var criteria = new CustomerByIdCriteria();
 
-        [Fact]
-        public async Task FetchDataSetAsync_InvalidCriteria_ReturnsEmptyListTable()
-        {
-            // Arrange.
-            var criteria = new CustomerByIdCriteria();
+        // Act.
+        var dataSet = await proxy.FetchDataSetAsync(criteria);
 
-            // Act.
-            var dataSet = await proxy.FetchDataSetAsync(criteria);
+        // Assert.
+        Assert.Empty(dataSet.Tables);
+    }
 
-            // Assert.
-            Assert.Empty(dataSet.Tables);
-        }
+    [Fact]
+    public async Task FetchDataSetAsync_ValidCriteria_ReturnsDataSetCorrectly()
+    {
+        // Arrange.
+        var criteria = new GetTopCustomerCriteria { Top = 10 };
 
-        [Fact]
-        public async Task FetchDataSetAsync_ValidCriteria_ReturnsDataSetCorrectly()
-        {
-            // Arrange.
-            var criteria = new GetTopCustomerCriteria { Top = 10 };
+        // Act.
+        var actualResult = await proxy.FetchDataSetAsync(criteria);
 
-            // Act.
-            var actualResult = await proxy.FetchDataSetAsync(criteria);
-
-            // Assert.
-            Assert.Equal(10, actualResult.Tables[0].Rows.Count);
-        }
+        // Assert.
+        Assert.Equal(10, actualResult.Tables[0].Rows.Count);
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime;
-using System;
 using Fanex.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Fanex.Data.Services;
 
@@ -13,9 +11,24 @@ using System.Text;
 [ApiController]
 public class HomeController : ControllerBase
 {
+    private static bool alive = true;
     [HttpGet]
     public IActionResult Index()
     {
+        return alive 
+            ? Ok(Environment.MachineName) 
+            : Problem(
+                "Alive is false", 
+                Environment.MachineName, 
+                400, 
+                "Alive is false", 
+                "Alive is false");
+    }
+
+    [HttpGet("kill")]
+    public IActionResult Kill()
+    {
+        alive = false;
         return Ok(Environment.MachineName);
     }
 
@@ -43,10 +56,10 @@ public class HomeController : ControllerBase
         currentProcess.Refresh();
         var memory = currentProcess.WorkingSet64 / megabyte;
 
-        stringBuilder.AppendFormat("Total memory - Before GC.Collect: {0} Mb", memory);
+        stringBuilder.Append($"Before GC.Collect: {memory} Mb.\r\n");
 
         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive | GCCollectionMode.Forced, true, true);
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
         GC.WaitForPendingFinalizers();
         GC.WaitForFullGCComplete();
 
@@ -54,7 +67,8 @@ public class HomeController : ControllerBase
         memory = currentProcess.WorkingSet64 / megabyte;
 
         var duration = sw.ElapsedMilliseconds;
-        stringBuilder.AppendFormat("GC.Collected. Usage memory = {0}. Duration: {1} milliseconds", memory, duration);
+        stringBuilder.Append($"After GC.Collect. Usage memory = {memory}.\r\n");
+        stringBuilder.Append($"Duration: {duration} milliseconds.\r\n");
 
         return Ok(stringBuilder.ToString());
     }

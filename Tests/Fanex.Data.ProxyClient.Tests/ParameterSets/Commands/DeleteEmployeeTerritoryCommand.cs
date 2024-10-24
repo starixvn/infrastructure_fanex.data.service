@@ -1,17 +1,16 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Commands
+﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Commands;
+
+using Repository;
+
+public class DeleteEmployeeTerritoryCommand : NonQueryCommand
 {
-    using Repository;
+    public int EmployeeId { get; set; }
 
-    public class DeleteEmployeeTerritoryCommand : NonQueryCommand
-    {
-        public int EmployeeId { get; set; }
+    public string TerritoryId { get; set; }
 
-        public string TerritoryId { get; set; }
+    public override string GetSettingKey()
+        => "DeleteEmployeeTerritory";
 
-        public override string GetSettingKey()
-            => "DeleteEmployeeTerritory";
-
-        public override bool IsValid()
-            => EmployeeId > 0 && !string.IsNullOrEmpty(TerritoryId);
-    }
+    public override bool IsValid()
+        => EmployeeId > 0 && !string.IsNullOrEmpty(TerritoryId);
 }

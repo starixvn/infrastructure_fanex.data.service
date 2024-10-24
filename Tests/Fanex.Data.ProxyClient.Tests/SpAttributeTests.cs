@@ -1,82 +1,81 @@
 ﻿using Fanex.Data.ProxyClient.Tests.ParameterSets.Query;
 using Fanex.Data.SampleData.Models;
 
-namespace Fanex.Data.ProxyClient.Tests
+namespace Fanex.Data.ProxyClient.Tests;
+
+using Repository;
+using System.Threading.Tasks;
+using Xunit;
+
+[Collection("Fanex Data Client collection")]
+public class SpAttributeTests
 {
-    using Repository;
-    using System.Threading.Tasks;
-    using Xunit;
+    private readonly DynamicRepository proxy = new();
 
-    [Collection("Fanex Data Client collection")]
-    public class SpAttributeTests
+    private const string TestedCustomerId = "VINET";
+
+    [Fact]
+    public async Task Params_Always_InputCorrectly()
     {
-        private readonly DynamicRepository proxy = new DynamicRepository();
+        // Arrange
+        var criteria = new CustomerByIdCriteria { CustomerId = TestedCustomerId };
 
-        private const string TestedCustomerId = "VINET";
+        // Act
+        var customers = await proxy.GetAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task Params_Always_InputCorrectly()
-        {
-            // Arrange
-            var criteria = new CustomerByIdCriteria { CustomerId = TestedCustomerId };
+        // Assert
+        Assert.Equal(ExpectedData.ExpectedCustomer, customers);
+    }
 
-            // Act
-            var customers = await proxy.GetAsync<Customer>(criteria);
+    [Fact]
+    public async Task SqlParamNameAttribute_Always_MapCorrectly()
+    {
+        // Arrange
+        var criteria = new SqlParamNameMapCriteria { Id = TestedCustomerId };
 
-            // Assert
-            Assert.Equal(ExpectedData.ExpectedCustomer, customers);
-        }
+        // Act
+        var customers = await proxy.GetAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task SqlParamNameAttribute_Always_MapCorrectly()
-        {
-            // Arrange
-            var criteria = new SqlParamNameMapCriteria { Id = TestedCustomerId };
+        // Assert
+        Assert.Equal(ExpectedData.ExpectedCustomer, customers);
+    }
 
-            // Act
-            var customers = await proxy.GetAsync<Customer>(criteria);
+    [Fact]
+    public async Task IgnoreParamAttribute_Always_IgnoreCorrectly()
+    {
+        // Arrange
+        var criteria = new AttributeIgnoreCriteria { CustomerId = TestedCustomerId, IgnoredParam = 1 };
 
-            // Assert
-            Assert.Equal(ExpectedData.ExpectedCustomer, customers);
-        }
+        // Act
+        var customers = await proxy.GetAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task IgnoreParamAttribute_Always_IgnoreCorrectly()
-        {
-            // Arrange
-            var criteria = new AttributeIgnoreCriteria { CustomerId = TestedCustomerId, IgnoredParam = 1 };
+        // Assert
+        Assert.Equal(ExpectedData.ExpectedCustomer, customers);
+    }
 
-            // Act
-            var customers = await proxy.GetAsync<Customer>(criteria);
+    [Fact]
+    public async Task AllowNullAttribute_Always_Correctly()
+    {
+        // Arrange
+        var criteria = new AttributeAllowNullCriteria();
 
-            // Assert
-            Assert.Equal(ExpectedData.ExpectedCustomer, customers);
-        }
+        // Act
+        var customer = await proxy.GetAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task AllowNullAttribute_Always_Correctly()
-        {
-            // Arrange
-            var criteria = new AttributeAllowNullCriteria();
+        // Assert
+        Assert.Equal("Owner", customer.ContactTitle);
+    }
 
-            // Act
-            var customer = await proxy.GetAsync<Customer>(criteria);
+    [Fact]
+    public async Task OutPut_Always_UpdateCorrectly()
+    {
+        // Arrange
+        var criteria = new GetTopCustomerCriteria { Top = 10, RemainingCustomers = 0 };
 
-            // Assert
-            Assert.Equal("Owner", customer.ContactTitle);
-        }
+        // Act
+        await proxy.FetchAsync<Customer>(criteria);
 
-        [Fact]
-        public async Task OutPut_Always_UpdateCorrectly()
-        {
-            // Arrange
-            var criteria = new GetTopCustomerCriteria { Top = 10, RemainingCustomers = 0 };
-
-            // Act
-            await proxy.FetchAsync<Customer>(criteria);
-
-            // Assert
-            Assert.True(criteria.RemainingCustomers > 0);
-        }
+        // Assert
+        Assert.True(criteria.RemainingCustomers > 0);
     }
 }

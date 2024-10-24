@@ -1,9 +1,6 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.Models
-{
-    using System;
+﻿namespace Fanex.Data.ProxyClient.Tests.Models;
 
-    [AttributeUsage(AttributeTargets.Property)]
-    internal sealed class IncomparablePropertyAttribute : Attribute
-    {
-    }
-}
+using System;
+
+[AttributeUsage(AttributeTargets.Property)]
+internal sealed class IncomparablePropertyAttribute : Attribute;

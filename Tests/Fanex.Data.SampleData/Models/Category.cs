@@ -1,11 +1,10 @@
-﻿namespace Fanex.Data.SampleData.Models
+﻿namespace Fanex.Data.SampleData.Models;
+
+public class Category : Entity
 {
-    public class Category : Entity
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string CategoryName { get; set; }
+    public string CategoryName { get; set; }
 
-        public string Description { get; set; }
-    }
+    public string Description { get; set; }
 }

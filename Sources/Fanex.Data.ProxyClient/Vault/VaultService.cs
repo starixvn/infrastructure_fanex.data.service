@@ -85,7 +85,7 @@ namespace Fanex.Data.Vault
                 return false;
             }
 
-            return currentCredentials == null || currentCredentials.SequenceEqual(credentials);
+            return currentCredentials == null || !currentCredentials.SequenceEqual(credentials);
         }
 
         public void UpdateConnectionMapsByVaultCredentials(Dictionary<string, ConnectionConfiguration> connectionMaps, IEnumerable<DatabaseCredential> credentials)

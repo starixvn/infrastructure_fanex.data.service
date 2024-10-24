@@ -1,11 +1,10 @@
-﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query.ErrorCriteria
+﻿namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Query.ErrorCriteria;
+
+using Repository;
+
+internal class SpNameNotExistCriteria : CriteriaBase
 {
-    using Repository;
+    public override string GetSettingKey() => "SpNotExist";
 
-    internal class SpNameNotExistCriteria : CriteriaBase
-    {
-        public override string GetSettingKey() => "SpNotExist";
-
-        public override bool IsValid() => true;
-    }
+    public override bool IsValid() => true;
 }

@@ -48,7 +48,7 @@ public class CacheController(ICache cache) : ControllerBase
             await cache.TryGetAsync<Dictionary<string, DateTimeOffset>>(CacheKey.ServerStatusCacheKey);
         if (!found)
         {
-            serverStatus = new();
+            serverStatus = new Dictionary<string, DateTimeOffset>();
         }
 
         var dockerSwarmServiceName = GetDockerSwarmServiceName();

@@ -4,24 +4,24 @@ namespace Fanex.Data.Services.Cache;
 
 public static class Monitoring
 {
-    private const int ResponseStatisticSize = 20;
+    private const int ResponseStatisticSize = 50;
 
     private const int RequestStatisticSize = 3 * 24 * 60;
 
-    public static int[] ResponseStatistics { get; set; } = CreateResponseStatistics();
+    public static long[] ResponseStatistics { get; set; } = CreateResponseStatistics();
 
-    public static int[] RequestStatistics { get; set; } = CreateRequestStatistics();
+    public static long[] RequestStatistics { get; set; } = CreateRequestStatistics();
 
-    private static DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
+    private static DateTimeOffset StartTime { get; } = DateTimeOffset.UtcNow;
 
-    public static int[] CreateResponseStatistics()
+    public static long[] CreateResponseStatistics()
     {
-        return Enumerable.Repeat(0, ResponseStatisticSize).ToArray();
+        return Enumerable.Repeat(0L, ResponseStatisticSize).ToArray();
     }
 
-    public static int[] CreateRequestStatistics()
+    public static long[] CreateRequestStatistics()
     {
-        return Enumerable.Repeat(0, RequestStatisticSize).ToArray();
+        return Enumerable.Repeat(0L, RequestStatisticSize).ToArray();
     }
 
     public static void UpdateRequestStatistic()
@@ -70,8 +70,8 @@ public static class Monitoring
 
     private static void UpdateResponseStatistic(int dataLength)
     {
-        var index = (int)Math.Floor((decimal)dataLength / 500);
-        index = index >= ResponseStatisticSize ? ResponseStatisticSize - 1 : index;
+        var index = (int)Math.Floor((decimal)dataLength / 1000);
+        index %= ResponseStatisticSize;
 
         Interlocked.Increment(ref ResponseStatistics[index]);
     }

@@ -1,9 +1,8 @@
-﻿namespace Fanex.Data.SampleData.Models
-{
-    public class Image
-    {
-        public int ImageId { get; set; }
+﻿namespace Fanex.Data.SampleData.Models;
 
-        public byte[] ImageData { get; set; }
-    }
+public class Image
+{
+    public int ImageId { get; set; }
+
+    public byte[] ImageData { get; set; }
 }

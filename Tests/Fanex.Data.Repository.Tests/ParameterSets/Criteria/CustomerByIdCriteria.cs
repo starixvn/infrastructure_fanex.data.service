@@ -1,13 +1,12 @@
-﻿namespace Fanex.Data.Repository.Tests.ParameterSets.Criteria
+﻿namespace Fanex.Data.Repository.Tests.ParameterSets.Criteria;
+
+public class CustomerByIdCriteria : CriteriaBase
 {
-    public class CustomerByIdCriteria : CriteriaBase
-    {
-        public string CustomerId { get; set; }
+    public string CustomerId { get; set; }
 
-        public override string GetSettingKey()
-            => "CustomerByID";
+    public override string GetSettingKey()
+        => "CustomerByID";
 
-        public override bool IsValid()
-            => !string.IsNullOrWhiteSpace(CustomerId);
-    }
+    public override bool IsValid()
+        => !string.IsNullOrWhiteSpace(CustomerId);
 }

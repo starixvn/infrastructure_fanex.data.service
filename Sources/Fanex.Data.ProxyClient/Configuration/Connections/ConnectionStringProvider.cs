@@ -8,7 +8,7 @@ namespace Fanex.Data
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global"),
      SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
-    public class ConnectionStringProviderBase
+    public class ConnectionStringProvider
     {
         private readonly ConcurrentDictionary<string, string> connectionCache = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -18,6 +18,11 @@ namespace Fanex.Data
         protected Dictionary<string, ConnectionConfiguration> ConnectionMaps { get; set; }
 
         protected bool IsPlainPassword { get; set; }
+
+        public ConnectionStringProvider(Dictionary<string, ConnectionConfiguration> connectionMaps)
+        {
+            ConnectionMaps = connectionMaps;
+        }
 
         internal void Initialize(Dictionary<string, ConnectionConfiguration> connectionMaps, bool isPlainPassword = false)
         {

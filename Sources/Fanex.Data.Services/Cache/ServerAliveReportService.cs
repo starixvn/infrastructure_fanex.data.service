@@ -7,7 +7,7 @@ public class ServerAliveReportService : BackgroundService
     private readonly ICache cache;
 
     private readonly int timerPeriod;
-    
+
     public ServerAliveReportService(ICache cache)
     {
         this.cache = cache;
@@ -41,7 +41,7 @@ public class ServerAliveReportService : BackgroundService
     private async Task ReportStatus()
     {
         var serverStatus = await GetServerAliveStatus().ConfigureAwait(false);
-        RemoveExpiredServer(serverStatus);
+        serverStatus = GetNotExpiredServers(serverStatus);
 
         var cacheItemOptions = new CacheItemOptions
         {
@@ -66,16 +66,9 @@ public class ServerAliveReportService : BackgroundService
         return serverStatus;
     }
 
-    private static void RemoveExpiredServer(Dictionary<string, DateTimeOffset> serverStatus)
+    private static Dictionary<string, DateTimeOffset> GetNotExpiredServers(Dictionary<string, DateTimeOffset> serverStatus)
     {
-        var keySet = new HashSet<string>(serverStatus.Keys);
-        foreach (var machineName in keySet)
-        {
-            var lastActive = serverStatus[machineName];
-            if ((DateTimeOffset.Now - lastActive).TotalMinutes > 5)
-            {
-                serverStatus.Remove(machineName);
-            }
-        }
+        return serverStatus.Where(x => (DateTimeOffset.Now - x.Value).TotalMinutes <= 5)
+            .ToDictionary();
     }
 }
