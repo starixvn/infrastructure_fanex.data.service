@@ -1,114 +1,82 @@
 ﻿using Dapper;
-using Fanex.Caching;
 using Fanex.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
 namespace Fanex.Data.Services;
 
-using System.Diagnostics;
+using MassTransit;
 
 [Route("api/cache")]
 [ApiController]
-public class CacheController(ICache cache) : ControllerBase
+public class CacheController(IPublishEndpoint publishEndpoint) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> Status()
-    {
-        var serverStatus = await GetServerStatus();
+	[HttpPost("remove")]
+	public async Task<IActionResult> Remove(List<StoredProcedureDefinition> commands)
+	{
+		var message = new ClearStoredProcedureCacheMessage
+		{
+			ServiceName = GetServiceName(),
+			StoredProcedureDefinitions = commands
+		};
 
-        return Ok(serverStatus);
-    }
+		await publishEndpoint.Publish(message);
 
-    [HttpPost("remove")]
-    public async Task<IActionResult> Remove(List<StoredProcedureDefinition> commands)
-    {
-        commands.ForEach(c => DbParameterDefinitionCache.Remove(c.ConnectionString, c.StoreProcedureName));
-        var serverName = Environment.MachineName;
+		return Ok(new
+		{
+			ServerName = Environment.MachineName,
+			ServerStatus = new Dictionary<string, DateTimeOffset>
+			{
+				{ Environment.MachineName , DateTimeOffset.Now }
+			}
+		});
+	}
 
-        var serverStatus = await GetServerStatus();
+	private static string GetServiceName()
+	{
+		var machineName = Environment.MachineName;
+		var lastIndex = machineName.LastIndexOf("-", StringComparison.Ordinal);
+		var index = lastIndex >= 0 ? lastIndex + 1 : machineName.Length;
+		return machineName[..index];
+	}
 
-        return Ok(new
-        {
-            ServerName = serverName,
-            ServerStatus = serverStatus
-        });
-    }
+	[HttpGet("caching-storage")]
+	public IActionResult GetCachingStorage()
+	{
+		return Ok(DbParameterDefinitionCache.GetCachingStorage());
+	}
 
-    [HttpGet("clear-server-status")]
-    public async Task<IActionResult> ClearServerStatus()
-    {
-        await cache.RemoveAsync(CacheKey.ServerStatusCacheKey);
-        return Ok(Environment.MachineName);
-    }
+	[HttpGet("purge-cache")]
+	public IActionResult PurgeCache()
+	{
+		SqlMapper.PurgeQueryCache();
 
-    private async Task<Dictionary<string, DateTimeOffset>> GetServerStatus()
-    {
-        var (found, serverStatus) =
-            await cache.TryGetAsync<Dictionary<string, DateTimeOffset>>(CacheKey.ServerStatusCacheKey);
-        if (!found)
-        {
-            serverStatus = new Dictionary<string, DateTimeOffset>();
-        }
+		return Ok(Environment.MachineName);
+	}
 
-        var dockerSwarmServiceName = GetDockerSwarmServiceName();
-        return serverStatus
-            .Where(v => v.Key.StartsWith(dockerSwarmServiceName))
-            .ToDictionary(v => v.Key, v => v.Value);
-    }
+	[HttpGet("clean")]
+	public IActionResult CleanCache()
+	{
+		SqlMapper.PurgeQueryCache();
+		DbParameterDefinitionCache.Clear();
 
-    private static string GetDockerSwarmServiceName()
-    {
-        var currentMachineName = Environment.MachineName;
-        var index = currentMachineName.LastIndexOf("-", StringComparison.Ordinal) + 1;
-        return currentMachineName[..index];
-    }
+		return Ok(Environment.MachineName);
+	}
 
-    [HttpGet("caching-storage")]
-    public IActionResult GetCachingStorage()
-    {
-        return Ok(DbParameterDefinitionCache.GetCachingStorage());
-    }
+	[HttpGet("dapper-cached")]
+	public IActionResult GetDapperCached()
+	{
+		var cached = SqlMapper.GetCachedSQL();
 
-    [HttpGet("purge-cache")]
-    public IActionResult PurgeCache()
-    {
-        SqlMapper.PurgeQueryCache();
+		var info = new StringBuilder();
 
-        return Ok(Environment.MachineName);
-    }
+		info.AppendLine($"Count: {SqlMapper.GetCachedSQLCount()}");
+		foreach (var tuple in cached)
+		{
+			info.AppendLine($"Key: {tuple.Item2}, HitCount: {tuple.Item3}");
+		}
 
-    [HttpGet("clean")]
-    public IActionResult CleanCache()
-    {
-        SqlMapper.PurgeQueryCache();
-        DbParameterDefinitionCache.Clear();
-
-        return Ok(Environment.MachineName);
-    }
-
-    [HttpGet("memory")]
-    public IActionResult GetCurrentMemory()
-    {
-        using var currentProcess = Process.GetCurrentProcess();
-        currentProcess.Refresh();
-        return Ok($"MB: {currentProcess.WorkingSet64 / 1000000}");
-    }
-
-    [HttpGet("dapper-cached")]
-    public IActionResult GetDapperCached()
-    {
-        var cached = SqlMapper.GetCachedSQL();
-
-        var info = new StringBuilder();
-
-        info.AppendLine($"Count: {SqlMapper.GetCachedSQLCount()}");
-        foreach (var tuple in cached)
-        {
-            info.AppendLine($"Key: {tuple.Item2}, HitCount: {tuple.Item3}");
-        }
-
-        return Ok(info.ToString());
-    }
+		return Ok(info.ToString());
+	}
 
 }

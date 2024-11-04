@@ -16,7 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Fanex.Data
 {
-    using Vault;
+	using Repository;
+	using Vault;
 
     public static class DbSettingProviderManagerExtensions
     {
@@ -94,7 +95,9 @@ namespace Fanex.Data
                 .StartNewSession()
                 .Register(configuration, ignoreRedundantParameters)
                 .Run();
-            
+
+            services.AddTransient<IDynamicRepository, DynamicRepository>();
+
             return services;
         }
 
