@@ -124,12 +124,7 @@
 
         public string GetIp(string dbAlias)
         {
-            if (DbAlias.TryGetValue(dbAlias, out var ip))
-            {
-                return ip;
-            }
-
-            return string.Empty;
+	        return DbAlias.TryGetValue(dbAlias, out var ip) ? ip : string.Empty;
         }
     }
 }

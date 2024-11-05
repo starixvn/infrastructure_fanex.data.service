@@ -60,7 +60,9 @@ namespace Fanex.Data.Vault
                 if (isCredentialChanged)
                 {
                     DbSettingProviderManager.CurrentSession.ReloadConnectionStrings();
-                }
+                    CacheManager.ClearCache();
+                    Console.WriteLine("Credential is changed. ReloadConnectionStrings and ClearCache");
+				}
             }
             catch (Exception e)
             {

@@ -84,8 +84,7 @@ public class VaultServiceTests
         await vaultService.UpdateConnectionMaps();
 
         var actualConnectionString = DbSettingProviderManager.CurrentSession.ConnectionMaps["DBACC.bodb02.wsv_nap"].ConnectionString;
-        var expected =
-            "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
+        const string expected = "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
         Assert.Equal(expected, actualConnectionString);
     }
 
@@ -102,8 +101,7 @@ public class VaultServiceTests
         await vaultService.UpdateConnectionMaps();
 
         var actualConnectionString = DbSettingProviderManager.CurrentSession.ConnectionMaps["DBACC.bodb02.wsv_nap"].ConnectionString;
-        var expected =
-            "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
+        const string expected = "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
         Assert.Equal(expected, actualConnectionString);
     }
 

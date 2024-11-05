@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.ProxyClient.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.SampleData", "Tests\Fanex.Data.SampleData\Fanex.Data.SampleData.csproj", "{86FFC02D-730D-4974-BDB3-6C525A2E96B8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplicationDemo", "WebApplicationDemo\WebApplicationDemo.csproj", "{8CE51120-04AB-477B-86AC-F0FDD7CA589A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{86FFC02D-730D-4974-BDB3-6C525A2E96B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86FFC02D-730D-4974-BDB3-6C525A2E96B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86FFC02D-730D-4974-BDB3-6C525A2E96B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CE51120-04AB-477B-86AC-F0FDD7CA589A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CE51120-04AB-477B-86AC-F0FDD7CA589A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CE51120-04AB-477B-86AC-F0FDD7CA589A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CE51120-04AB-477B-86AC-F0FDD7CA589A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
