@@ -2,6 +2,8 @@
 
 namespace Fanex.Data.Services.Cache;
 
+using Middleware;
+
 public class ClearStoredProcedureCacheConsumer : IConsumer<ClearStoredProcedureCacheMessage>
 {
 	public async Task Consume(ConsumeContext<ClearStoredProcedureCacheMessage> context)
@@ -12,12 +14,30 @@ public class ClearStoredProcedureCacheConsumer : IConsumer<ClearStoredProcedureC
 		{
 			return;
 		}
-
-		var procedure = definitions.Select(d => d.StoreProcedureName).FirstOrDefault();
-
+		
 		definitions.ForEach(c => DbParameterDefinitionCache.Remove(c.ConnectionString, c.StoreProcedureName));
-		Console.WriteLine($"Cache of server {Environment.MachineName} is cleared at {DateTimeOffset.Now}. One of procedure: {procedure}");
+
+		var connectionStrings = GetSimplifiedConnectionString(definitions);
+		Console.WriteLine($"Cache of server {Environment.MachineName} is cleared at {DateTimeOffset.Now}.\nConnection String: {connectionStrings}");
 
 		await Task.CompletedTask;
+	}
+
+	private string GetSimplifiedConnectionString(List<StoredProcedureDefinition> definitions)
+	{
+		var connectionStrings = GetSimplifiedConnectionStringCollection(definitions);
+		return $"[{string.Join(", ", connectionStrings)}]";
+	}
+
+	private IEnumerable<string> GetSimplifiedConnectionStringCollection(List<StoredProcedureDefinition> definitions)
+	{
+		var connectionStrings = definitions.Select(d => d.ConnectionString).Distinct();
+		foreach (var connectionString in connectionStrings)
+		{
+			var builder = new ConnectionStringBuilder(connectionString);
+			var server = builder.GetServer();
+			var user = builder.GetUserId();
+			yield return $"{user}@{server}";
+		}
 	}
 }
