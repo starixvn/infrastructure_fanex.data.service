@@ -35,7 +35,7 @@ public static class Monitoring
         RequestStatistics[next] = 0;
     }
 
-    public static void UpdateResponseStatistic(DataSet dataset)
+    public static void UpdateResponseStatistic(DataSet dataset, string spName)
     {
         if (dataset == null || dataset.Tables.Count == 0)
         {
@@ -44,20 +44,20 @@ public static class Monitoring
 
         var maxCount = (from DataTable table in dataset.Tables select table.Rows.Count).Max();
 
-        UpdateResponseStatistic(maxCount);
+        UpdateResponseStatistic(maxCount, spName);
     }
 
-    public static void UpdateResponseStatistic(List<dynamic> models)
+    public static void UpdateResponseStatistic(List<dynamic> models, string spName)
     {
         if (models == null)
         {
             return;
         }
 
-        UpdateResponseStatistic(models.Count);
+        UpdateResponseStatistic(models.Count, spName);
     }
 
-    public static void UpdateResponseStatistic(List<dynamic>[] models)
+    public static void UpdateResponseStatistic(List<dynamic>[] models, string spName)
     {
         if (models == null)
         {
@@ -65,14 +65,19 @@ public static class Monitoring
         }
 
         var maxCount = models.Select(m => m?.Count ?? 0).Max();
-        UpdateResponseStatistic(maxCount);
+        UpdateResponseStatistic(maxCount, spName);
     }
 
-    private static void UpdateResponseStatistic(int dataLength)
+    private static void UpdateResponseStatistic(int dataLength, string spName)
     {
         var index = (int)Math.Floor((decimal)dataLength / 1000);
         index %= ResponseStatisticSize;
 
         Interlocked.Increment(ref ResponseStatistics[index]);
+
+        if (dataLength >= 10000)
+        {
+            Console.WriteLine($"{spName} returns {dataLength} rows");
+        }
     }
 }

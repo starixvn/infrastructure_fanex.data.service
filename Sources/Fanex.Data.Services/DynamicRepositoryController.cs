@@ -28,7 +28,7 @@ public class DynamicRepositoryController : ControllerBase
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
-        Monitoring.UpdateResponseStatistic(models);
+        Monitoring.UpdateResponseStatistic(models, proxyParameter.DbSetting.SpName);
         Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
@@ -46,7 +46,7 @@ public class DynamicRepositoryController : ControllerBase
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
-        Monitoring.UpdateResponseStatistic(model);
+        Monitoring.UpdateResponseStatistic(model, proxyParameter.DbSetting.SpName);
         Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
@@ -69,7 +69,7 @@ public class DynamicRepositoryController : ControllerBase
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
-        Monitoring.UpdateResponseStatistic(fetchedData);
+        Monitoring.UpdateResponseStatistic(fetchedData, proxyParameter.DbSetting.SpName);
         Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
