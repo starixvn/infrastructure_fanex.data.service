@@ -2,6 +2,8 @@
 
 namespace Fanex.Data.Services.Cache;
 
+using Newtonsoft.Json;
+
 public static class Monitoring
 {
     private const int ResponseStatisticSize = 50;
@@ -35,7 +37,7 @@ public static class Monitoring
         RequestStatistics[next] = 0;
     }
 
-    public static void UpdateResponseStatistic(DataSet dataset, string spName)
+    public static void UpdateResponseStatistic(DataSet dataset, string spName, Dictionary<string, object> parameters)
     {
         if (dataset == null || dataset.Tables.Count == 0)
         {
@@ -44,20 +46,20 @@ public static class Monitoring
 
         var maxCount = (from DataTable table in dataset.Tables select table.Rows.Count).Max();
 
-        UpdateResponseStatistic(maxCount, spName);
+        UpdateResponseStatistic(maxCount, spName, parameters);
     }
 
-    public static void UpdateResponseStatistic(List<dynamic> models, string spName)
+    public static void UpdateResponseStatistic(List<dynamic> models, string spName, Dictionary<string, object> parameters)
     {
         if (models == null)
         {
             return;
         }
 
-        UpdateResponseStatistic(models.Count, spName);
+        UpdateResponseStatistic(models.Count, spName, parameters);
     }
 
-    public static void UpdateResponseStatistic(List<dynamic>[] models, string spName)
+    public static void UpdateResponseStatistic(List<dynamic>[] models, string spName, Dictionary<string, object> parameters)
     {
         if (models == null)
         {
@@ -65,19 +67,27 @@ public static class Monitoring
         }
 
         var maxCount = models.Select(m => m?.Count ?? 0).Max();
-        UpdateResponseStatistic(maxCount, spName);
+        UpdateResponseStatistic(maxCount, spName, parameters);
     }
 
-    private static void UpdateResponseStatistic(int dataLength, string spName)
+    private static void UpdateResponseStatistic(int dataLength, string spName, Dictionary<string, object> parameters)
     {
         var index = (int)Math.Floor((decimal)dataLength / 1000);
-        index %= ResponseStatisticSize;
+        index = index >= ResponseStatisticSize ? ResponseStatisticSize - 1 : index;
 
         Interlocked.Increment(ref ResponseStatistics[index]);
 
-        if (dataLength >= 10000)
+        LogSpWhichReturnsMoreThan10kRows(dataLength, spName, parameters);
+    }
+
+    private static void LogSpWhichReturnsMoreThan10kRows(int dataLength, string spName, Dictionary<string, object> parameters)
+    {
+        if (dataLength < 10000)
         {
-            Console.WriteLine($"{spName} returns {dataLength} rows");
+            return;
         }
+
+        var json = JsonConvert.SerializeObject(parameters);
+        Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} returns {dataLength} rows. Parameters: {json}");
     }
 }

@@ -29,7 +29,7 @@ public class ClearStoredProcedureCacheConsumer : IConsumer<ClearStoredProcedureC
 		return $"[{string.Join(", ", connectionStrings)}]";
 	}
 
-	private IEnumerable<string> GetSimplifiedConnectionStringCollection(List<StoredProcedureDefinition> definitions)
+	private static IEnumerable<string> GetSimplifiedConnectionStringCollection(List<StoredProcedureDefinition> definitions)
 	{
 		var connectionStrings = definitions.Select(d => d.ConnectionString).Distinct();
 		foreach (var connectionString in connectionStrings)

@@ -12,17 +12,29 @@ using System.Text;
 public class HomeController : ControllerBase
 {
     private static bool alive = true;
+
+    private static readonly DateTimeOffset StartTime = DateTimeOffset.Now;
+
+    private static readonly int MinutesToLive = new Random(StartTime.Microsecond).Next(29 * 60, 47 * 60);
+
     [HttpGet]
     public IActionResult Index()
     {
-        return alive 
-            ? Ok(Environment.MachineName) 
+        return alive && (DateTimeOffset.Now - StartTime).TotalMinutes < MinutesToLive
+            ? Ok(new
+            {
+                Environment.MachineName,
+                Alive = alive,
+                MinutesToLive,
+                WorkedMinutes = (DateTimeOffset.Now - StartTime).TotalMinutes
+            })
             : Problem(
-                "Alive is false", 
-                Environment.MachineName, 
-                400, 
-                "Alive is false", 
-                "Alive is false");
+                $"WorkedMinutes: {(DateTimeOffset.Now - StartTime).TotalMinutes}",
+                Environment.MachineName,
+                400,
+                $"MinutesToLive: {MinutesToLive}",
+                $"Alive: {alive}"
+                );
     }
 
     [HttpGet("kill")]
