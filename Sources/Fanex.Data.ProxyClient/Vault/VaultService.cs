@@ -1,129 +1,121 @@
 ﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Fanex.Data.ProxyClient.Tests")]
-namespace Fanex.Data.Vault
+namespace Fanex.Data.Vault;
+
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
+using System.Threading.Tasks;
+
+internal interface VaultService
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data.Common;
-    using System.Linq;
-    using System.Threading.Tasks;
+    Task<bool> UpdateConnectionMaps();
 
-    internal interface VaultService
+    Task<List<DatabaseCredential>> TryLoadAsync(List<string> connectionAliases, int tryCount);
+
+    bool IsCredentialChanged(List<DatabaseCredential> credentials);
+
+    void UpdateConnectionMapsByVaultCredentials(Dictionary<string, ConnectionConfiguration> connectionMaps, IEnumerable<DatabaseCredential> credentials);
+}
+
+internal class VaultServiceImp(VaultProvider vaultProvider) : VaultService
+{
+    private const int TryCount = 3;
+
+    private List<DatabaseCredential> currentCredentials;
+
+    public async Task<bool> UpdateConnectionMaps()
     {
-        Task<bool> UpdateConnectionMaps();
+        var connectionMaps = DbSettingProviderManager.CurrentSession.ConnectionMaps;
+        var connectionAliases = connectionMaps.Keys.Select(k => k).ToList();
+        var credentials = await TryLoadAsync(connectionAliases, TryCount).ConfigureAwait(false);
 
-        Task<List<DatabaseCredential>> TryLoadAsync(List<string> connectionAliases, int tryCount);
+        var isCredentialChanged = IsCredentialChanged(credentials);
+        if (isCredentialChanged)
+        {
+            UpdateConnectionMapsByVaultCredentials(connectionMaps, credentials);
+            DbSettingProviderManager.CurrentSession.Use(connectionMaps, true);
+        }
 
-        bool IsCredentialChanged(List<DatabaseCredential> credentials);
+        currentCredentials = credentials;
 
-        void UpdateConnectionMapsByVaultCredentials(Dictionary<string, ConnectionConfiguration> connectionMaps, IEnumerable<DatabaseCredential> credentials);
+        return isCredentialChanged;
     }
 
-    internal class VaultServiceImp : VaultService
+    public async Task<List<DatabaseCredential>> TryLoadAsync(List<string> connectionAliases, int tryCount)
     {
-        private const int TryCount = 3;
-
-        private List<DatabaseCredential> currentCredentials;
-
-        private readonly VaultProvider vaultProvider;
-
-        public VaultServiceImp(VaultProvider vaultProvider)
+        Exception latestException = null;
+        for (var i = 0; i < tryCount; i++)
         {
-            this.vaultProvider = vaultProvider;
+            try
+            {
+                await vaultProvider.EnsureVaultTokenIsValid().ConfigureAwait(false);
+                return await vaultProvider.LoadAsync(connectionAliases).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                latestException = e;
+                vaultProvider.ResetVaultToken();
+            }
+
+            await Task.Delay(3000).ConfigureAwait(false);
         }
 
-        public async Task<bool> UpdateConnectionMaps()
+        if (latestException != null)
         {
-            var connectionMaps = DbSettingProviderManager.CurrentSession.ConnectionMaps;
-            var connectionAliases = connectionMaps.Keys.Select(k => k).ToList();
-            var credentials = await TryLoadAsync(connectionAliases, TryCount).ConfigureAwait(false);
-
-            var isCredentialChanged = IsCredentialChanged(credentials);
-            if (isCredentialChanged)
-            {
-                UpdateConnectionMapsByVaultCredentials(connectionMaps, credentials);
-                DbSettingProviderManager.CurrentSession.Use(connectionMaps, true);
-            }
-
-            currentCredentials = credentials;
-
-            return isCredentialChanged;
+            throw latestException;
         }
 
-        public async Task<List<DatabaseCredential>> TryLoadAsync(List<string> connectionAliases, int tryCount)
+        return null;
+    }
+
+    public bool IsCredentialChanged(List<DatabaseCredential> credentials)
+    {
+        if (credentials == null)
         {
-            Exception latestException = null;
-            for (var i = 0; i < tryCount; i++)
-            {
-                try
-                {
-                    await vaultProvider.EnsureVaultTokenIsValid().ConfigureAwait(false);
-                    return await vaultProvider.LoadAsync(connectionAliases).ConfigureAwait(false);
-                }
-                catch (Exception e)
-                {
-                    latestException = e;
-                    vaultProvider.ResetVaultToken();
-                }
-
-                await Task.Delay(3000).ConfigureAwait(false);
-            }
-
-            if (latestException != null)
-            {
-                throw latestException;
-            }
-
-            return null;
+            return false;
         }
 
-        public bool IsCredentialChanged(List<DatabaseCredential> credentials)
+        return currentCredentials == null || !currentCredentials.SequenceEqual(credentials);
+    }
+
+    public void UpdateConnectionMapsByVaultCredentials(Dictionary<string, ConnectionConfiguration> connectionMaps, IEnumerable<DatabaseCredential> credentials)
+    {
+        foreach (var item in credentials)
         {
-            if (credentials == null)
+            if (!connectionMaps.TryGetValue(item.Key, out var connection))
             {
-                return false;
+                continue;
             }
 
-            return currentCredentials == null || !currentCredentials.SequenceEqual(credentials);
-        }
-
-        public void UpdateConnectionMapsByVaultCredentials(Dictionary<string, ConnectionConfiguration> connectionMaps, IEnumerable<DatabaseCredential> credentials)
-        {
-            foreach (var item in credentials)
+            var builder = new DbConnectionStringBuilder
             {
-                if (!connectionMaps.TryGetValue(item.Key, out var connection))
-                {
-                    continue;
-                }
+                ConnectionString = connection.ConnectionString
+            };
 
-                var builder = new DbConnectionStringBuilder
-                {
-                    ConnectionString = connection.ConnectionString
-                };
-
-                if (!string.IsNullOrWhiteSpace(item.IP))
-                {
-                    builder.SetServer(item.IP);
-                }
-
-                if (!string.IsNullOrWhiteSpace(item.Username))
-                {
-                    builder.SetUserId(item.Username);
-                }
-
-                if (!string.IsNullOrWhiteSpace(item.Password))
-                {
-                    builder.SetPassword(item.Password);
-                }
-
-                var newConnection = new ConnectionConfiguration(
-                    connection.ConnectionAlias,
-                    builder.ToString(),
-                    connection.ProviderName);
-
-                connectionMaps[item.Key] = newConnection;
+            if (!string.IsNullOrWhiteSpace(item.IP))
+            {
+                builder.SetServer(item.IP);
             }
+
+            if (!string.IsNullOrWhiteSpace(item.Username))
+            {
+                builder.SetUserId(item.Username);
+            }
+
+            if (!string.IsNullOrWhiteSpace(item.Password))
+            {
+                builder.SetPassword(item.Password);
+            }
+
+            var newConnection = new ConnectionConfiguration(
+                connection.ConnectionAlias,
+                builder.ToString(),
+                connection.ProviderName);
+
+            connectionMaps[item.Key] = newConnection;
         }
     }
 }

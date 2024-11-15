@@ -1,130 +1,121 @@
-﻿namespace Fanex.Data.Vault
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using VaultSharp;
-    using VaultSharp.V1.AuthMethods.AppRole;
+﻿namespace Fanex.Data.Vault;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using VaultSharp;
+using VaultSharp.V1.AuthMethods.AppRole;
    
-    public interface VaultProvider
+public interface VaultProvider
+{
+    Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases);
+
+    void ResetVaultToken();
+
+    Task EnsureVaultTokenIsValid();
+
+    string GetIp(string dbAlias);
+}
+
+public class VaultProviderImp(VaultOptions vaultOptions) : VaultProvider
+{
+    private const int MinTimeToLive = 15;
+
+    private static IDictionary<string, string> DbAlias = new Dictionary<string, string>();
+
+    private readonly VaultClient vaultClient = CreateVaultClient(vaultOptions);
+
+    public async Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases)
     {
-        Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases);
+        await LoadDbAlias();
 
-        void ResetVaultToken();
+        var result = await QueryCredentials(connectionAliases);
 
-        Task EnsureVaultTokenIsValid();
-
-        string GetIp(string dbAlias);
+        return result.OrderBy(v => v.Key).ToList();
     }
 
-    public class VaultProviderImp : VaultProvider
+    private async Task LoadDbAlias()
     {
-        private const int MinTimeToLive = 15;
+        const string dbAliasPath = "database/alias";
+        var aliasSecrets = await vaultClient.V1.Secrets.KeyValue.V2
+            .ReadSecretAsync(dbAliasPath, null, vaultOptions.MountPath)
+            .ConfigureAwait(false);
+        var dbAlias = aliasSecrets.Data.Data.ToDictionary(v => v.Key,
+            v => v.Value == null ? string.Empty : v.Value.ToString().Trim());
 
-        private static IDictionary<string, string> DbAlias = new Dictionary<string, string>();
+        DbAlias = dbAlias;
+    }
 
-        private readonly VaultOptions vaultOptions;
+    private async Task<List<DatabaseCredential>> QueryCredentials(List<string> connectionAliases)
+    {
+        var result = new List<DatabaseCredential>();
 
-        private readonly VaultClient vaultClient;
-
-        public VaultProviderImp(VaultOptions vaultOptions)
+        foreach (var alias in connectionAliases)
         {
-            this.vaultOptions = vaultOptions;
-            vaultClient = CreateVaultClient(vaultOptions);
-        }
-
-        public async Task<List<DatabaseCredential>> LoadAsync(List<string> connectionAliases)
-        {
-            await LoadDbAlias();
-
-            var result = await QueryCredentials(connectionAliases);
-
-            return result.OrderBy(v => v.Key).ToList();
-        }
-
-        private async Task LoadDbAlias()
-        {
-            const string dbAliasPath = "database/alias";
-            var aliasSecrets = await vaultClient.V1.Secrets.KeyValue.V2
-                .ReadSecretAsync(dbAliasPath, null, vaultOptions.MountPath)
-                .ConfigureAwait(false);
-            var dbAlias = aliasSecrets.Data.Data.ToDictionary(v => v.Key,
-                v => v.Value == null ? string.Empty : v.Value.ToString().Trim());
-
-            DbAlias = dbAlias;
-        }
-
-        private async Task<List<DatabaseCredential>> QueryCredentials(List<string> connectionAliases)
-        {
-            var result = new List<DatabaseCredential>();
-
-            foreach (var alias in connectionAliases)
+            var parts = alias.Split('.');
+            if (parts.Length != 3)
             {
-                var parts = alias.Split('.');
-                if (parts.Length != 3)
-                {
-                    continue;
-                }
-
-                var dbAlias = parts[0];
-                var dbLogin = parts[2];
-
-                var (username, password) = await QueryCredential(dbLogin);
-
-                var ip = GetIp(dbAlias);
-
-                var item = new DatabaseCredential(alias)
-                {
-                    IP = ip,
-                    Password = password,
-                    Username = username
-                };
-
-                result.Add(item);
+                continue;
             }
 
-            return result;
-        }
+            var dbAlias = parts[0];
+            var dbLogin = parts[2];
 
-        private async Task<(string username, string password)> QueryCredential(string dbLogin)
-        {
-            var credentialPath = $"database/credentials/{dbLogin}";
-            var credentialSecrets = await vaultClient.V1.Secrets.KeyValue.V2
-                .ReadSecretAsync(credentialPath, null, vaultOptions.MountPath)
-                .ConfigureAwait(false);
-            var username = credentialSecrets.Data.Data["username"].ToString();
-            var password = credentialSecrets.Data.Data["password"].ToString();
-            return (username, password);
-        }
+            var (username, password) = await QueryCredential(dbLogin);
 
-        public async Task EnsureVaultTokenIsValid()
-        {
-            var tokenData = await vaultClient.V1.Auth.Token.LookupSelfAsync();
-            var timeToLive = tokenData.Data.TimeToLive;
-            if (timeToLive < MinTimeToLive)
+            var ip = GetIp(dbAlias);
+
+            var item = new DatabaseCredential(alias)
             {
-                vaultClient.V1.Auth.ResetVaultToken();
-            }
+                IP = ip,
+                Password = password,
+                Username = username
+            };
+
+            result.Add(item);
         }
 
-        private static VaultClient CreateVaultClient(VaultOptions vaultOptions)
-        {
-            var vaultClientSettings = new VaultClientSettings(
-                vaultOptions.Address,
-                new AppRoleAuthMethodInfo(vaultOptions.Role, vaultOptions.SecretId)
-            );
+        return result;
+    }
 
-            return new VaultClient(vaultClientSettings);
-        }
+    private async Task<(string username, string password)> QueryCredential(string dbLogin)
+    {
+        var credentialPath = $"database/credentials/{dbLogin}";
+        var credentialSecrets = await vaultClient.V1.Secrets.KeyValue.V2
+            .ReadSecretAsync(credentialPath, null, vaultOptions.MountPath)
+            .ConfigureAwait(false);
+        var username = credentialSecrets.Data.Data["username"].ToString();
+        var password = credentialSecrets.Data.Data["password"].ToString();
+        return (username, password);
+    }
 
-        public void ResetVaultToken()
+    public async Task EnsureVaultTokenIsValid()
+    {
+        var tokenData = await vaultClient.V1.Auth.Token.LookupSelfAsync();
+        var timeToLive = tokenData.Data.TimeToLive;
+        if (timeToLive < MinTimeToLive)
         {
             vaultClient.V1.Auth.ResetVaultToken();
         }
+    }
 
-        public string GetIp(string dbAlias)
-        {
-	        return DbAlias.TryGetValue(dbAlias, out var ip) ? ip : string.Empty;
-        }
+    private static VaultClient CreateVaultClient(VaultOptions vaultOptions)
+    {
+        var vaultClientSettings = new VaultClientSettings(
+            vaultOptions.Address,
+            new AppRoleAuthMethodInfo(vaultOptions.Role, vaultOptions.SecretId)
+        );
+
+        return new VaultClient(vaultClientSettings);
+    }
+
+    public void ResetVaultToken()
+    {
+        vaultClient.V1.Auth.ResetVaultToken();
+    }
+
+    public string GetIp(string dbAlias)
+    {
+        return DbAlias.TryGetValue(dbAlias, out var ip) ? ip : string.Empty;
     }
 }

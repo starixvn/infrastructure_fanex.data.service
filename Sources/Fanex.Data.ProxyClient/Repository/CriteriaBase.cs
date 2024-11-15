@@ -1,19 +1,18 @@
-﻿namespace Fanex.Data.Repository
+﻿namespace Fanex.Data.Repository;
+
+public interface ICriteria
 {
-    public interface ICriteria
-    {
-        string GetSettingKey();
+    string GetSettingKey();
 
-        bool IsValid();
-    }
+    bool IsValid();
+}
 
-    public abstract class CriteriaBase : ICriteria
-    {
-        public abstract string GetSettingKey();
+public abstract class CriteriaBase : ICriteria
+{
+    public abstract string GetSettingKey();
 
-        public abstract bool IsValid();
+    public abstract bool IsValid();
 
-        public bool IsInvalid()
-            => !IsValid();
-    }
+    public bool IsInvalid()
+        => !IsValid();
 }

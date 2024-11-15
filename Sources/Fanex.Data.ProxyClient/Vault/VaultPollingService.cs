@@ -1,73 +1,72 @@
 ﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Fanex.Data.ProxyClient.Tests")]
-namespace Fanex.Data.Vault
+namespace Fanex.Data.Vault;
+
+using System;
+using System.Threading;
+
+internal class VaultPollingService
 {
-    using System;
-    using System.Threading;
+    private Thread pollingThread;
 
-    internal class VaultPollingService
+    private bool running;
+
+    private int intervalInSeconds = 5 * 60;
+
+    private readonly VaultService vaultService;
+
+    internal VaultPollingService(VaultProvider provider)
     {
-        private Thread pollingThread;
+        vaultService = new VaultServiceImp(provider);
+    }
 
-        private bool running;
+    public Exception LatestException { get; private set; }
 
-        private int intervalInSeconds = 5 * 60;
+    public void Start(int secondsDelay)
+    {
+        Stop();
 
-        private readonly VaultService vaultService;
+        running = true;
+        intervalInSeconds = secondsDelay;
+        pollingThread = new Thread(Poll);
+        pollingThread.Start();
+    }
 
-        internal VaultPollingService(VaultProvider provider)
+    public void Stop()
+    {
+        if (pollingThread != null)
         {
-            vaultService = new VaultServiceImp(provider);
+            running = false;
+            pollingThread.Join();
+            pollingThread = null;
         }
+    }
 
-        public Exception LatestException { get; private set; }
-
-        public void Start(int secondsDelay)
+    private void Poll()
+    {
+        while (running)
         {
-            Stop();
-
-            running = true;
-            intervalInSeconds = secondsDelay;
-            pollingThread = new Thread(Poll);
-            pollingThread.Start();
+            SafeReloadDbSettingProvider();
+            Thread.Sleep(intervalInSeconds * 1000);
         }
+    }
 
-        public void Stop()
+    private void SafeReloadDbSettingProvider()
+    {
+        try
         {
-            if (pollingThread != null)
+            var isCredentialChanged = vaultService.UpdateConnectionMaps().GetAwaiter().GetResult();
+            if (isCredentialChanged)
             {
-                running = false;
-                pollingThread.Join();
-                pollingThread = null;
+                DbSettingProviderManager.CurrentSession.ReloadConnectionStrings();
+                CacheManager.ClearCache();
+                Console.WriteLine("Credential is changed. ReloadConnectionStrings and ClearCache");
             }
         }
-
-        private void Poll()
+        catch (Exception e)
         {
-            while (running)
-            {
-                SafeReloadDbSettingProvider();
-                Thread.Sleep(intervalInSeconds * 1000);
-            }
-        }
-
-        private void SafeReloadDbSettingProvider()
-        {
-            try
-            {
-                var isCredentialChanged = vaultService.UpdateConnectionMaps().GetAwaiter().GetResult();
-                if (isCredentialChanged)
-                {
-                    DbSettingProviderManager.CurrentSession.ReloadConnectionStrings();
-                    CacheManager.ClearCache();
-                    Console.WriteLine("Credential is changed. ReloadConnectionStrings and ClearCache");
-				}
-            }
-            catch (Exception e)
-            {
-                LatestException = e;
-            }
+            LatestException = e;
         }
     }
 }

@@ -1,23 +1,22 @@
-﻿namespace Fanex.Data
+﻿namespace Fanex.Data;
+
+using System;
+using System.Net.Http;
+
+internal static class HttpClientFactory
 {
-    using System;
-    using System.Net.Http;
-
-    internal static class HttpClientFactory
-    {
-        internal static HttpClient Client { get; }
+    internal static HttpClient Client { get; }
         
-        static HttpClientFactory()
+    static HttpClientFactory()
+    {
+        var serviceApiUri = DbSettingProviderManager.ServiceApiUri;
+        var timeout = TimeSpan.FromSeconds(DbSettingProviderManager.GetMaxSpTimeout() + 30);
+
+
+        Client = new HttpClient
         {
-            var serviceApiUri = DbSettingProviderManager.ServiceApiUri;
-            var timeout = TimeSpan.FromSeconds(DbSettingProviderManager.GetMaxSpTimeout() + 30);
-
-
-            Client = new HttpClient
-            {
-                BaseAddress = serviceApiUri,
-                Timeout = timeout
-            };
-        }
+            BaseAddress = serviceApiUri,
+            Timeout = timeout
+        };
     }
 }

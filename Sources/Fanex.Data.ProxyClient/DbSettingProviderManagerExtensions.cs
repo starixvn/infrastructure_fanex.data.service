@@ -14,13 +14,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 #endif
 
-namespace Fanex.Data
-{
-	using Repository;
-	using Vault;
+namespace Fanex.Data;
 
-    public static class DbSettingProviderManagerExtensions
-    {
+using Repository;
+using Vault;
+
+public static class DbSettingProviderManagerExtensions
+{
 
 #if NETFRAMEWORK
 
@@ -89,56 +89,55 @@ namespace Fanex.Data
 
 #if NET6_0_OR_GREATER
 
-        public static IServiceCollection AddFanexData(this IServiceCollection services, IConfiguration configuration, bool ignoreRedundantParameters = false)
-        {
-            DbSettingProviderManager
-                .StartNewSession()
-                .Register(configuration, ignoreRedundantParameters)
-                .Run();
+    public static IServiceCollection AddFanexData(this IServiceCollection services, IConfiguration configuration, bool ignoreRedundantParameters = false)
+    {
+        DbSettingProviderManager
+            .StartNewSession()
+            .Register(configuration, ignoreRedundantParameters)
+            .Run();
 
-            services.AddTransient<IDynamicRepository, DynamicRepository>();
+        services.AddTransient<IDynamicRepository, DynamicRepository>();
 
-            return services;
-        }
-
-        public static DbSettingProviderManager Register(
-            this DbSettingProviderManager currentSession,
-            IConfiguration configuration,
-            bool ignoreRedundantParameters = false)
-        {
-            try
-            {
-                var connections = ReadConnectionStrings(configuration);
-
-                var resourcePath = configuration.GetSection("StoredProcedurePath").Value;
-                var serviceApiUrl = configuration.GetSection("FanexDataServiceApi").Value;
-                var vaultOptions = configuration.GetSection("VaultOptions").Get<VaultOptions>();
-                return currentSession
-                        .Use(connections)
-                        .Use(serviceApiUrl)
-                        .Use(vaultOptions)
-                        .UseDefaultDbSettingProvider(resourcePath, ignoreRedundantParameters);
-            }
-            catch (Exception exception)
-            {
-                const string message = "Invalid configuration in appsettings.json. "
-                                       + "Please check ConnectionStrings and StoredProcedurePath";
-                throw new ArgumentException(message, exception);
-            }
-        }
-
-        private static Dictionary<string, ConnectionConfiguration> ReadConnectionStrings(IConfiguration configuration)
-        {
-            var connections = configuration.GetSection("ConnectionStrings")
-                .GetChildren()
-                .AsEnumerable()
-                .ToDictionary(
-                    x => x.GetValue<string>("Name"),
-                    y => new ConnectionConfiguration(y.GetValue<string>("Name"), y.GetValue<string>("ConnectionString"), y.GetValue<string>("ProviderName"))
-                );
-            
-            return connections;
-        }
-#endif
+        return services;
     }
+
+    public static DbSettingProviderManager Register(
+        this DbSettingProviderManager currentSession,
+        IConfiguration configuration,
+        bool ignoreRedundantParameters = false)
+    {
+        try
+        {
+            var connections = ReadConnectionStrings(configuration);
+
+            var resourcePath = configuration.GetSection("StoredProcedurePath").Value;
+            var serviceApiUrl = configuration.GetSection("FanexDataServiceApi").Value;
+            var vaultOptions = configuration.GetSection("VaultOptions").Get<VaultOptions>();
+            return currentSession
+                .Use(connections)
+                .Use(serviceApiUrl)
+                .Use(vaultOptions)
+                .UseDefaultDbSettingProvider(resourcePath, ignoreRedundantParameters);
+        }
+        catch (Exception exception)
+        {
+            const string message = "Invalid configuration in appsettings.json. "
+                                   + "Please check ConnectionStrings and StoredProcedurePath";
+            throw new ArgumentException(message, exception);
+        }
+    }
+
+    private static Dictionary<string, ConnectionConfiguration> ReadConnectionStrings(IConfiguration configuration)
+    {
+        var connections = configuration.GetSection("ConnectionStrings")
+            .GetChildren()
+            .AsEnumerable()
+            .ToDictionary(
+                x => x.GetValue<string>("Name"),
+                y => new ConnectionConfiguration(y.GetValue<string>("Name"), y.GetValue<string>("ConnectionString"), y.GetValue<string>("ProviderName"))
+            );
+            
+        return connections;
+    }
+#endif
 }
