@@ -9,38 +9,33 @@ using System.Text;
 
 [Route("")]
 [ApiController]
-public class HomeController : ControllerBase
+public class HomeController(AliveStatusService aliveStatusService) : ControllerBase
 {
-    private static bool alive = true;
-
-    private static readonly DateTimeOffset StartTime = DateTimeOffset.Now;
-
-    private static readonly int MinutesToLive = new Random(StartTime.Microsecond).Next(29 * 60, 47 * 60);
-
     [HttpGet]
     public IActionResult Index()
     {
-        return alive && (DateTimeOffset.Now - StartTime).TotalMinutes < MinutesToLive
+        var alive = aliveStatusService.IsAlive();
+        return alive
             ? Ok(new
             {
                 Environment.MachineName,
-                Alive = alive,
-                MinutesToLive,
-                WorkedMinutes = (DateTimeOffset.Now - StartTime).TotalMinutes
+                Alive = true,
+                aliveStatusService.MinutesToLive,
+                aliveStatusService.MinutesWorked
             })
             : Problem(
-                $"WorkedMinutes: {(DateTimeOffset.Now - StartTime).TotalMinutes}",
+                $"MinuteWorked: {aliveStatusService.MinutesWorked}",
                 Environment.MachineName,
                 400,
-                $"MinutesToLive: {MinutesToLive}",
-                $"Alive: {alive}"
+                $"MinutesToLive: {aliveStatusService.MinutesToLive}",
+                $"Alive: {false}"
                 );
     }
 
     [HttpGet("kill")]
     public IActionResult Kill()
     {
-        alive = false;
+        aliveStatusService.Kill();
         return Ok(Environment.MachineName);
     }
 
