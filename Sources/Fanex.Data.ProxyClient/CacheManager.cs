@@ -3,6 +3,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Extensions;
 using Newtonsoft.Json;
 
 public static class CacheManager

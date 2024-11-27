@@ -12,11 +12,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Fanex.Data.Repository;
+
 #endif
 
 namespace Fanex.Data;
 
-using Repository;
 using Vault;
 
 public static class DbSettingProviderManagerExtensions

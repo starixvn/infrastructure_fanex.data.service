@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Extensions;
 
 public static class Cryptography
 {

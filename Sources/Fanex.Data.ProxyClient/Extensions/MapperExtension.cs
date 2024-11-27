@@ -1,13 +1,12 @@
-﻿using Fanex.Data.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿namespace Fanex.Data.Extensions;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-namespace Fanex.Data;
-
 using Helper;
+using Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public static class MapperExtension
 {

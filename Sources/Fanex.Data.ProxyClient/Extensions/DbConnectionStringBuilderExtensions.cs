@@ -1,4 +1,4 @@
-﻿namespace Fanex.Data;
+﻿namespace Fanex.Data.Extensions;
 
 using System.Collections.Generic;
 using System.Data.Common;

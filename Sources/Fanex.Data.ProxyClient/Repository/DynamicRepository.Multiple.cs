@@ -4,6 +4,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Extensions;
+
 public partial class DynamicRepository : IDynamicRepository
 {
     public (IEnumerable<T1>, IEnumerable<T2>) FetchMultiple<T1, T2>(ICriteria criteria, string serverIp = "") => FetchMultipleAsync<T1, T2>(criteria, serverIp).GetAwaiter().GetResult();
