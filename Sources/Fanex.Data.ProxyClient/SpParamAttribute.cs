@@ -1,22 +1,21 @@
-﻿namespace Fanex.Data
+﻿namespace Fanex.Data;
+
+using System;
+
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+public sealed class SpParamAttribute : Attribute
 {
-    using System;
+    public string SqlParamName { get; set; }
 
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public sealed class SpParamAttribute : Attribute
+    public bool Ignored { get; set; }
+
+    public bool IsSpecialType { get; set; }
+
+    public bool AllowNull
     {
-        public string SqlParamName { get; set; }
-
-        public bool Ignored { get; set; }
-
-        public bool IsSpecialType { get; set; }
-
-        public bool AllowNull
-        {
-            get => ForcePassingNull ?? default;
-            set => ForcePassingNull = value;
-        }
-
-        private bool? ForcePassingNull { get; set; }
+        get => ForcePassingNull ?? default;
+        set => ForcePassingNull = value;
     }
+
+    private bool? ForcePassingNull { get; set; }
 }

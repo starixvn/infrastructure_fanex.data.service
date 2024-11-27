@@ -23,7 +23,7 @@ public class ClearStoredProcedureCacheConsumer : IConsumer<ClearStoredProcedureC
 		await Task.CompletedTask;
 	}
 
-	private string GetSimplifiedConnectionString(List<StoredProcedureDefinition> definitions)
+	private static string GetSimplifiedConnectionString(List<StoredProcedureDefinition> definitions)
 	{
 		var connectionStrings = GetSimplifiedConnectionStringCollection(definitions);
 		return $"[{string.Join(", ", connectionStrings)}]";

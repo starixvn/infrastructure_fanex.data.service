@@ -1,9 +1,8 @@
-﻿namespace Fanex.Data.Repository
-{
-    internal class ProxyResult<T>
-    {
-        public string ParameterSet { get; set; }
+﻿namespace Fanex.Data.Repository;
 
-        public T Result { get; set; }
-    }
+internal class ProxyResult<T>
+{
+    public string ParameterSet { get; set; }
+
+    public T Result { get; set; }
 }

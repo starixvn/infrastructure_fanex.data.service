@@ -1,9 +1,8 @@
-﻿namespace Fanex.Data.Models
-{
-    internal class StoredProcedureDefinition
-    {
-        public string ConnectionString { get; set; }
+﻿namespace Fanex.Data.Models;
 
-        public string StoreProcedureName { get; set; }
-    }
+internal class StoredProcedureDefinition
+{
+    public string ConnectionString { get; set; }
+
+    public string StoreProcedureName { get; set; }
 }

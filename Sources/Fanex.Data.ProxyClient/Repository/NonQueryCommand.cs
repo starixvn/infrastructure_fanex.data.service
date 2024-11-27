@@ -1,10 +1,5 @@
-﻿namespace Fanex.Data.Repository
-{
-    public interface INonQueryCommand : ICriteria
-    {
-    }
+﻿namespace Fanex.Data.Repository;
 
-    public abstract class NonQueryCommand : CriteriaBase, INonQueryCommand
-    {
-    }
-}
+public interface INonQueryCommand : ICriteria;
+
+public abstract class NonQueryCommand : CriteriaBase, INonQueryCommand;

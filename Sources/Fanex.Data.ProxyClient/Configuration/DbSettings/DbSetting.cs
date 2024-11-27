@@ -1,108 +1,96 @@
-﻿namespace Fanex.Data
+﻿namespace Fanex.Data;
+
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Extensions;
+
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+public class DbSetting(
+    string key,
+    string provider,
+    string dbName,
+    string connectionString,
+    string spName,
+    int? commandTimeout,
+    IDictionary<string, string> columnMaps,
+    IDictionary<string, object> firmParameters)
 {
-    using System.Collections.Generic;
-    using System.Data.Common;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
+    public const int DefaultCommandTimeout = 120;
 
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class DbSetting
+    public string Key { get; } = key;
+
+    public string Provider { get; set; } = provider;
+
+    public string DbName { get; } = dbName;
+
+    public string ConnectionString { get; private set; } = connectionString;
+
+    public string SpName { get; } = spName;
+
+    public int CommandTimeout { get; } = commandTimeout ?? DefaultCommandTimeout;
+
+    public IDictionary<string, string> ColumnMaps { get; set; } = columnMaps;
+
+    public IDictionary<string, object> FirmParameters { get; } = firmParameters;
+
+    public bool IsValid()
+        => IsValidSpNameConfiguration() && IsValidDbNameConfiguration() && IsValidColumnMaps();
+
+    protected bool IsValidSpNameConfiguration()
+        => !string.IsNullOrWhiteSpace(Key) && !string.IsNullOrWhiteSpace(SpName);
+
+    protected bool IsValidDbNameConfiguration()
+        => !string.IsNullOrWhiteSpace(DbName) && !string.IsNullOrWhiteSpace(ConnectionString);
+
+    protected bool IsValidColumnMaps()
     {
-        public const int DefaultCommandTimeout = 120;
+        var numberOfMappingsWithType = ColumnMaps.Keys.Count(IsMappedWithType);
 
-        public DbSetting(
-            string key,
-            string provider,
-            string dbName,
-            string connectionString,
-            string spName,
-            int? commandTimeout,
-            IDictionary<string, string> columnMaps,
-            IDictionary<string, object> firmParameters)
+        return numberOfMappingsWithType == 0 || numberOfMappingsWithType == ColumnMaps.Count;
+    }
+
+    private static bool IsMappedWithType(string mappedKey)
+    {
+        var typeNameSeparatorIndex = mappedKey.IndexOf(';');
+
+        if (typeNameSeparatorIndex >= 0)
         {
-            Key = key;
-            Provider = provider;
-            DbName = dbName;
-            ConnectionString = connectionString;
-            SpName = spName;
-            CommandTimeout = commandTimeout ?? DefaultCommandTimeout;
-            ColumnMaps = columnMaps;
-            FirmParameters = firmParameters;
+            var mappedTypeName = mappedKey.Substring(typeNameSeparatorIndex + 1);
+
+            return !string.IsNullOrEmpty(mappedTypeName);
         }
 
-        public string Key { get; }
+        return false;
+    }
 
-        public string Provider { get; set; }
+    public DbSetting Clone()
+    {
+        return new DbSetting
+        (Key,
+            Provider,
+            DbName,
+            ConnectionString,
+            SpName,
+            CommandTimeout,
+            new Dictionary<string, string>(ColumnMaps),
+            FirmParameters);
+    }
 
-        public string DbName { get; }
-
-        public string ConnectionString { get; private set; }
-
-        public string SpName { get; }
-
-        public int CommandTimeout { get; }
-
-        public IDictionary<string, string> ColumnMaps { get; set; }
-
-        public IDictionary<string, object> FirmParameters { get; }
-
-        public bool IsValid()
-            => IsValidSpNameConfiguration() && IsValidDbNameConfiguration() && IsValidColumnMaps();
-
-        protected bool IsValidSpNameConfiguration()
-            => !string.IsNullOrWhiteSpace(Key) && !string.IsNullOrWhiteSpace(SpName);
-
-        protected bool IsValidDbNameConfiguration()
-            => !string.IsNullOrWhiteSpace(DbName) && !string.IsNullOrWhiteSpace(ConnectionString);
-
-        protected bool IsValidColumnMaps()
+    public void ReplaceServerIp(string serverIp)
+    {
+        if (string.IsNullOrWhiteSpace(serverIp))
         {
-            var numberOfMappingsWithType = ColumnMaps.Keys.Count(IsMappedWithType);
-
-            return numberOfMappingsWithType == 0 || numberOfMappingsWithType == ColumnMaps.Count;
+            return;
         }
 
-        private static bool IsMappedWithType(string mappedKey)
+        var builder = new DbConnectionStringBuilder
         {
-            var typeNameSeparatorIndex = mappedKey.IndexOf(';');
+            ConnectionString = ConnectionString
+        };
+        builder.SetServer(serverIp);
 
-            if (typeNameSeparatorIndex >= 0)
-            {
-                var mappedTypeName = mappedKey.Substring(typeNameSeparatorIndex + 1);
-
-                return !string.IsNullOrEmpty(mappedTypeName);
-            }
-
-            return false;
-        }
-
-        public DbSetting Clone()
-        {
-            return new DbSetting
-                (Key,
-                Provider,
-                DbName,
-                ConnectionString,
-                SpName,
-                CommandTimeout,
-                new Dictionary<string, string>(ColumnMaps),
-                FirmParameters);
-        }
-
-        public void ReplaceServerIp(string serverIp)
-        {
-            if (string.IsNullOrWhiteSpace(serverIp))
-            {
-                return;
-            }
-
-            var builder = new DbConnectionStringBuilder
-            {
-                ConnectionString = ConnectionString
-            };
-            builder.SetServer(serverIp);
-
-            ConnectionString = builder.ToString();
-        }
+        ConnectionString = builder.ToString();
     }
 }

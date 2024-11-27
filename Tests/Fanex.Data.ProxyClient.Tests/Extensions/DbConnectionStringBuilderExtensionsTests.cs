@@ -3,6 +3,8 @@ using Xunit;
 
 namespace Fanex.Data.ProxyClient.Tests.Extensions;
 
+using Data.Extensions;
+
 public class DbConnectionStringBuilderExtensionsTests
 {
     private readonly DbConnectionStringBuilder _connectionStringBuilder = new();
