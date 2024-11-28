@@ -143,7 +143,7 @@ public class DbSettingProviderManager
 
         if (VaultOptions?.Enable == true)
         {
-            var vaultProvider = new VaultProviderImp(VaultOptions);
+            var vaultProvider = new VaultProviderImp(VaultOptions, new VaultDbAliasServiceImp());
             var vaultService = new VaultServiceImp(vaultProvider);
             vaultService.UpdateConnectionMaps().Wait();
 

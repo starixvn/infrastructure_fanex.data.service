@@ -25,7 +25,7 @@ public class VaultProviderIntegrationTests
         {
             "DBACC.bodb02.wsv_nap"
         };
-        var vaultProvider = new VaultProviderImp(vaultOptions);
+        var vaultProvider = new VaultProviderImp(vaultOptions, new VaultDbAliasServiceImp());
             
         var credentials = await vaultProvider.LoadAsync(aliases);
 

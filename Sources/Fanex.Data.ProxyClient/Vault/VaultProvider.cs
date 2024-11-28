@@ -13,15 +13,11 @@ public interface VaultProvider
     void ResetVaultToken();
 
     Task EnsureVaultTokenIsValid();
-
-    string GetIp(string dbAlias);
 }
 
-public class VaultProviderImp(VaultOptions vaultOptions) : VaultProvider
+public class VaultProviderImp(VaultOptions vaultOptions, VaultDbAliasService dbAliasService) : VaultProvider
 {
     private const int MinTimeToLive = 15;
-
-    private static IDictionary<string, string> DbAlias = new Dictionary<string, string>();
 
     private readonly VaultClient vaultClient = CreateVaultClient(vaultOptions);
 
@@ -43,7 +39,7 @@ public class VaultProviderImp(VaultOptions vaultOptions) : VaultProvider
         var dbAlias = aliasSecrets.Data.Data.ToDictionary(v => v.Key,
             v => v.Value == null ? string.Empty : v.Value.ToString().Trim());
 
-        DbAlias = dbAlias;
+        dbAliasService.UpdateDbAlias(dbAlias);
     }
 
     private async Task<List<DatabaseCredential>> QueryCredentials(List<string> connectionAliases)
@@ -63,7 +59,7 @@ public class VaultProviderImp(VaultOptions vaultOptions) : VaultProvider
 
             var (username, password) = await QueryCredential(dbLogin);
 
-            var ip = GetIp(dbAlias);
+            var ip = dbAliasService.GetIp(dbAlias);
 
             var item = new DatabaseCredential(alias)
             {
@@ -112,10 +108,5 @@ public class VaultProviderImp(VaultOptions vaultOptions) : VaultProvider
     public void ResetVaultToken()
     {
         vaultClient.V1.Auth.ResetVaultToken();
-    }
-
-    public string GetIp(string dbAlias)
-    {
-        return DbAlias.TryGetValue(dbAlias, out var ip) ? ip : string.Empty;
     }
 }
