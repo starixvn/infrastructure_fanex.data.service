@@ -1,11 +1,8 @@
-﻿using System.Diagnostics;
-using System.Runtime;
-using Fanex.Data.Services.Cache;
+﻿using Fanex.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fanex.Data.Services;
 
-using System.Text;
 using Olympus.Diagnostic;
 
 [Route("")]
