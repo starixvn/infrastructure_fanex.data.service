@@ -98,6 +98,7 @@ public static class DbSettingProviderManagerExtensions
             .Run();
 
         services.AddTransient<IDynamicRepository, DynamicRepository>();
+        services.AddSingleton<VaultDbAliasService, VaultDbAliasServiceImp>();
 
         return services;
     }
