@@ -61,7 +61,7 @@ internal class VaultServiceImp(VaultProvider vaultProvider) : VaultService
                 vaultProvider.ResetVaultToken();
             }
 
-            await Task.Delay(3000).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
         }
 
         if (latestException != null)
