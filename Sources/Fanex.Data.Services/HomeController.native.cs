@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Fanex.Data.Services;
 
+using System.Text;
+using MassTransit.MessageData.Values;
 using Olympus.Diagnostic;
 
 [Route("")]
 [ApiController]
 public class HomeController(AliveStatusService aliveStatusService) : ControllerBase
 {
+    private readonly Random random = new Random(DateTimeOffset.Now.Millisecond);
+
     [HttpGet]
     public IActionResult Index()
     {
@@ -54,5 +58,25 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
     {
         var gc = GarbageCollector.CollectExtremely();
         return Ok(gc);
+    }
+
+    private static byte[] randomBytes;
+
+    [HttpGet("random")]
+    public IActionResult Random()
+    {
+        ReadBytes();
+        randomBytes[20] = (byte)random.Next(0x61, 0x7B);
+        return File(randomBytes, "text/plain", $"{Guid.NewGuid()}.txt");
+    }
+
+    private static void ReadBytes()
+    {
+        if (randomBytes != null)
+        {
+            return;
+        }
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "content.txt");
+        randomBytes = System.IO.File.ReadAllBytes(filePath);
     }
 }

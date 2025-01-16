@@ -13,9 +13,23 @@ using System.Diagnostics;
 [ApiController]
 public class DynamicRepositoryController : ControllerBase
 {
+    private static ProxyResult<IEnumerable<dynamic>> cachedProxyResult;
+
+    [HttpGet("clear")]
+    public async Task<IActionResult> Clear()
+    {
+        cachedProxyResult = null;
+        return Ok(Environment.MachineName);
+    }
+
     [HttpPost("fetch")]
     public async Task<IActionResult> Fetch(ProxyParameter proxyParameter)
     {
+        if (cachedProxyResult != null)
+        {
+            return Ok(cachedProxyResult);
+        }
+
         var stopWatch = new Stopwatch();
         stopWatch.Start();
         using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
@@ -36,6 +50,7 @@ public class DynamicRepositoryController : ControllerBase
         Monitoring.UpdateResponseStatistic(models, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
         Monitoring.UpdateRequestStatistic();
 
+        cachedProxyResult = proxyResult;
         return Ok(proxyResult);
     }
 

@@ -1,3 +1,4 @@
+using System.Text;
 using Fanex.Data.Services.Cache;
 using Fanex.Data.Services.Extensions;
 using Fanex.Data.Services.Middleware;
@@ -24,6 +25,15 @@ services.AddControllers().AddNewtonsoftJson(options =>
 });
 
 var app = builder.Build();
+
+await using (var stream = new FileStream("content.txt", FileMode.OpenOrCreate))
+{
+    for (var i = 0; i < 3 * 1000_000; i++)
+    {
+        await stream.WriteAsync(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString()));
+        await stream.WriteAsync("\n"u8.ToArray());
+    }
+}
 
 // Configure the HTTP request pipeline.
 app.UseRouting();
