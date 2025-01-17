@@ -7,6 +7,7 @@ using Extensions;
 using Cache;
 using Newtonsoft.Json;
 using System.Data;
+using System.Diagnostics;
 
 [Route("api/dynamic-repository")]
 [ApiController]
@@ -15,6 +16,8 @@ public class DynamicRepositoryController : ControllerBase
     [HttpPost("fetch")]
     public async Task<IActionResult> Fetch(ProxyParameter proxyParameter)
     {
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
         using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
 
         var models = (await objectDb.QueryAsync<dynamic>(proxyParameter.ParameterSet)).ToList();
@@ -27,8 +30,10 @@ public class DynamicRepositoryController : ControllerBase
             Result = result,
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
+        
+        stopWatch.Stop();
 
-        Monitoring.UpdateResponseStatistic(models, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
+        Monitoring.UpdateResponseStatistic(models, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
         Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
@@ -37,6 +42,8 @@ public class DynamicRepositoryController : ControllerBase
     [HttpPost("fetch-dataset")]
     public async Task<IActionResult> FetchDataSet(ProxyParameter proxyParameter)
     {
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
         using var objectDb = Proxy.ObjectDbFactory.CreateInstance(proxyParameter);
         var model = await objectDb.ExecuteDataSetAsync(proxyParameter.ParameterSet);
 
@@ -46,7 +53,8 @@ public class DynamicRepositoryController : ControllerBase
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
-        Monitoring.UpdateResponseStatistic(model, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
+        stopWatch.Stop();
+        Monitoring.UpdateResponseStatistic(model, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
         Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);
@@ -55,6 +63,8 @@ public class DynamicRepositoryController : ControllerBase
     [HttpPost("fetch-multiple")]
     public async Task<IActionResult> FetchMultiple([FromQuery] int collectionCount, ProxyParameter proxyParameter)
     {
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
         var fetchedData = await FetchMultipleAsync(proxyParameter, collectionCount).ConfigureAwait(false);
         var typeNames = proxyParameter.TypeNames ?? [];
         var columnMaps = proxyParameter.DbSetting.ColumnMaps ?? new Dictionary<string, string>();
@@ -69,7 +79,8 @@ public class DynamicRepositoryController : ControllerBase
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
 
-        Monitoring.UpdateResponseStatistic(fetchedData, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
+        stopWatch.Stop();
+        Monitoring.UpdateResponseStatistic(fetchedData, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
         Monitoring.UpdateRequestStatistic();
 
         return Ok(proxyResult);

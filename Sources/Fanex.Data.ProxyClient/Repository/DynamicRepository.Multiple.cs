@@ -21,7 +21,7 @@ public partial class DynamicRepository : IDynamicRepository
 
     public async Task<(IEnumerable<T1>, IEnumerable<T2>)> FetchMultipleAsync<T1, T2>(ICriteria criteria, string serverIp = "")
     {
-        const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=2";
+        const string endpoint = "api/dynamic-repository/fetch-multiple?collectionCount=2";
 
         if (!criteria.IsValid())
         {
@@ -44,7 +44,7 @@ public partial class DynamicRepository : IDynamicRepository
 
     public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>)> FetchMultipleAsync<T1, T2, T3>(ICriteria criteria, string serverIp = "")
     {
-        const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=3";
+        const string endpoint = "api/dynamic-repository/fetch-multiple?collectionCount=3";
 
         if (!criteria.IsValid())
         {
@@ -71,7 +71,7 @@ public partial class DynamicRepository : IDynamicRepository
 
     public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(ICriteria criteria, string serverIp = "")
     {
-        const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=4";
+        const string endpoint = "api/dynamic-repository/fetch-multiple?collectionCount=4";
 
         if (!criteria.IsValid())
         {
@@ -100,7 +100,7 @@ public partial class DynamicRepository : IDynamicRepository
 
     public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>)> FetchMultipleAsync<T1, T2, T3, T4, T5>(ICriteria criteria, string serverIp = "")
     {
-        const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=5";
+        const string endpoint = "api/dynamic-repository/fetch-multiple?collectionCount=5";
 
         if (!criteria.IsValid())
         {
@@ -132,7 +132,7 @@ public partial class DynamicRepository : IDynamicRepository
 
     public async Task<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>)> FetchMultipleAsync<T1, T2, T3, T4, T5, T6>(ICriteria criteria, string serverIp = "")
     {
-        const string endpoint = "/api/dynamic-repository/fetch-multiple?collectionCount=6";
+        const string endpoint = "api/dynamic-repository/fetch-multiple?collectionCount=6";
 
         if (!criteria.IsValid())
         {

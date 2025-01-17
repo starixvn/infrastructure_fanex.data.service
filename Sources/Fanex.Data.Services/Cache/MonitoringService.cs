@@ -37,7 +37,7 @@ public static class Monitoring
         RequestStatistics[next] = 0;
     }
 
-    public static void UpdateResponseStatistic(DataSet dataset, string spName, Dictionary<string, object> parameters)
+    public static void UpdateResponseStatistic(DataSet dataset, decimal duration, string spName, Dictionary<string, object> parameters)
     {
         if (dataset == null || dataset.Tables.Count == 0)
         {
@@ -46,20 +46,20 @@ public static class Monitoring
 
         var maxCount = (from DataTable table in dataset.Tables select table.Rows.Count).Max();
 
-        UpdateResponseStatistic(maxCount, spName, parameters);
+        UpdateResponseStatistic(maxCount, duration, spName, parameters);
     }
 
-    public static void UpdateResponseStatistic(List<dynamic> models, string spName, Dictionary<string, object> parameters)
+    public static void UpdateResponseStatistic(List<dynamic> models, decimal duration, string spName, Dictionary<string, object> parameters)
     {
         if (models == null)
         {
             return;
         }
 
-        UpdateResponseStatistic(models.Count, spName, parameters);
+        UpdateResponseStatistic(models.Count, duration, spName, parameters);
     }
 
-    public static void UpdateResponseStatistic(List<dynamic>[] models, string spName, Dictionary<string, object> parameters)
+    public static void UpdateResponseStatistic(List<dynamic>[] models, decimal duration, string spName, Dictionary<string, object> parameters)
     {
         if (models == null)
         {
@@ -67,27 +67,31 @@ public static class Monitoring
         }
 
         var maxCount = models.Select(m => m?.Count ?? 0).Max();
-        UpdateResponseStatistic(maxCount, spName, parameters);
+        UpdateResponseStatistic(maxCount, duration, spName, parameters);
     }
 
-    private static void UpdateResponseStatistic(int dataLength, string spName, Dictionary<string, object> parameters)
+    private static void UpdateResponseStatistic(int dataLength, decimal duration, string spName, Dictionary<string, object> parameters)
     {
         var index = (int)Math.Floor((decimal)dataLength / 1000);
         index = index >= ResponseStatisticSize ? ResponseStatisticSize - 1 : index;
 
         Interlocked.Increment(ref ResponseStatistics[index]);
 
-        LogSpWhichReturnsMoreThan10kRows(dataLength, spName, parameters);
+        LogSpWhichReturnsMoreThan10kRows(dataLength, duration, spName, parameters);
     }
 
-    private static void LogSpWhichReturnsMoreThan10kRows(int dataLength, string spName, Dictionary<string, object> parameters)
+    private static void LogSpWhichReturnsMoreThan10kRows(int dataLength, decimal duration, string spName, Dictionary<string, object> parameters)
     {
-        if (dataLength < 10000)
+        if (duration >= 10000)
         {
-            return;
+            var json = JsonConvert.SerializeObject(parameters);
+            Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} takes {duration} milliseconds and returns {dataLength} rows. Parameters: {json}");
         }
 
-        var json = JsonConvert.SerializeObject(parameters);
-        Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} returns {dataLength} rows. Parameters: {json}");
+        if (dataLength >= 10000)
+        {
+            var json = JsonConvert.SerializeObject(parameters);
+            Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} returns {dataLength} rows. Parameters: {json}"); 
+        }
     }
 }

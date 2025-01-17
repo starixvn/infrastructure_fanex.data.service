@@ -110,7 +110,7 @@ public partial class DynamicRepository
     private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, ProxyParameter proxyParameter)
     {
         var requestJson = JsonConvert.SerializeObject(proxyParameter, JsonSerializerSettings);
-        var response = await PostAsync(endpoint, requestJson).ConfigureAwait(false);
+        using var response = await PostAsync(endpoint, requestJson).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
             var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false) + $". Status code: {response.StatusCode}";
@@ -146,7 +146,7 @@ public partial class DynamicRepository
 
     private static async Task<HttpResponseMessage> PostAsync(string endpoint, string requestJson)
     {
-        var requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
+        using var requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
         try
         {
             return await HttpClientFactory
