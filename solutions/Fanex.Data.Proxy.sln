@@ -10,17 +10,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.ProxyClient", "Sources\Fanex.Data.ProxyClient\Fanex.Data.ProxyClient.csproj", "{91DB4B38-9E0E-44E0-940D-34F603470E6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.ProxyClient", "..\Sources\Fanex.Data.ProxyClient\Fanex.Data.ProxyClient.csproj", "{91DB4B38-9E0E-44E0-940D-34F603470E6B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{11F4A065-EEA0-4CC9-98EE-FAB6FAE46F90}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.Repository.Tests", "Tests\Fanex.Data.Repository.Tests\Fanex.Data.Repository.Tests.csproj", "{F0D589B7-D1AF-42B5-A168-A8F6E543ED57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.Repository.Tests", "..\Tests\Fanex.Data.Repository.Tests\Fanex.Data.Repository.Tests.csproj", "{F0D589B7-D1AF-42B5-A168-A8F6E543ED57}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.ProxyClient.Tests", "Tests\Fanex.Data.ProxyClient.Tests\Fanex.Data.ProxyClient.Tests.csproj", "{56FA271C-B7EE-4DF6-AADB-36B831AC589F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.ProxyClient.Tests", "..\Tests\Fanex.Data.ProxyClient.Tests\Fanex.Data.ProxyClient.Tests.csproj", "{56FA271C-B7EE-4DF6-AADB-36B831AC589F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.SampleData", "Tests\Fanex.Data.SampleData\Fanex.Data.SampleData.csproj", "{86FFC02D-730D-4974-BDB3-6C525A2E96B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Data.SampleData", "..\Tests\Fanex.Data.SampleData\Fanex.Data.SampleData.csproj", "{86FFC02D-730D-4974-BDB3-6C525A2E96B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplicationDemo", "WebApplicationDemo\WebApplicationDemo.csproj", "{8CE51120-04AB-477B-86AC-F0FDD7CA589A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplicationDemo", "..\WebApplicationDemo\WebApplicationDemo.csproj", "{8CE51120-04AB-477B-86AC-F0FDD7CA589A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

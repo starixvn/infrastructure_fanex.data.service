@@ -1,6 +1,5 @@
 ﻿namespace Fanex.Data.Services.Middleware;
 
-using Data;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
@@ -43,6 +42,21 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
         }
     }
 
+    private static async Task HandleException(HttpContext context, Exception exception)
+    {
+        try
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync(exception.Message + Environment.NewLine);
+            await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
     private static string GetInfoException(Exception exception)
     {
         try
@@ -78,19 +92,4 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
                 .Select(parameter => $"{parameter.Key}={parameter.Value}")
                 .Aggregate((firstPair, secondPair) => $"{firstPair};{secondPair}")
             : string.Empty;
-
-    private static async Task HandleException(HttpContext context, Exception exception)
-    {
-        try
-        {
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "text/plain";
-            await context.Response.WriteAsync(exception.Message + Environment.NewLine);
-            await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
-    }
 }

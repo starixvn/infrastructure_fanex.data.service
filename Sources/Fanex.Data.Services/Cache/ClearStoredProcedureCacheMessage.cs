@@ -2,7 +2,7 @@
 
 public class ClearStoredProcedureCacheMessage
 {
-	public string ServiceName { get; set; } = string.Empty;
+    public string ServiceName { get; set; } = string.Empty;
 
-	public List<StoredProcedureDefinition> StoredProcedureDefinitions { get; set; } = [];
+    public List<StoredProcedureDefinition> StoredProcedureDefinitions { get; set; } = [];
 }
