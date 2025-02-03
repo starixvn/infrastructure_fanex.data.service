@@ -21,10 +21,10 @@ internal class ConnectionStringBuilder(string connectionString)
                 kvp => kvp[1].Trim(),
                 StringComparer.InvariantCultureIgnoreCase);
 
-    public string GetServer()
+    internal string GetServer()
         => GetValue(ServerAliases);
 
-    public string GetUserId()
+    internal string GetUserId()
         => GetValue(UserIdAliases);
 
     private string GetValue(IEnumerable<string> keywordAliases)

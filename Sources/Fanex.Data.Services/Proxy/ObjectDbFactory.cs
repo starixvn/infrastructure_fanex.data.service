@@ -8,10 +8,8 @@ public static class ObjectDbFactory
         var dbSetting = proxyParameter.DbSetting;
         var ignoreRedundantParameters = proxyParameter.IgnoreRedundantParameters;
 
-        return dbSetting.Provider switch
-        {
-            "MySql.Data.MySqlClient" => new MySqlObjectDb(dbSetting, ignoreRedundantParameters),
-            _ => new SqlObjectDb(dbSetting, ignoreRedundantParameters)
-        };
+        return dbSetting.Provider == "MySql.Data.MySqlClient"
+            ? new MySqlObjectDb(dbSetting, ignoreRedundantParameters)
+            : new SqlObjectDb(dbSetting, ignoreRedundantParameters);
     }
 }

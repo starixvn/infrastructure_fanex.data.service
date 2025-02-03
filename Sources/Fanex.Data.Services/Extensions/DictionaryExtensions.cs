@@ -1,12 +1,12 @@
 ﻿namespace Fanex.Data.Services.Extensions;
 
-public static class DictionaryExtensions
+internal static class DictionaryExtensions
 {
-    public static IEnumerable<dynamic> MapCollection(this IDictionary<string, string> columnMaps, string typeName, List<dynamic> sources)
+    internal static IEnumerable<dynamic> MapCollection(this IDictionary<string, string> columnMaps, string typeName, List<dynamic> sources)
     {
         if (sources is null)
         {
-            return null;
+            return [];
         }
 
         for (var i = 0; i < sources.Count; i++)
@@ -17,7 +17,7 @@ public static class DictionaryExtensions
         return sources;
     }
 
-    public static dynamic MapSingle(this IDictionary<string, string> columnMaps, string typeName, dynamic source)
+    internal static dynamic MapSingle(this IDictionary<string, string> columnMaps, string typeName, dynamic source)
     {
         if (source is not IDictionary<string, object> dictionary)
         {
@@ -48,13 +48,11 @@ public static class DictionaryExtensions
 
     private static bool TryGetValue(IDictionary<string, string> columnMaps, string key, out string value)
     {
-        foreach (var pair in columnMaps)
+        var pair = columnMaps.FirstOrDefault(p => string.Equals(key, p.Key, StringComparison.CurrentCultureIgnoreCase));
+        if (!string.IsNullOrEmpty(pair.Key))
         {
-            if (string.Equals(key, pair.Key, StringComparison.CurrentCultureIgnoreCase))
-            {
-                value = pair.Value;
-                return true;
-            }
+            value = pair.Value;
+            return true;
         }
 
         value = string.Empty;
