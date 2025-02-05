@@ -1,6 +1,7 @@
 namespace Fanex.Data;
 
 using System;
+using System.Text;
 
 public sealed class DbProxyHttpRequestException(string message, Exception innerException)
     : DbProxyException(message, innerException)
@@ -10,12 +11,14 @@ public sealed class DbProxyHttpRequestException(string message, Exception innerE
         string requestJson,
         Exception e)
     {
-        var message = $"Exception Message: {e.Message}" + Environment.NewLine
-                                                        + "HttpRequestException occurs" + Environment.NewLine
-                                                        + "responseJson: Empty"
-                                                        + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
-                                                        + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine;
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine($"Exception Message: {e.Message}");
+        stringBuilder.AppendLine("HttpClient exception occurs");
+        stringBuilder.AppendLine("responseJson: Empty");
+        stringBuilder.AppendLine("requestJson:");
+        stringBuilder.AppendLine(ObscurePassword(requestJson));
+        stringBuilder.AppendLine($"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}");
 
-        return new DbProxyHttpRequestException(message, e);
+        return new DbProxyHttpRequestException(stringBuilder.ToString(), e);
     }
 }

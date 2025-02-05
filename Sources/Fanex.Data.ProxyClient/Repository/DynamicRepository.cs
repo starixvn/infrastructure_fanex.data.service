@@ -22,8 +22,6 @@ public partial class DynamicRepository
 
     private static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(JsonSerializerSettings);
 
-    public string DebugInformation { get; set; }
-
     #region sync
 
     public IEnumerable<T> Fetch<T>(ICriteria criteria, string serverIp = "") => FetchAsync<T>(criteria, serverIp).GetAwaiter().GetResult();
@@ -83,7 +81,7 @@ public partial class DynamicRepository
         const string endpoint = "api/dynamic-repository/execute";
         if (!command.IsValid())
         {
-            return default;
+            return 0;
         }
 
         return await ExecuteApiService<int>(endpoint, command, new List<string>(), serverIp).ConfigureAwait(false);
@@ -93,13 +91,13 @@ public partial class DynamicRepository
 
     #region utility
 
-    private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<string> typeNames, string serverIp)
+    private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<string> typeNames, string serverIp)
     {
         var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverIp, typeNames);
         return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
     }
 
-    private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverIp)
+    private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, List<Type> types, string serverIp)
     {
         var typeNames = types.Select(t => t.Name).ToList();
         var proxyParameter = DbSettingProviderManager.GetProxyParameter(criteria, serverIp, typeNames);
@@ -107,7 +105,7 @@ public partial class DynamicRepository
         return await ExecuteApiService<T>(endpoint, criteria, proxyParameter).ConfigureAwait(false);
     }
 
-    private async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, ProxyParameter proxyParameter)
+    private static async Task<T> ExecuteApiService<T>(string endpoint, ICriteria criteria, ProxyParameter proxyParameter)
     {
         var requestJson = JsonConvert.SerializeObject(proxyParameter, JsonSerializerSettings);
         using var response = await PostAsync(endpoint, requestJson).ConfigureAwait(false);
@@ -120,11 +118,7 @@ public partial class DynamicRepository
         var responseJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         try
         {
-            var result = ExtractResultFromJson<T>(criteria, responseJson);
-            DebugInformation = $"Endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine
-                + $"RequestJson: {requestJson}" + Environment.NewLine
-                + $"ResponseJson: {responseJson}";
-            return result;
+            return ExtractResultFromJson<T>(criteria, responseJson);
         }
         catch (Exception e)
         {

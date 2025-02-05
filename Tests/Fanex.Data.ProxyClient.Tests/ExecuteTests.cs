@@ -66,7 +66,7 @@ public class ExecuteTests
 
         // Assert.
 
-        Assert.Equal(default, result);
+        Assert.Equal(0, result);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class ExecuteTests
         var result = await proxy.ExecuteAsync(command);
 
         // Assert.
-        Assert.Equal(default, result);
+        Assert.Equal(0, result);
     }
 
     [Fact]

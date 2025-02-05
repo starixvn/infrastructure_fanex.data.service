@@ -13,7 +13,7 @@ public sealed class SpParamAttribute : Attribute
 
     public bool AllowNull
     {
-        get => ForcePassingNull ?? default;
+        get => ForcePassingNull ?? false;
         set => ForcePassingNull = value;
     }
 

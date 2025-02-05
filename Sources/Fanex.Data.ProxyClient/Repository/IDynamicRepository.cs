@@ -8,8 +8,6 @@ namespace Fanex.Data.Repository;
 [SuppressMessage("ReSharper", "UnusedMemberInSuper.Global")]
 public interface IDynamicRepository
 {
-    string DebugInformation { get; set; }
-
     (IEnumerable<T1>, IEnumerable<T2>) FetchMultiple<T1, T2>(ICriteria criteria, string serverIp = "");
 
     (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>) FetchMultiple<T1, T2, T3>(ICriteria criteria, string serverIp = "");
