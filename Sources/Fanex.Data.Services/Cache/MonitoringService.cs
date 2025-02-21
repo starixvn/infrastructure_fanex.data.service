@@ -82,16 +82,12 @@ public static class Monitoring
 
     private static void LogSpWhichReturnsMoreThan10kRows(int dataLength, decimal duration, string spName, Dictionary<string, object> parameters)
     {
-        if (duration >= 10000)
+        if (duration < 10000 && dataLength < 10000)
         {
-            var json = JsonConvert.SerializeObject(parameters);
-            Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} takes {duration} milliseconds and returns {dataLength} rows. Parameters: {json}");
+            return;
         }
 
-        if (dataLength >= 10000)
-        {
-            var json = JsonConvert.SerializeObject(parameters);
-            Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} returns {dataLength} rows. Parameters: {json}"); 
-        }
+        var json = JsonConvert.SerializeObject(parameters);
+        Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} took {duration} milliseconds to returned {dataLength} rows. Parameters: {json}");
     }
 }
