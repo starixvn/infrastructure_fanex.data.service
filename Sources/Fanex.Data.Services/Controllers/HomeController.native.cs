@@ -1,7 +1,7 @@
 ﻿using Fanex.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Fanex.Data.Services;
+namespace Fanex.Data.Services.Controllers;
 
 using Olympus.Diagnostic;
 
