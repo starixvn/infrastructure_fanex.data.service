@@ -4,7 +4,7 @@ namespace Fanex.Data.Services.Cache;
 
 using Middleware;
 
-public class ClearStoredProcedureCacheConsumer : IConsumer<ClearStoredProcedureCacheMessage>
+public class ClearStoredProcedureCacheConsumer(ILogger<DataServiceLogger> logger) : IConsumer<ClearStoredProcedureCacheMessage>
 {
     public async Task Consume(ConsumeContext<ClearStoredProcedureCacheMessage> context)
     {
@@ -18,7 +18,10 @@ public class ClearStoredProcedureCacheConsumer : IConsumer<ClearStoredProcedureC
         definitions.ForEach(c => DbParameterDefinitionCache.Remove(c.ConnectionString, c.StoreProcedureName));
 
         var connectionStrings = GetSimplifiedConnectionString(definitions);
-        Console.WriteLine($"Cache of server {Environment.MachineName} is cleared at {DateTimeOffset.Now}.\nConnection String: {connectionStrings}");
+        logger.LogInformation("Cache of server {MachineName} is cleared at {Now}.\nConnection String: {ConnectionStrings}",
+            Environment.MachineName,
+            DateTimeOffset.Now,
+            connectionStrings);
 
         await Task.CompletedTask;
     }

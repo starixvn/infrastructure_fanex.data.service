@@ -1,7 +1,7 @@
 ﻿using Fanex.Data.Services.Proxy;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Fanex.Data.Services;
+namespace Fanex.Data.Services.Controllers;
 
 using Extensions;
 using Cache;
@@ -30,7 +30,7 @@ public class DynamicRepositoryController : ControllerBase
             Result = result,
             ParameterSet = JsonConvert.SerializeObject(proxyParameter.ParameterSet)
         };
-        
+
         stopWatch.Stop();
 
         Monitoring.UpdateResponseStatistic(models, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
@@ -100,7 +100,7 @@ public class DynamicRepositoryController : ControllerBase
             fetchedData[index] = (await multiResultReader.ReadAsync<dynamic>()).ToList();
             index++;
         }
-        
+
         return fetchedData;
     }
 

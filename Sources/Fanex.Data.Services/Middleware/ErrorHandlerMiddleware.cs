@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-public class ErrorHandlerMiddleware(RequestDelegate next)
+public class ErrorHandlerMiddleware(RequestDelegate next, ILogger<DataServiceLogger> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -21,7 +21,7 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
         }
     }
 
-    private static async Task HandleException(HttpContext context, ObjectDbException exception)
+    private async Task HandleException(HttpContext context, ObjectDbException exception)
     {
         try
         {
@@ -30,19 +30,25 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
             await context.Response.WriteAsync(exception.Message + Environment.NewLine);
             await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
             await context.Response.WriteAsync(GetInfoException(exception));
+
+            logger.LogInformation(exception.Message );
+            logger.LogInformation("Container: {MachineName}", Environment.MachineName);
+            logger.LogInformation(GetInfoException(exception));
+
             var exceptionInfo = GetObjectDbExceptionInfo(exception);
             foreach (var pair in exceptionInfo)
             {
                 await context.Response.WriteAsync($"{pair.Key}={pair.Value}{Environment.NewLine}");
+                logger.LogInformation("{Key}={Value}", pair.Key, pair.Value);
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            logger.LogError(e, "HandleException of ObjectDbException error");
         }
     }
 
-    private static async Task HandleException(HttpContext context, Exception exception)
+    private async Task HandleException(HttpContext context, Exception exception)
     {
         try
         {
@@ -50,10 +56,13 @@ public class ErrorHandlerMiddleware(RequestDelegate next)
             context.Response.ContentType = "text/plain";
             await context.Response.WriteAsync(exception.Message + Environment.NewLine);
             await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
+
+            logger.LogInformation(exception.Message);
+            logger.LogInformation("Container: {MachineName}", Environment.MachineName);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            logger.LogError(e, "HandleException error");
         }
     }
 

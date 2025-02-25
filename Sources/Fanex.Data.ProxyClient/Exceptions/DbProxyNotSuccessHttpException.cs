@@ -1,6 +1,7 @@
 namespace Fanex.Data;
 
-using System;
+using System.Text;
+
 public sealed class DbProxyNotSuccessHttpException(string message) : DbProxyException(message)
 {
     internal static DbProxyNotSuccessHttpException Create(
@@ -8,10 +9,14 @@ public sealed class DbProxyNotSuccessHttpException(string message) : DbProxyExce
         string requestJson,
         string responseJson)
     {
-        var message = $"responseJson: {responseJson}" + Environment.NewLine
-                                                      + "HttpClient exception. HttpResponse is not successful" + Environment.NewLine
-                                                      + $"requestJson: {ObscurePassword(requestJson)}" + Environment.NewLine
-                                                      + $"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}" + Environment.NewLine;
-        return new DbProxyNotSuccessHttpException(message);
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine("responseJson:");
+        stringBuilder.AppendLine(responseJson);
+        stringBuilder.AppendLine("HttpClient exception. HttpResponse is not successful");
+        stringBuilder.AppendLine("requestJson:");
+        stringBuilder.AppendLine(requestJson);
+        stringBuilder.AppendLine($"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}");
+        
+        return new DbProxyNotSuccessHttpException(stringBuilder.ToString());
     }
 }

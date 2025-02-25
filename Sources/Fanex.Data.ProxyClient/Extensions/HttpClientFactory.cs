@@ -9,14 +9,14 @@ internal static class HttpClientFactory
         
     static HttpClientFactory()
     {
+        var maxSpTimeout = DbSettingProviderManager.GetMaxSpTimeout();
+        var timeout = maxSpTimeout + 300;
         var serviceApiUri = DbSettingProviderManager.ServiceApiUri;
-        var timeout = TimeSpan.FromSeconds(DbSettingProviderManager.GetMaxSpTimeout() + 30);
-
-
+        
         Client = new HttpClient
         {
             BaseAddress = serviceApiUri,
-            Timeout = timeout
+            Timeout = TimeSpan.FromSeconds(timeout)
         };
     }
 }

@@ -3,7 +3,7 @@ using Fanex.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
-namespace Fanex.Data.Services;
+namespace Fanex.Data.Services.Controllers;
 
 using MassTransit;
 
