@@ -6,7 +6,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>Fanex.Data</RootNamespace>
-    <Version>1.0.3.5</Version>
+    <Version>1.0.3.6</Version>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Fanex.Data.ProxyClient</Title>
