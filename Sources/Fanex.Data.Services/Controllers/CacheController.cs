@@ -6,7 +6,6 @@ using System.Text;
 namespace Fanex.Data.Services.Controllers;
 
 using MassTransit;
-using MassTransit.Transports;
 
 [Route("api/cache")]
 [ApiController]
