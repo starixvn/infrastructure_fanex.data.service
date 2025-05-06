@@ -20,7 +20,10 @@ public class CacheController(IPublishEndpoint publishEndpoint) : ControllerBase
             StoredProcedureDefinitions = commands
         };
 
-        await publishEndpoint.Publish(message);
+        await publishEndpoint.Publish(message, context =>
+        {
+            context.TimeToLive = TimeSpan.FromMinutes(15);
+        });
 
         return Ok(new
         {
