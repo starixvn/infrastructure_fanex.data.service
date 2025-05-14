@@ -220,4 +220,20 @@ public class GetTests(DynamicRepositoryFixture fixture) : IClassFixture<DynamicR
         // Assert.
         Assert.Null(actualResult);
     }
+
+    [Fact]
+    public async Task GetAsync_TestGuid_ReturnGuid()
+    {
+        // Arrange.
+        var criteria = new TestGuidCriteria
+        {
+            SessionId = Guid.NewGuid()
+        };
+       
+        // Act.
+        var actualResult = await repository.GetAsync<TestGuid>(criteria);
+
+        // Assert.
+        Assert.True(actualResult.SessionId != Guid.Empty);
+    }
 }

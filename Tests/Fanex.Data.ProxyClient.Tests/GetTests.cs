@@ -262,4 +262,22 @@ public class GetTests
         // Assert.
         Assert.NotNull(actualResult);
     }
+
+    [Fact]
+    public async Task GetAsync_TestGuid_ReturnGuid()
+    {
+        // Arrange.
+        var criteria = new TestGuidCriteria
+        {
+            SessionId = Guid.NewGuid()
+        };
+
+        // Act.
+        var actualResult = await proxy.GetAsync<TestGuid>(criteria);
+
+        var expected = new Guid("a1b2c3d4-e5f6-7890-1234-567890abcdef");
+
+        // Assert.
+        Assert.Equal(expected, actualResult.SessionId);
+    }
 }

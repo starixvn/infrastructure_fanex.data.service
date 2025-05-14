@@ -18,6 +18,11 @@ public static class ParamsProcessing
             {
                 proxyParameter.ParameterSet[specialType.Key] = Convert.FromBase64String((string)value);
             }
+
+            if (specialType.Value == "Guid")
+            {
+                proxyParameter.ParameterSet[specialType.Key] = new Guid((string)value);
+            }
         }
     }
 }

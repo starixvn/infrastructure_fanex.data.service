@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Fanex.Data.ProxyClient.Tests.Criteria;
+namespace Fanex.Data.ProxyClient.Tests.ParameterSets.Commands;
 
 public class InsertSiteCriteria
 {

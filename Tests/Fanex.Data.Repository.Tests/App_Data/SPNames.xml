@@ -26,4 +26,5 @@
   <Setting Key="FetchMultipleTables" SpName="FetchMultipleTables" DbName="MSSQL.FanexDataTests" />
   <Setting Key="SpNotExist" SpName="SpNotExist" DbName="MSSQL.FanexDataTests" />
   <Setting Key="allowPassingNull" SpName="GetCustomerByContactTitle" DbName="MSSQL.FanexDataTests" />
+  <Setting Key="TestGuid" SpName="TestGuid" DbName="MSSQL.FanexDataTests" />
 </Functions>
