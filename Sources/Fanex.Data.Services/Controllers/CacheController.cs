@@ -22,7 +22,7 @@ public class CacheController(IPublishEndpoint publishEndpoint) : ControllerBase
 
         await publishEndpoint.Publish(message, context =>
         {
-            context.TimeToLive = TimeSpan.FromMinutes(15);
+            context.TimeToLive = TimeSpan.FromMinutes(1);
         });
 
         return Ok(new

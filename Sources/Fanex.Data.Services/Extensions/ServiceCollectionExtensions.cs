@@ -25,7 +25,8 @@ internal static class ServiceCollectionExtensions
                 });
 
                 busFactoryConfigurator.ConfigureEndpoints(context);
-                busFactoryConfigurator.QueueExpiration = TimeSpan.FromMinutes(15);
+                busFactoryConfigurator.QueueExpiration = TimeSpan.FromMinutes(1);
+                busFactoryConfigurator.AutoDelete = true;
             });
         });
     }
