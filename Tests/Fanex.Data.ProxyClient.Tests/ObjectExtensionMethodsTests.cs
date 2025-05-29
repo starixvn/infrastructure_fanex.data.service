@@ -1,6 +1,7 @@
-﻿namespace Fanex.Data.ProxyClient.Tests;
+﻿using Fanex.Data.ProxyClient.Tests.ParameterSets.Commands;
 
-using Criteria;
+namespace Fanex.Data.ProxyClient.Tests;
+
 using Data.Extensions;
 using Xunit;
 using Xunit.Asserts.Compare;
