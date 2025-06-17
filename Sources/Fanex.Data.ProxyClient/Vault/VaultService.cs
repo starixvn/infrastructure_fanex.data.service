@@ -59,6 +59,7 @@ internal class VaultServiceImp(VaultProvider vaultProvider) : VaultService
             {
                 latestException = e;
                 vaultProvider.ResetVaultToken();
+                Console.WriteLine($"TryLoadAsync:{e.Message}");
             }
 
             await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);

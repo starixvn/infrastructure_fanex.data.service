@@ -1,3 +1,5 @@
+using Fanex.Data.Exceptions;
+
 namespace Fanex.Data;
 
 using System;
@@ -18,7 +20,7 @@ public sealed class DbProxyJsonDeserializeException(string message, Exception in
         stringBuilder.AppendLine("Json exception occurs when deserializing the json result");
         stringBuilder.AppendLine($"Exception Message: {e.Message}");
         stringBuilder.AppendLine("requestJson:");
-        stringBuilder.AppendLine(requestJson);
+        stringBuilder.AppendLine(PasswordObfuscator.Obfuscate(requestJson));
         stringBuilder.AppendLine($"endpoint: {DbSettingProviderManager.ServiceApiUri}{endpoint}");
 
         return new DbProxyJsonDeserializeException(stringBuilder.ToString(), e);
