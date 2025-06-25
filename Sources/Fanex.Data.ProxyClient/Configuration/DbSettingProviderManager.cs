@@ -110,7 +110,12 @@ public class DbSettingProviderManager
 
     public DbSettingProviderManager Use(Dictionary<string, ConnectionConfiguration> connectionMaps, bool isPlainPassword = false)
     {
-        ConnectionMaps = connectionMaps ?? throw new ArgumentNullException(nameof(connectionMaps));
+        if (connectionMaps == null)
+        {
+            throw new ArgumentNullException(nameof(connectionMaps));
+        }
+        
+        ConnectionMaps = new Dictionary<string, ConnectionConfiguration>(connectionMaps, StringComparer.OrdinalIgnoreCase);
         connectionStringProvider = new ConnectionStringProvider(connectionMaps);
         connectionStringProvider.Initialize(connectionMaps, isPlainPassword);
 
