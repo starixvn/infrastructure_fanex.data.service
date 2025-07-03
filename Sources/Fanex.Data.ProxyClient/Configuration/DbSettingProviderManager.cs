@@ -114,7 +114,7 @@ public class DbSettingProviderManager
         {
             throw new ArgumentNullException(nameof(connectionMaps));
         }
-        
+
         ConnectionMaps = new Dictionary<string, ConnectionConfiguration>(connectionMaps, StringComparer.OrdinalIgnoreCase);
         connectionStringProvider = new ConnectionStringProvider(connectionMaps);
         connectionStringProvider.Initialize(connectionMaps, isPlainPassword);
@@ -141,32 +141,37 @@ public class DbSettingProviderManager
             throw new InvalidOperationException($"No {nameof(DbSettingProvider)} was configured.");
         }
 
-        if (connectionStringProvider == null)
-        {
-            throw new InvalidOperationException($"No {nameof(ConnectionStringProvider)} was configured. Please call Use(Dictionary<string, ConnectionConfiguration> connectionConfiguration) first.");
-        }
-
-        if (VaultOptions?.Enable == true)
-        {
-            var vaultProvider = new VaultProviderImp(VaultOptions, new VaultDbAliasServiceImp());
-            var vaultService = new VaultServiceImp(vaultProvider);
-            vaultService.UpdateConnectionMaps().Wait();
-
-            vaultPollingService?.Stop();
-            vaultPollingService = new VaultPollingService(vaultProvider);
-            vaultPollingService.Start(VaultOptions.MinutesPolling * 60);
-        }
-
-        settingProvider.ConnectionStringProvider = connectionStringProvider;
-        settingProvider.Start();
-
+        var index = 1;
         try
         {
+            if (connectionStringProvider == null)
+            {
+                throw new InvalidOperationException($"No {nameof(ConnectionStringProvider)} was configured. Please call Use(Dictionary<string, ConnectionConfiguration> connectionConfiguration) first.");
+            }
+
+            if (VaultOptions?.Enable == true)
+            {
+                index = 2;
+                var vaultProvider = new VaultProviderImp(VaultOptions, new VaultDbAliasServiceImp());
+                var vaultService = new VaultServiceImp(vaultProvider);
+                vaultService.UpdateConnectionMaps().Wait();
+                index = 3;
+                vaultPollingService?.Stop();
+                vaultPollingService = new VaultPollingService(vaultProvider);
+                vaultPollingService.Start(VaultOptions.MinutesPolling * 60);
+                index = 4;
+            }
+
+            settingProvider.ConnectionStringProvider = connectionStringProvider;
+            settingProvider.Start();
+            index = 5;
+
             CacheManager.ClearCache();
+            index = 6;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            Console.WriteLine("CacheManager.ClearCache: "+e.Message);
+            Console.WriteLine($"Run{index}: " + e.Message);
         }
     }
 }

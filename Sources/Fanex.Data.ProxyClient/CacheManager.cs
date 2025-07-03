@@ -1,4 +1,6 @@
-﻿namespace Fanex.Data;
+﻿using System;
+
+namespace Fanex.Data;
 
 using System.Net.Http;
 using System.Text;
@@ -22,8 +24,25 @@ public static class CacheManager
         return json;
     }
 
-    public static string ClearCache()
+    public static void ClearCache()
     {
-        return ClearCacheAsync().GetAwaiter().GetResult();
+        SafeClearCacheAsync();
+    }
+
+    private static async Task SafeClearCacheAsync()
+    {
+        for (var i = 0; i < 60; i++)
+        {
+            try
+            {
+                await ClearCacheAsync().ConfigureAwait(false);
+                return;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error clearing cache: {ex.Message}");
+                await Task.Delay(TimeSpan.FromSeconds(5));
+            }
+        }
     }
 }
