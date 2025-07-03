@@ -160,6 +160,13 @@ public class DbSettingProviderManager
         settingProvider.ConnectionStringProvider = connectionStringProvider;
         settingProvider.Start();
 
-        CacheManager.ClearCache();
+        try
+        {
+            CacheManager.ClearCache();
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine("CacheManager.ClearCache: "+e.Message);
+        }
     }
 }
