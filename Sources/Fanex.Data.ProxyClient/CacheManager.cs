@@ -41,8 +41,9 @@ public static class CacheManager
             catch (Exception ex)
             {
                 Console.WriteLine($"Error clearing cache: {ex.Message}");
-                await Task.Delay(TimeSpan.FromSeconds(5));
             }
+
+            await Task.Delay(TimeSpan.FromSeconds(5));
         }
     }
 }

@@ -15,7 +15,7 @@ public sealed class DbProxyJsonDeserializeException(string message, Exception in
         Exception e)
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine("responseJson:");
+        stringBuilder.Append("responseJson:");
         stringBuilder.AppendLine(responseJson);
         stringBuilder.AppendLine("Json exception occurs when deserializing the json result");
         stringBuilder.AppendLine($"Exception Message: {e.Message}");

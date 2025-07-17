@@ -11,7 +11,7 @@ public sealed class DbProxyNotSuccessHttpException(string message) : DbProxyExce
         string responseJson)
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine("responseJson:");
+        stringBuilder.Append("responseJson:");
         stringBuilder.AppendLine(responseJson);
         stringBuilder.AppendLine("HttpClient exception. HttpResponse is not successful");
         stringBuilder.AppendLine("requestJson:");
