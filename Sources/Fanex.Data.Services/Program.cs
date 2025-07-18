@@ -22,6 +22,7 @@ services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
     options.SerializerSettings.Converters.Add(dateConverter);
 });
+services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -29,5 +30,6 @@ var app = builder.Build();
 app.UseRouting();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.MapControllers();
+app.MapHealthChecks("/healthz");
 
 await app.RunAsync();

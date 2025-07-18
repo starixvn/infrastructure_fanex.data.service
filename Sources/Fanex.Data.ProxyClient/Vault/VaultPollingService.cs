@@ -67,6 +67,7 @@ internal class VaultPollingService
         catch (Exception e)
         {
             LatestException = e;
+            Console.WriteLine($"SafeReloadDbSettingProvider error: {e.Message}");
         }
     }
 }

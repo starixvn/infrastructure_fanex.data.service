@@ -1,4 +1,6 @@
-﻿namespace Fanex.Data.Vault;
+﻿using System;
+
+namespace Fanex.Data.Vault;
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ public interface VaultDbAliasService
 
 public class VaultDbAliasServiceImp: VaultDbAliasService
 {
-    private static readonly ConcurrentDictionary<string, string> DbAlias = new();
+    private static readonly ConcurrentDictionary<string, string> DbAlias = new(StringComparer.OrdinalIgnoreCase);
 
     public string GetIp(string dbAlias)
     {
