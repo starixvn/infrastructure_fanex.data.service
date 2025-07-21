@@ -21,6 +21,16 @@ public class VaultServiceTests
         }
     ];
 
+    public readonly List<DatabaseCredential> NewCredentialsWithPort =
+    [
+        new("DBACC.bodb02.wsv_nap")
+        {
+            IP = "10.18.200.61:3306",
+            Password = "h9Sky5eJOAeB0EOPr1IhVw==",
+            Username = "FanexUser"
+        }
+    ];
+
     public readonly List<DatabaseCredential> OldCredentials =
     [
         new("DBACC.bodb02.wsv_nap")
@@ -102,6 +112,23 @@ public class VaultServiceTests
 
         var actualConnectionString = DbSettingProviderManager.CurrentSession.ConnectionMaps["DBACC.bodb02.wsv_nap"].ConnectionString;
         const string expected = "packet size=4096;data source=10.18.200.61\\Devdb053;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True";
+        Assert.Equal(expected, actualConnectionString);
+    }
+
+    [Fact]
+    public async Task UpdateConnectionMaps_OldCredentialsHasNoPort_NewCredentialsHasPort_UpdateNewConnectionString()
+    {
+        var vaultProvider = Substitute.For<VaultProvider>();
+        vaultProvider.LoadAsync(Arg.Any<List<string>>()).ReturnsForAnyArgs(OldCredentials);
+
+        var vaultService = new VaultServiceImp(vaultProvider);
+        await vaultService.UpdateConnectionMaps();
+
+        vaultProvider.LoadAsync(Arg.Any<List<string>>()).ReturnsForAnyArgs(NewCredentialsWithPort);
+        await vaultService.UpdateConnectionMaps();
+
+        var actualConnectionString = DbSettingProviderManager.CurrentSession.ConnectionMaps["DBACC.bodb02.wsv_nap"].ConnectionString;
+        const string expected = "packet size=4096;data source=10.18.200.61;initial catalog=bodb02;connect timeout=600;integrated security=false;user id=FanexUser;password=\"h9Sky5eJOAeB0EOPr1IhVw==\";trustservercertificate=True;port=3306";
         Assert.Equal(expected, actualConnectionString);
     }
 
