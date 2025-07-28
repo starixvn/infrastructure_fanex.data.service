@@ -1,4 +1,6 @@
-﻿namespace Fanex.Data.Vault;
+﻿using System;
+
+namespace Fanex.Data.Vault;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -32,14 +34,21 @@ public class VaultProviderImp(VaultOptions vaultOptions, VaultDbAliasService dbA
 
     private async Task LoadDbAlias()
     {
-        const string dbAliasPath = "database/alias";
-        var aliasSecrets = await vaultClient.V1.Secrets.KeyValue.V2
-            .ReadSecretAsync(dbAliasPath, null, vaultOptions.MountPath)
-            .ConfigureAwait(false);
-        var dbAlias = aliasSecrets.Data.Data.ToDictionary(v => v.Key,
-            v => v.Value == null ? string.Empty : v.Value.ToString().Trim());
+        try
+        {
+            const string dbAliasPath = "database/alias";
+            var aliasSecrets = await vaultClient.V1.Secrets.KeyValue.V2
+                .ReadSecretAsync(dbAliasPath, null, vaultOptions.MountPath)
+                .ConfigureAwait(false);
+            var dbAlias = aliasSecrets.Data.Data.ToDictionary(v => v.Key,
+                v => v.Value == null ? string.Empty : v.Value.ToString().Trim());
 
-        dbAliasService.UpdateDbAlias(dbAlias);
+            dbAliasService.UpdateDbAlias(dbAlias);
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Failed to load database alias from Vault.", e);
+        }
     }
 
     private async Task<List<DatabaseCredential>> QueryCredentials(List<string> connectionAliases)
@@ -76,13 +85,20 @@ public class VaultProviderImp(VaultOptions vaultOptions, VaultDbAliasService dbA
 
     private async Task<(string username, string password)> QueryCredential(string dbLogin)
     {
-        var credentialPath = $"database/credentials/{dbLogin}";
-        var credentialSecrets = await vaultClient.V1.Secrets.KeyValue.V2
-            .ReadSecretAsync(credentialPath, null, vaultOptions.MountPath)
-            .ConfigureAwait(false);
-        var username = credentialSecrets.Data.Data["username"].ToString();
-        var password = credentialSecrets.Data.Data["password"].ToString();
-        return (username, password);
+        try
+        {
+            var credentialPath = $"database/credentials/{dbLogin}";
+            var credentialSecrets = await vaultClient.V1.Secrets.KeyValue.V2
+                .ReadSecretAsync(credentialPath, null, vaultOptions.MountPath)
+                .ConfigureAwait(false);
+            var username = credentialSecrets.Data.Data["username"].ToString();
+            var password = credentialSecrets.Data.Data["password"].ToString();
+            return (username, password);
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Failed to load credential for {dbLogin}.", e);
+        }
     }
 
     public async Task EnsureVaultTokenIsValid()
