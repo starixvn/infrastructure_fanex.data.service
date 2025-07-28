@@ -99,7 +99,9 @@ internal class VaultServiceImp(VaultProvider vaultProvider) : VaultService
 
             if (!string.IsNullOrWhiteSpace(item.IP))
             {
-                builder.SetServer(item.IP);
+                var (serverIp, port) = SplitServerAndPort(item.IP);
+                builder.SetServer(serverIp);
+                builder.SetPort(port);
             }
 
             if (!string.IsNullOrWhiteSpace(item.Username))
@@ -119,5 +121,25 @@ internal class VaultServiceImp(VaultProvider vaultProvider) : VaultService
 
             connectionMaps[item.Key] = newConnection;
         }
+    }
+
+    public static (string, string) SplitServerAndPort(string server)
+    {
+        if (string.IsNullOrEmpty(server))
+        {
+            return (string.Empty, string.Empty);
+        }
+
+        var parts = server.Split(':');
+        if (parts.Length == 1)
+        {
+            return (parts[0], string.Empty);
+        }
+        if (parts.Length == 2)
+        {
+            return (parts[0], parts[1]);
+        }
+
+        throw new ArgumentException("Invalid server format. Expected format is 'server:port'.");
     }
 }
