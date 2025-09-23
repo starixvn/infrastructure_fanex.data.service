@@ -8,15 +8,15 @@ public class AliveStatusService
     
     public AliveStatusService(IConfiguration configuration)
     {
-        var minutesToLiveFrom = configuration.GetValue<int>("MinutesToLive:From");
-        var minutesToLiveTo = configuration.GetValue<int>("MinutesToLive:To");
+        var minutesToLiveFrom = configuration.GetValue<int>("MaximumUptimeMinutes:From");
+        var minutesToLiveTo = configuration.GetValue<int>("MaximumUptimeMinutes:To");
         var random = new Random(DateTimeOffset.Now.Millisecond);
-        MinutesToLive = random.Next(minutesToLiveFrom, minutesToLiveTo);
+        MaximumUptimeMinutes = random.Next(minutesToLiveFrom, minutesToLiveTo);
     }
 
     public bool IsAlive()
     {
-        return isAlive && MinutesWorked < MinutesToLive;
+        return isAlive && UptimeMinutes < MaximumUptimeMinutes;
     }
 
     public void Kill()
@@ -24,7 +24,7 @@ public class AliveStatusService
         isAlive = false;
     }
 
-    public int MinutesToLive { get; }
+    public int MaximumUptimeMinutes { get; }
 
-    public int MinutesWorked => (int)(DateTimeOffset.Now - startTimeOffset).TotalMinutes;
+    public int UptimeMinutes => (int)(DateTimeOffset.Now - startTimeOffset).TotalMinutes;
 }

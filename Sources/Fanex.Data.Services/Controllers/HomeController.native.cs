@@ -18,15 +18,15 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
             {
                 Environment.MachineName,
                 Alive = true,
-                aliveStatusService.MinutesToLive,
-                aliveStatusService.MinutesWorked
+                aliveStatusService.MaximumUptimeMinutes,
+                aliveStatusService.UptimeMinutes
             })
             : Problem(
-                $"MinuteWorked: {aliveStatusService.MinutesWorked}",
+                $"Alive: false. UptimeMinutes: {aliveStatusService.UptimeMinutes}. MaximumUptimeMinutes: {aliveStatusService.MaximumUptimeMinutes}",
                 Environment.MachineName,
                 400,
-                $"MinutesToLive: {aliveStatusService.MinutesToLive}",
-                $"Alive: {false}"
+                "Time to shutdown",
+                "Time to shutdown"
                 );
     }
 
@@ -45,7 +45,11 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
             {
                 Requests = Monitoring.RequestStatistics.Where(x => x > 0),
                 Responses = Monitoring.ResponseStatistics,
-                server = Environment.MachineName
+                DbStatistic = Monitoring.DbServerStatistics,
+                SpStatistic = Monitoring.SpNameStatistics,
+                Server = Environment.MachineName,
+                aliveStatusService.UptimeMinutes,
+                aliveStatusService.MaximumUptimeMinutes
             });
     }
 
@@ -53,6 +57,6 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
     public IActionResult Gc()
     {
         var gc = GarbageCollector.CollectExtremely();
-        return Ok(gc);
+        return Ok($"{Environment.MachineName}. {gc}");
     }
 }

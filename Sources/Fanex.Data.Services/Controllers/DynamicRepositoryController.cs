@@ -35,6 +35,7 @@ public class DynamicRepositoryController : ControllerBase
 
         Monitoring.UpdateResponseStatistic(models, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
         Monitoring.UpdateRequestStatistic();
+        Monitoring.UpdateRequestStatisticsByDbServerAndSp(proxyParameter);
 
         return Ok(proxyResult);
     }
@@ -56,6 +57,7 @@ public class DynamicRepositoryController : ControllerBase
         stopWatch.Stop();
         Monitoring.UpdateResponseStatistic(model, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
         Monitoring.UpdateRequestStatistic();
+        Monitoring.UpdateRequestStatisticsByDbServerAndSp(proxyParameter);
 
         return Ok(proxyResult);
     }
@@ -82,6 +84,7 @@ public class DynamicRepositoryController : ControllerBase
         stopWatch.Stop();
         Monitoring.UpdateResponseStatistic(fetchedData, stopWatch.ElapsedMilliseconds, proxyParameter.DbSetting.SpName, proxyParameter.ParameterSet);
         Monitoring.UpdateRequestStatistic();
+        Monitoring.UpdateRequestStatisticsByDbServerAndSp(proxyParameter);
 
         return Ok(proxyResult);
     }
@@ -131,6 +134,7 @@ public class DynamicRepositoryController : ControllerBase
         };
 
         Monitoring.UpdateRequestStatistic();
+        Monitoring.UpdateRequestStatisticsByDbServerAndSp(proxyParameter);
 
         return Ok(proxyResult);
     }
@@ -147,6 +151,7 @@ public class DynamicRepositoryController : ControllerBase
         };
 
         Monitoring.UpdateRequestStatistic();
+        Monitoring.UpdateRequestStatisticsByDbServerAndSp(proxyParameter);
 
         return Ok(proxyResult);
     }

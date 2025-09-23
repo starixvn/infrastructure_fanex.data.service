@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.Collections.Concurrent;
+using System.Data;
+using Fanex.Data.Services.Proxy;
 
 namespace Fanex.Data.Services.Cache;
 
@@ -15,6 +17,10 @@ public static class Monitoring
     public static long[] RequestStatistics { get; set; } = CreateRequestStatistics();
 
     private static DateTimeOffset StartTime { get; } = DateTimeOffset.UtcNow;
+
+    public static ConcurrentDictionary<string, int> DbServerStatistics { get; } = new();
+
+    public static ConcurrentDictionary<string, int> SpNameStatistics { get; } = new();
 
     public static long[] CreateResponseStatistics()
     {
@@ -90,5 +96,24 @@ public static class Monitoring
         var json = JsonConvert.SerializeObject(parameters);
         json = json.Length > 10000 ? json[..10000] : json;
         Console.WriteLine($"At: {DateTimeOffset.Now}, {spName} took {duration} milliseconds to return {dataLength} rows. Parameters: {json}");
+    }
+
+    public static void UpdateRequestStatisticsByDbServerAndSp(ProxyParameter parameter)
+    {
+        var dbName = parameter?.DbSetting?.DbName;
+        var spName = parameter?.DbSetting?.SpName;
+        if (string.IsNullOrWhiteSpace(dbName) || string.IsNullOrWhiteSpace(spName))
+        {
+            return;
+        }
+
+        DbServerStatistics.AddOrUpdate(
+            dbName,
+            1,
+            (_, existingCount) => existingCount + 1);
+        SpNameStatistics.AddOrUpdate(
+            spName,
+            1,
+            (_, existingCount) => existingCount + 1);
     }
 }
