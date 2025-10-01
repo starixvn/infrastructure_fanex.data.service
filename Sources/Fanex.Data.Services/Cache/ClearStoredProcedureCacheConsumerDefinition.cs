@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Data.Services.Cache;
 
+using Fanex.Data.Services.Extensions;
 using MassTransit;
 
 public class ClearStoredProcedureCacheConsumerDefinition : ConsumerDefinition<ClearStoredProcedureCacheConsumer>
@@ -12,7 +13,7 @@ public class ClearStoredProcedureCacheConsumerDefinition : ConsumerDefinition<Cl
 
     public ClearStoredProcedureCacheConsumerDefinition()
     {
-        EndpointName = $"clear-stored-procedure-definition-queue-{Environment.MachineName}";
+        EndpointName = $"clear-stored-procedure-definition-queue-{MachineIdentifier.MachineName}";
     }
 
     protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<ClearStoredProcedureCacheConsumer> consumerConfigurator,

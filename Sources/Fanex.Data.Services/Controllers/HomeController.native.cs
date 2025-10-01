@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Fanex.Data.Services.Controllers;
 
+using Fanex.Data.Services.Extensions;
 using Olympus.Diagnostic;
 
 [Route("")]
@@ -16,14 +17,14 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
         return alive
             ? Ok(new
             {
-                Environment.MachineName,
+                MachineIdentifier.MachineName,
                 Alive = true,
                 aliveStatusService.MaximumUptimeMinutes,
                 aliveStatusService.UptimeMinutes
             })
             : Problem(
                 $"Alive: false. UptimeMinutes: {aliveStatusService.UptimeMinutes}. MaximumUptimeMinutes: {aliveStatusService.MaximumUptimeMinutes}",
-                Environment.MachineName,
+                MachineIdentifier.MachineName,
                 400,
                 "Time to shutdown",
                 "Time to shutdown"
@@ -34,12 +35,13 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
     public IActionResult Kill()
     {
         aliveStatusService.Kill();
-        return Ok(Environment.MachineName);
+        return Ok(MachineIdentifier.MachineName);
     }
 
     [HttpGet("statistic")]
     public IActionResult Statistic()
     {
+        Console.WriteLine($"Now: {DateTimeOffset.UtcNow}");
         return Ok(
             new
             {
@@ -47,7 +49,7 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
                 Responses = Monitoring.ResponseStatistics,
                 DbStatistic = Monitoring.DbServerStatistics,
                 SpStatistic = Monitoring.SpNameStatistics,
-                Server = Environment.MachineName,
+                Server = MachineIdentifier.MachineName,
                 aliveStatusService.UptimeMinutes,
                 aliveStatusService.MaximumUptimeMinutes
             });
@@ -57,6 +59,6 @@ public class HomeController(AliveStatusService aliveStatusService) : ControllerB
     public IActionResult Gc()
     {
         var gc = GarbageCollector.CollectExtremely();
-        return Ok($"{Environment.MachineName}. {gc}");
+        return Ok($"{MachineIdentifier.MachineName}. {gc}");
     }
 }

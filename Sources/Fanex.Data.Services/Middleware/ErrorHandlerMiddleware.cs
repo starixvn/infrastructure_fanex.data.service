@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Data.Services.Middleware;
 
+using Fanex.Data.Services.Extensions;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
@@ -28,11 +29,11 @@ public class ErrorHandlerMiddleware(RequestDelegate next, ILogger<DataServiceLog
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "text/plain";
             await context.Response.WriteAsync(exception.Message + Environment.NewLine);
-            await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
+            await context.Response.WriteAsync($"Container: {MachineIdentifier.MachineName}" + Environment.NewLine);
             await context.Response.WriteAsync(GetInfoException(exception));
 
             logger.LogInformation(exception.Message );
-            logger.LogInformation("Container: {MachineName}", Environment.MachineName);
+            logger.LogInformation("Container: {MachineName}", MachineIdentifier.MachineName);
             logger.LogInformation(GetInfoException(exception));
 
             var exceptionInfo = GetObjectDbExceptionInfo(exception);
@@ -55,10 +56,10 @@ public class ErrorHandlerMiddleware(RequestDelegate next, ILogger<DataServiceLog
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "text/plain";
             await context.Response.WriteAsync(exception.Message + Environment.NewLine);
-            await context.Response.WriteAsync($"Container: {Environment.MachineName}" + Environment.NewLine);
+            await context.Response.WriteAsync($"Container: {MachineIdentifier.MachineName}" + Environment.NewLine);
 
             logger.LogInformation(exception.Message);
-            logger.LogInformation("Container: {MachineName}", Environment.MachineName);
+            logger.LogInformation("Container: {MachineName}", MachineIdentifier.MachineName);
         }
         catch (Exception e)
         {

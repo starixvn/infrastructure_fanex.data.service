@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Fanex.Data.Services.Controllers;
 
+using Fanex.Data.Services.Extensions;
 using MassTransit;
 
 [Route("api/cache")]
@@ -16,7 +17,7 @@ public class CacheController(IPublishEndpoint publishEndpoint) : ControllerBase
     {
         var message = new ClearStoredProcedureCacheMessage
         {
-            ServiceName = GetServiceName(),
+            ServiceName = MachineIdentifier.MachineName,
             StoredProcedureDefinitions = commands
         };
 
@@ -27,20 +28,12 @@ public class CacheController(IPublishEndpoint publishEndpoint) : ControllerBase
 
         return Ok(new
         {
-            ServerName = Environment.MachineName,
+            ServerName = MachineIdentifier.MachineName,
             ServerStatus = new Dictionary<string, DateTimeOffset>
             {
-                { Environment.MachineName , DateTimeOffset.Now }
+                { MachineIdentifier.MachineName , DateTimeOffset.Now }
             }
         });
-    }
-
-    private static string GetServiceName()
-    {
-        var machineName = Environment.MachineName;
-        var lastIndex = machineName.LastIndexOf("-", StringComparison.Ordinal);
-        var index = lastIndex >= 0 ? lastIndex + 1 : machineName.Length;
-        return machineName[..index];
     }
 
     [HttpGet("caching-storage")]
@@ -54,7 +47,7 @@ public class CacheController(IPublishEndpoint publishEndpoint) : ControllerBase
     {
         SqlMapper.PurgeQueryCache();
 
-        return Ok(Environment.MachineName);
+        return Ok(MachineIdentifier.MachineName);
     }
 
     [HttpGet("clean")]
@@ -63,7 +56,7 @@ public class CacheController(IPublishEndpoint publishEndpoint) : ControllerBase
         SqlMapper.PurgeQueryCache();
         DbParameterDefinitionCache.Clear();
 
-        return Ok(Environment.MachineName);
+        return Ok(MachineIdentifier.MachineName);
     }
 
     [HttpGet("dapper-cached")]
